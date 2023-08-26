@@ -1,6 +1,6 @@
 mod error;
 mod model;
-mod util;
+pub(crate) mod util;
 
 use error::ValueType;
 use util::MapExt;
@@ -23,7 +23,22 @@ pub fn from_json(v: &serde_json::Value) -> Result<Lottie, Error> {
         .as_object()
         .ok_or(Error::IncorrectType("root".to_string(), ValueType::Map))?;
 
-    let version = root.extract_string("root", "v")?;
+    let parent = "root";
+    let version = root.extract_string(parent, "v")?;
+    let frame_rate = root.extract_number(parent, "fr")?;
+    let in_point = root.extract_number(parent, "ip")?;
+    let out_point = root.extract_number(parent, "op")?;
+    let width = root.extract_int(parent, "w")?;
+    let height = root.extract_int(parent, "h")?;
+    let three_dimensional = root.extract_bool(parent, "ddd")?;
 
-    Ok(Lottie { version })
+    Ok(Lottie {
+        version,
+        frame_rate,
+        in_point,
+        out_point,
+        width,
+        height,
+        three_dimensional,
+    })
 }

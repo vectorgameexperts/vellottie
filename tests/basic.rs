@@ -21,6 +21,12 @@ lazy_static! {
     );
     static ref LOTTIE: Lottie = Lottie {
         version: "5.5.2".to_string(),
+        frame_rate: 60.0,
+        in_point: 0.0,
+        out_point: 60.0,
+        width: 512,
+        height: 512,
+        three_dimensional: false,
     };
 }
 
@@ -36,10 +42,7 @@ fn test_deserialize() {
 
 #[test]
 fn test_serialize() {
-    let actual = Lottie {
-        version: "5.5.2".to_string(),
-    }
-    .to_json();
+    let actual = LOTTIE.to_json();
 
     assert_eq!(*JSON, actual)
 }

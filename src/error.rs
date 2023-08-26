@@ -5,6 +5,7 @@ pub enum ValueType {
     Object,
     Map,
     Number,
+    Integer,
     String,
     Array,
 }
