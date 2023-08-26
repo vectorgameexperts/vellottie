@@ -18,5 +18,5 @@ pub enum Error {
     MissingChild(String, String),
 
     #[error("{0} is the wrong type, expected a {1:?}")]
-    IncorrectType(&'static str, ValueType),
+    IncorrectType(String, ValueType),
 }
