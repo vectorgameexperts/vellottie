@@ -23,8 +23,8 @@ pub struct LayerProperties {
     pub match_name: Option<String>,
     /// Whether the layer is 3D. Lottie doesn't actually support 3D stuff so this should always be 0
     #[serde(rename = "ddd", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub three_dimensional: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub three_dimensional: Option<BoolInt>,
     /// Whether the layer is hidden
     #[serde(rename = "hd", default)]
     #[serde(skip_serializing_if = "util::is_false")]
@@ -125,7 +125,7 @@ impl LayerProperties {
     ) -> Result<Self, Error> {
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
-        let three_dimensional = obj.extract_bool_int(breadcrumb, "ddd")?;
+        let three_dimensional = obj.extract_bool_int(breadcrumb, "ddd").ok();
         let hidden = obj.extract_bool(breadcrumb, "hd").unwrap_or_default();
         let layer_type: LayerType = obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let index = obj.extract_number(breadcrumb, "ind").ok();
