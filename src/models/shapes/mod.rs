@@ -3,9 +3,11 @@ pub mod ellipse;
 pub mod group;
 pub mod polystar;
 pub mod rectangle;
+pub mod transform;
 
 use self::common::ShapeProperties;
 use self::rectangle::RectangleShape;
+use self::transform::TransformShape;
 use crate::breadcrumb::Breadcrumb;
 use crate::models::layer::animated_properties::AnimatedVector;
 use crate::util::MapExt;
@@ -15,6 +17,7 @@ use group::GroupShape;
 use serde::{Deserialize, Serialize};
 
 use super::layer::animated_properties::AnimatedNumber;
+use super::layer::transform::Transform;
 
 /// Lottie considers everything related to vector data as a "shape". All shapes share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -26,6 +29,7 @@ pub enum Shape {
     Rectangle(RectangleShape),
     /// An ellipse, defined by its center point and width and height.
     Ellipse(EllipseShape),
+    Transform(TransformShape),
     // TODO: model other shapes
 }
 
@@ -72,7 +76,10 @@ pub enum ShapeType {
 }
 
 impl Shape {
-    pub fn from_json(breadcrumb: &mut Breadcrumb, v: &serde_json::Value) -> Result<Shape, Error> {
+    pub fn from_json(
+        mut breadcrumb: &mut Breadcrumb,
+        v: &serde_json::Value,
+    ) -> Result<Shape, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Shape,
@@ -103,7 +110,27 @@ impl Shape {
                     &root.extract_obj(breadcrumb, "r")?,
                 )?,
             }),
-            _ => todo!(),
+            ShapeType::Group => Shape::Group(GroupShape {
+                properties,
+                num_properties: root.extract_number(breadcrumb, "np").ok(),
+                shapes: {
+                    let mut shapes = vec![];
+                    for s in root.extract_arr(breadcrumb, "it").unwrap_or_default() {
+                        breadcrumb.enter("it");
+                        let shape = Shape::from_json(&mut breadcrumb, &s)?;
+                        shapes.push(shape);
+                        breadcrumb.exit();
+                    }
+                    shapes
+                },
+            }),
+            ShapeType::Transform => Shape::Transform(TransformShape {
+                properties,
+                transform: Transform::from_object(breadcrumb, root)?,
+            }),
+            other_shape => {
+                todo!("Shape {:?} not yet implemented", other_shape)
+            }
         };
 
         breadcrumb.exit();
