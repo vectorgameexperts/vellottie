@@ -21,10 +21,10 @@ lazy_static! {
         id: "my image".to_string(),
         height: Number::from(512),
         width: Number::from(512),
-        embedded: BoolInt::True,
+        embedded: Some(BoolInt::True),
         dir: "".to_string(),
         file_name: "data:image/png;base64,...".to_string(),
-        sequence: false
+        sequence: None
     };
 }
 

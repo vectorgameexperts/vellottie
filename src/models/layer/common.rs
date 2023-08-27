@@ -2,12 +2,7 @@ use super::{
     enumerations::{BlendMode, LayerType},
     BoolInt, Transform,
 };
-use crate::{
-    breadcrumb::Breadcrumb,
-    error::ValueType,
-    util::{self, MapExt},
-    Error,
-};
+use crate::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
@@ -27,8 +22,8 @@ pub struct LayerProperties {
     pub three_dimensional: Option<BoolInt>,
     /// Whether the layer is hidden
     #[serde(rename = "hd", default)]
-    #[serde(skip_serializing_if = "util::is_false")]
-    pub hidden: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hidden: Option<bool>,
     /// Layer type, must be one of the values seen above
     #[serde(rename = "ty")]
     pub layer_type: LayerType,
@@ -58,8 +53,8 @@ pub struct LayerProperties {
     pub matte_mode: Option<()>, // TODO: Matte Mode
     /// Matte target
     #[serde(rename = "td", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub matte_target: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub matte_target: Option<BoolInt>,
     /// Masks for the layer
     #[serde(rename = "maskProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,20 +72,20 @@ pub struct LayerProperties {
     pub transform: Transform,
     /// If 1, The layer will rotate itself to match its animated position path
     #[serde(rename = "ao", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub rotate_to_match_anim_pos_path: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rotate_to_match_anim_pos_path: Option<BoolInt>,
     /// Index of the layer used as matte, if omitted assume the layer above the current one
     #[serde(rename = "tp")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matte_layer_index: Option<Number>,
     /// Whether the layer has masks applied
     #[serde(rename = "hasMask", default)]
-    #[serde(skip_serializing_if = "util::is_false")]
-    pub has_mask: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub has_mask: Option<bool>,
     /// Whether motion blur is enabled for the layer
     #[serde(rename = "mb", default)]
-    #[serde(skip_serializing_if = "util::is_false")]
-    pub motion_blur: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub motion_blur: Option<bool>,
     /// Blend Mode
     #[serde(rename = "bm")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -114,8 +109,8 @@ pub struct LayerProperties {
     pub tranform_before_mask_deprecated: Option<String>,
     /// Marks that transforms should be applied before masks
     #[serde(rename = "ct", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub transform_before_mask: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub transform_before_mask: Option<BoolInt>,
 }
 
 impl LayerProperties {
@@ -126,7 +121,7 @@ impl LayerProperties {
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
         let three_dimensional = obj.extract_bool_int(breadcrumb, "ddd").ok();
-        let hidden = obj.extract_bool(breadcrumb, "hd").unwrap_or_default();
+        let hidden = obj.extract_bool(breadcrumb, "hd").ok();
         let layer_type: LayerType = obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let index = obj.extract_number(breadcrumb, "ind").ok();
         let parent_index = obj.extract_number(breadcrumb, "parent").ok();
@@ -134,17 +129,16 @@ impl LayerProperties {
         let in_point = obj.extract_number(breadcrumb, "ip")?;
         let out_point = obj.extract_number(breadcrumb, "op")?;
         let start_time = obj.extract_number(breadcrumb, "st")?;
-        let matte_target = obj.extract_bool_int(breadcrumb, "td").unwrap_or_default();
-        let rotate_to_match_anim_pos_path =
-            obj.extract_bool_int(breadcrumb, "ao").unwrap_or_default();
+        let matte_target = obj.extract_bool_int(breadcrumb, "td").ok();
+        let rotate_to_match_anim_pos_path = obj.extract_bool_int(breadcrumb, "ao").ok();
         let matte_layer_index = obj.extract_number(breadcrumb, "tp").ok();
-        let has_mask = obj.extract_bool(breadcrumb, "hasmask").unwrap_or_default();
-        let motion_blur = obj.extract_bool(breadcrumb, "mb").unwrap_or_default();
+        let has_mask = obj.extract_bool(breadcrumb, "hasmask").ok();
+        let motion_blur = obj.extract_bool(breadcrumb, "mb").ok();
         let css_class = obj.extract_string(breadcrumb, "cl").ok();
         let id = obj.extract_string(breadcrumb, "ln").ok();
         let tag_name = obj.extract_string(breadcrumb, "tg").ok();
         let tranform_before_mask_deprecated = obj.extract_string(breadcrumb, "cp").ok();
-        let transform_before_mask = obj.extract_bool_int(breadcrumb, "ct").unwrap_or_default();
+        let transform_before_mask = obj.extract_bool_int(breadcrumb, "ct").ok();
         let transform = Transform::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "ks")?)?;
         let blend_mode: Option<BlendMode> =
             obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();

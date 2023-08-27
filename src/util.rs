@@ -180,11 +180,3 @@ impl MapExt for &Map<String, Value> {
         y
     }
 }
-
-pub fn is_false_int(b: &BoolInt) -> bool {
-    *b == BoolInt::False
-}
-
-pub fn is_false(b: &bool) -> bool {
-    !*b
-}

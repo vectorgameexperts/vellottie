@@ -76,10 +76,7 @@ pub enum ShapeType {
 }
 
 impl Shape {
-    pub fn from_json(
-        mut breadcrumb: &mut Breadcrumb,
-        v: &serde_json::Value,
-    ) -> Result<Shape, Error> {
+    pub fn from_json(breadcrumb: &mut Breadcrumb, v: &serde_json::Value) -> Result<Shape, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Shape,
@@ -117,7 +114,7 @@ impl Shape {
                     let mut shapes = vec![];
                     for s in root.extract_arr(breadcrumb, "it").unwrap_or_default() {
                         breadcrumb.enter("it");
-                        let shape = Shape::from_json(&mut breadcrumb, &s)?;
+                        let shape = Shape::from_json(breadcrumb, &s)?;
                         shapes.push(shape);
                         breadcrumb.exit();
                     }

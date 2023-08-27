@@ -1,6 +1,4 @@
-use crate::models::layer::animated_properties::AnimatedNumber;
 use crate::models::layer::transform::Transform;
-use crate::models::shapes::AnimatedVector;
 use crate::models::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
 

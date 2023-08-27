@@ -1,6 +1,6 @@
 use crate::breadcrumb::Breadcrumb;
 use crate::models::BoolInt;
-use crate::util::{self, MapExt};
+use crate::util::MapExt;
 use crate::Error;
 use serde::{de::Deserializer, Serializer};
 use serde::{Deserialize, Serialize};
@@ -24,8 +24,8 @@ pub struct Image {
     pub file_name: String,
     /// Whether the file is embedded
     #[serde(rename = "e", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub embedded: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embedded: Option<BoolInt>,
     /// Width of the image
     #[serde(rename = "w")]
     pub width: Number,
@@ -39,28 +39,30 @@ pub struct Image {
         serialize_with = "seq_to_str",
         default
     )]
-    #[serde(skip_serializing_if = "util::is_false")]
-    pub sequence: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sequence: Option<bool>,
 }
 
-pub fn seq_from_str<'de, D>(deserializer: D) -> Result<bool, D::Error>
+pub fn seq_from_str<'de, D>(deserializer: D) -> Result<Option<bool>, D::Error>
 where
     D: Deserializer<'de>,
 {
-    if String::deserialize(deserializer)? == *"seq" {
-        Ok(true)
+    let v = String::deserialize(deserializer)?;
+    if v == *"seq" {
+        Ok(Some(true))
     } else {
-        Ok(false)
+        Ok(None)
     }
 }
 
-pub fn seq_to_str<S>(v: &bool, serializer: S) -> Result<S::Ok, S::Error>
+pub fn seq_to_str<S>(v: &Option<bool>, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
     match v {
-        true => Serializer::serialize_str(serializer, "seq"),
-        false => unimplemented!("serializer should skip if false"),
+        Some(true) => Serializer::serialize_str(serializer, "seq"),
+        Some(false) => Serializer::serialize_str(serializer, ""),
+        None => unimplemented!("serializer should skip if none"),
     }
 }
 
@@ -73,12 +75,13 @@ impl Image {
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let dir = obj.extract_string(breadcrumb, "u")?;
         let file_name = obj.extract_string(breadcrumb, "p")?;
-        let embedded = obj.extract_bool_int(breadcrumb, "e")?;
+        let embedded = obj.extract_bool_int(breadcrumb, "e").ok();
         let width = obj.extract_number(breadcrumb, "w")?;
         let height = obj.extract_number(breadcrumb, "h")?;
         let sequence = obj
             .extract_string(breadcrumb, "t")
-            .is_ok_and(|t| t == *"seq");
+            .ok()
+            .map(|t| t == *"seq");
         Ok(Self {
             id,
             name,

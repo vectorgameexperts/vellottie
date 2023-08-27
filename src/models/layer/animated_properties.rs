@@ -27,15 +27,14 @@ pub struct VectorKeyframe {
     pub easing_out_handle: Option<()>, // TODO: EasingHandle
     /// Whether it's a hold frame
     #[serde(rename = "h", default)]
-    #[serde(skip_serializing_if = "util::is_false")]
-    pub hold_frame: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hold_frame: Option<bool>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct StaticVector {
     /// Whether the property is animated
     #[serde(rename = "a", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
     pub animated: BoolInt,
     #[serde(rename = "k")]
     /// An animated 2D vector number value
@@ -47,7 +46,6 @@ pub struct StaticVector {
 pub struct VectorKeyframes {
     /// Whether the property is animated
     #[serde(rename = "a", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
     pub animated: BoolInt,
     #[serde(rename = "k")]
     /// An animated 2D vector number value
@@ -97,8 +95,8 @@ pub struct NumberKeyframe {
     pub easing_out_handle: Option<()>, // TODO: EasingHandle
     /// Whether it's a hold frame
     #[serde(rename = "h", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub hold_frame: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hold_frame: Option<BoolInt>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
