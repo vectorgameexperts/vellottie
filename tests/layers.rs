@@ -1,3 +1,5 @@
+#![recursion_limit = "512"]
+
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::{
@@ -20,12 +22,12 @@ lazy_static! {
         {
             "ddd": 0,
             "ty": 4,
-            "ind": 0,
+            "ind": 1,
             "st": 0,
             "ip": 0,
             "op": 180,
-            "nm": "Rectangle",
-            "mn": "{50b511ea-ca42-416e-b630-58eca8fb41d9}",
+            "nm": "Ellipse",
+            "mn": "{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}",
             "ks": {
                 "a": {
                     "a": 0,
@@ -60,89 +62,42 @@ lazy_static! {
             "shapes": [
                 {
                     "ty": "gr",
-                    "nm": "Rectangle",
-                    "mn": "{c338119b-6435-437a-a855-0f36a8264c22}",
+                    "nm": "Ellipse",
+                    "mn": "{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}",
                     "it": [
                         {
-                            "ty": "rc",
-                            "nm": "Rectangle",
-                            "mn": "{9e7f37be-ac4b-411e-8e47-3e2a2cad9102}",
+                            "ty": "el",
+                            "nm": "Ellipse",
+                            "mn": "{2aabac6e-1dd8-41b0-b60b-baf75ccb6318}",
                             "p": {
                                 "a": 0,
                                 "k": [
-                                    185.69552238805971,
-                                    256.1910447761194
+                                    303.9044776119403,
+                                    324.9671641791045
                                 ]
                             },
                             "s": {
                                 "a": 0,
                                 "k": [
-                                    268.2268656716418,
-                                    225.24179104477614
+                                    205.46865671641788,
+                                    204.6089552238806
                                 ]
-                            },
-                            "r": {
-                                "a": 0,
-                                "k": 0
                             }
-                        },
-                        {
-                            "ty": "st",
-                            "hd": true,
-                            "nm": "Stroke",
-                            "mn": "{9781440d-fa0d-45e1-b224-8c96fefc1f09}",
-                            "o": {
-                                "a": 0,
-                                "k": 100
-                            },
-                            "c": {
-                                "a": 0,
-                                "k": [
-                                    0,
-                                    0.5019607843137255,
-                                    1
-                                ]
-                            },
-                            "lc": 2,
-                            "lj": 2,
-                            "ml": 0,
-                            "w": {
-                                "a": 0,
-                                "k": 1
-                            }
-                        },
-                        {
-                            "ty": "fl",
-                            "nm": "Fill",
-                            "mn": "{dc302cc0-3912-40b0-81da-03b5c172432c}",
-                            "o": {
-                                "a": 0,
-                                "k": 100
-                            },
-                            "c": {
-                                "a": 0,
-                                "k": [
-                                    0.19607843137254902,
-                                    0.3137254901960784,
-                                    0.6901960784313725
-                                ]
-                            },
-                            "r": 1
                         },
                         {
                             "ty": "tr",
                             "a": {
                                 "a": 0,
                                 "k": [
-                                    185.69552238805971,
-                                    256.1910447761194
+                                    303.9044776119403,
+                                    324.9671641791045
                                 ]
                             },
                             "p": {
                                 "a": 0,
                                 "k": [
-                                    212.34626865671646,
-                                    239.85671641791043
+                                    330.55522388059705,
+                                    308.63283582089554
                                 ]
                             },
                             "s": {
@@ -170,7 +125,7 @@ lazy_static! {
         properties: LayerProperties {
             name: Some("Rectangle".to_string()),
             match_name: Some("{50b511ea-ca42-416e-b630-58eca8fb41d9}".to_string()),
-            three_dimensional: BoolInt::False,
+            three_dimensional: None,
             layer_type: LayerType::Shape,
             index: Some(Number::from(0)),
             start_time: Number::from(0),
@@ -223,7 +178,7 @@ lazy_static! {
     });
 }
 
-#[test]
+#[test_log::test]
 fn test_deserialize() {
     let actual = Layer::from_json(&mut Breadcrumb::new(), &JSON);
 
