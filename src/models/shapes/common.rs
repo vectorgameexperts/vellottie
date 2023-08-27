@@ -6,6 +6,7 @@ use crate::{
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
+/// Common properties between shapes
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeProperties {
     #[serde(rename = "nm")]

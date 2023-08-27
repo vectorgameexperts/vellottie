@@ -14,7 +14,8 @@ pub fn from_bytes(b: &[u8]) -> Result<Lottie, Error> {
 }
 
 pub fn from_str(s: &str) -> Result<Lottie, Error> {
-    let json_tree: serde_json::Value = serde_json::from_str(s)?;
+    let json_tree: serde_json::Value =
+        serde_json::from_str(s).map_err(|e| Error::FileNotJson(Box::new(e)))?;
     from_json(&json_tree)
 }
 

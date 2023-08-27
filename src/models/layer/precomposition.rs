@@ -2,6 +2,7 @@ use super::{animated_properties::AnimatedNumber, common};
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 
+/// Renders a Precomposition
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct PrecompositionLayer {
     #[serde(flatten)]

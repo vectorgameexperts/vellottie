@@ -45,6 +45,9 @@ impl Display for ValueType {
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
+    #[error("the file is not valid json: {0:?}")]
+    FileNotJson(Box<serde_json::Error>),
+
     #[error("encountered invalid json: {0:?}")]
     DeserializeError(#[from] serde_json::Error),
 

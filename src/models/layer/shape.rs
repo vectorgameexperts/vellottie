@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use util::MapExt;
 
+/// Has an array of shapes
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeLayer {
     #[serde(flatten)]

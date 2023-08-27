@@ -8,6 +8,7 @@ use crate::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
+/// Common properties between layers
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct LayerProperties {
     /// Name, as seen from editors and the like
