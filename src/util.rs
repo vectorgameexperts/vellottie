@@ -1,4 +1,5 @@
 use crate::{breadcrumb::Breadcrumb, error::ValueType, models::BoolInt, Error};
+use log::trace;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Number, Value};
 use std::{borrow::Borrow, fmt::Display, hash::Hash};
@@ -57,6 +58,7 @@ impl MapExt for &Map<String, Value> {
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
     {
+        trace!("extracting {key}");
         self.get(key).ok_or_else(|| Error::MissingChild {
             key: key.to_string(),
             breadcrumb: breadcrumb.to_owned(),
@@ -107,7 +109,7 @@ impl MapExt for &Map<String, Value> {
             .and_then(|i| match i {
                 0 => Ok(BoolInt::False),
                 1 => Ok(BoolInt::True),
-                other => Err(Error::IncorrectType {
+                _ => Err(Error::IncorrectType {
                     key: key.to_string(),
                     expected: ValueType::BoolInt,
                 }),

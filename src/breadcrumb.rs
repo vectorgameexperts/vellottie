@@ -1,14 +1,14 @@
 use log::trace;
 use std::fmt;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct Breadcrumb {
     path: Vec<String>,
 }
 
 impl Breadcrumb {
     pub fn new() -> Self {
-        Self { path: vec![] }
+        Self::default()
     }
 
     pub fn enter(&mut self, path: impl Into<String>) {

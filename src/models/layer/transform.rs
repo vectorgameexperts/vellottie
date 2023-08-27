@@ -44,20 +44,34 @@ impl Transform {
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         breadcrumb.enter("ks");
-        let anchor_point =
-            AnimatedVector::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "a")?).ok();
-        let position =
-            AnimatedVector::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "p")?).ok();
-        let scale =
-            AnimatedVector::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "s")?).ok();
-        let rotation =
-            AnimatedNumber::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "r")?).ok();
-        let skew =
-            AnimatedNumber::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "sk")?).ok();
-        let skew_axis =
-            AnimatedNumber::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "sa")?).ok();
-        let opacity =
-            AnimatedNumber::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "o")?).ok();
+        let anchor_point = obj
+            .extract_obj(breadcrumb, "a")
+            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .ok();
+        let position = obj
+            .extract_obj(breadcrumb, "p")
+            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .ok();
+        let scale = obj
+            .extract_obj(breadcrumb, "s")
+            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .ok();
+        let rotation = obj
+            .extract_obj(breadcrumb, "r")
+            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .ok();
+        let skew = obj
+            .extract_obj(breadcrumb, "sk")
+            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .ok();
+        let skew_axis = obj
+            .extract_obj(breadcrumb, "sa")
+            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .ok();
+        let opacity = obj
+            .extract_obj(breadcrumb, "o")
+            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .ok();
         let transform = Transform {
             anchor_point,
             position,
@@ -68,7 +82,6 @@ impl Transform {
             opacity,
         };
         breadcrumb.exit();
-
         Ok(transform)
     }
 }

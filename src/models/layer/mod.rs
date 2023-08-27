@@ -5,7 +5,10 @@ pub mod precomposition;
 pub mod shape;
 pub mod transform;
 
-use self::{common::LayerProperties, enumerations::LayerType, transform::Transform};
+use self::{
+    animated_properties::AnimatedNumber, common::LayerProperties, enumerations::LayerType,
+    transform::Transform,
+};
 use super::BoolInt;
 use crate::{
     breadcrumb::Breadcrumb,
@@ -37,7 +40,7 @@ pub enum Layer {
     /// Has an array of shapes
     Shape(ShapeLayer),
     // Renders Text
-    // todo text
+    // todo Text
 
     // unimplemented - Audio(AudioLayer),
     // unimplemented - VideoPlaceholder(VideoPlaceholderLayer)
@@ -62,9 +65,13 @@ impl Layer {
         let properties = LayerProperties::from_obj(breadcrumb, root)?;
 
         let layer = match properties.layer_type {
-            LayerType::Precomposition => Layer::Precomposition(
-                PrecompositionLayer::from_properties_and_object(breadcrumb, properties, root)?,
-            ),
+            LayerType::Precomposition => Layer::Precomposition(PrecompositionLayer {
+                properties,
+                precomp_id: root.extract_string(breadcrumb, "refID")?,
+                width: root.extract_number(breadcrumb, "w")?,
+                height: root.extract_number(breadcrumb, "h")?,
+                time_remap: AnimatedNumber::from_object(breadcrumb, root)?,
+            }),
             LayerType::Shape => Layer::Shape(ShapeLayer::from_properties_and_object(
                 breadcrumb, properties, root,
             )?),

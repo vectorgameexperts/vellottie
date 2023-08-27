@@ -33,8 +33,7 @@ impl ShapeProperties {
     ) -> Result<Self, Error> {
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
-        let shape_type = obj.extract_string(breadcrumb, "ty")?;
-        let shape_type: ShapeType = serde_json::from_str(&shape_type)?;
+        let shape_type: ShapeType = obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let hidden = obj.extract_bool(breadcrumb, "hd").ok();
         let blend_mode = obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();
         let index_in_expression = obj.extract_number(breadcrumb, "ix").ok();
