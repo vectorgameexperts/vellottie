@@ -13,6 +13,7 @@ use vellottie::{
             transform::Transform,
             Layer,
         },
+        shapes::{ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties, ShapeType},
         BoolInt,
     },
 };
@@ -62,7 +63,7 @@ lazy_static! {
             "shapes": [
                 {
                     "ty": "gr",
-                    "nm": "Ellipse",
+                    "nm": "Group",
                     "mn": "{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}",
                     "it": [
                         {
@@ -83,38 +84,6 @@ lazy_static! {
                                     204.6089552238806
                                 ]
                             }
-                        },
-                        {
-                            "ty": "tr",
-                            "a": {
-                                "a": 0,
-                                "k": [
-                                    303.9044776119403,
-                                    324.9671641791045
-                                ]
-                            },
-                            "p": {
-                                "a": 0,
-                                "k": [
-                                    330.55522388059705,
-                                    308.63283582089554
-                                ]
-                            },
-                            "s": {
-                                "a": 0,
-                                "k": [
-                                    100,
-                                    100
-                                ]
-                            },
-                            "r": {
-                                "a": 0,
-                                "k": 0
-                            },
-                            "o": {
-                                "a": 0,
-                                "k": 100
-                            }
                         }
                     ]
                 }
@@ -123,11 +92,11 @@ lazy_static! {
     );
     static ref LAYER: Layer = Layer::Shape(ShapeLayer {
         properties: LayerProperties {
-            name: Some("Rectangle".to_string()),
-            match_name: Some("{50b511ea-ca42-416e-b630-58eca8fb41d9}".to_string()),
-            three_dimensional: None,
+            name: Some("Ellipse".to_string()),
+            match_name: Some("{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}".to_string()),
+            three_dimensional: Some(BoolInt::False),
             layer_type: LayerType::Shape,
-            index: Some(Number::from(0)),
+            index: Some(Number::from(1)),
             start_time: Number::from(0),
             in_point: Number::from(0),
             out_point: Number::from(180),
@@ -174,7 +143,45 @@ lazy_static! {
             tranform_before_mask_deprecated: None,
             transform_before_mask: BoolInt::False
         },
-        shapes: vec![]
+        shapes: vec![Shape::Group(GroupShape {
+            properties: ShapeProperties {
+                name: Some("Group".to_string()),
+                match_name: Some("{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}".to_string()),
+                shape_type: ShapeType::Group,
+                hidden: None,
+                blend_mode: None,
+                index_in_expression: None,
+                css_class: None,
+                id: None
+            },
+            num_properties: None,
+            shapes: vec![Shape::Ellipse(EllipseShape {
+                properties: ShapeProperties {
+                    name: Some("Ellipse".to_string()),
+                    match_name: Some("{2aabac6e-1dd8-41b0-b60b-baf75ccb6318}".to_string()),
+                    shape_type: ShapeType::Ellipse,
+                    hidden: None,
+                    blend_mode: None,
+                    index_in_expression: None,
+                    css_class: None,
+                    id: None
+                },
+                position: AnimatedVector::Static(StaticVector {
+                    animated: BoolInt::False,
+                    value: [
+                        Number::from_f64(303.9044776119403).unwrap(),
+                        Number::from_f64(324.9671641791045).unwrap()
+                    ]
+                }),
+                size: AnimatedVector::Static(StaticVector {
+                    animated: BoolInt::False,
+                    value: [
+                        Number::from_f64(205.46865671641788).unwrap(),
+                        Number::from_f64(204.6089552238806).unwrap()
+                    ]
+                }),
+            })]
+        }),]
     });
 }
 

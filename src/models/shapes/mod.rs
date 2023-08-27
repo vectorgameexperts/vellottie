@@ -5,9 +5,10 @@ pub mod polystar;
 pub mod rectangle;
 pub mod transform;
 
-use self::common::ShapeProperties;
 use self::rectangle::RectangleShape;
 use self::transform::TransformShape;
+use super::layer::animated_properties::AnimatedNumber;
+use super::layer::transform::Transform;
 use crate::breadcrumb::Breadcrumb;
 use crate::models::layer::animated_properties::AnimatedVector;
 use crate::util::MapExt;
@@ -16,8 +17,7 @@ use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
 
-use super::layer::animated_properties::AnimatedNumber;
-use super::layer::transform::Transform;
+pub use self::common::ShapeProperties;
 
 /// Lottie considers everything related to vector data as a "shape". All shapes share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
