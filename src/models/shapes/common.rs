@@ -9,20 +9,27 @@ use serde_json::{Number, Value};
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeProperties {
     #[serde(rename = "nm")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(rename = "mn")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub match_name: Option<String>,
     #[serde(rename = "ty")]
     pub shape_type: ShapeType,
     #[serde(rename = "hd")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub hidden: Option<bool>,
     #[serde(rename = "bm")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub blend_mode: Option<BlendMode>,
     #[serde(rename = "ix")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub index_in_expression: Option<Number>,
     #[serde(rename = "cl")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub css_class: Option<String>,
     #[serde(rename = "ln")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
 }
 
