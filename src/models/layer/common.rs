@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use super::{
     enumerations::{BlendMode, LayerType},
     BoolInt, Transform,

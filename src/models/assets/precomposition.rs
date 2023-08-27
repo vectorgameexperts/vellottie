@@ -1,7 +1,7 @@
 use crate::{
     breadcrumb::Breadcrumb,
     models::{layer::Layer, BoolInt},
-    util::{self, MapExt},
+    util::MapExt,
     Error,
 };
 use serde::{Deserialize, Serialize};
@@ -31,7 +31,7 @@ pub struct Precomposition {
 
 impl Precomposition {
     pub fn from_object(
-        mut breadcrumb: &mut Breadcrumb,
+        breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         let id = obj.extract_string(breadcrumb, "id")?;

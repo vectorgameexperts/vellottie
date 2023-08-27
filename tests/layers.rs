@@ -1,4 +1,5 @@
 #![recursion_limit = "512"]
+#![allow(deprecated)]
 
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
