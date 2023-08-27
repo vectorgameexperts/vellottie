@@ -22,8 +22,8 @@ pub struct Precomposition {
     pub frame_rate: Option<Number>,
     /// Extra composition
     #[serde(rename = "xt", default)]
-    #[serde(skip_serializing_if = "util::is_false_int")]
-    pub extra: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub extra: Option<BoolInt>,
     /// An array of layers
     #[serde(rename = "layers")]
     pub layers: Vec<Layer>,
@@ -37,7 +37,7 @@ impl Precomposition {
         let id = obj.extract_string(breadcrumb, "id")?;
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let frame_rate = obj.extract_number(breadcrumb, "fr").ok();
-        let extra = obj.extract_bool_int(breadcrumb, "xt").unwrap_or_default();
+        let extra = obj.extract_bool_int(breadcrumb, "xt").ok();
         let mut layers = vec![];
         for v in obj.extract_arr(breadcrumb, "layers")? {
             breadcrumb.enter("layers".to_string());

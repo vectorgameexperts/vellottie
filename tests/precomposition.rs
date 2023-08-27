@@ -1,7 +1,7 @@
 #![recursion_limit = "512"]
 
 use lazy_static::lazy_static;
-use serde_json::json;
+use serde_json::{json, Number};
 use vellottie::{
     breadcrumb::Breadcrumb,
     models::{assets::precomposition::Precomposition, BoolInt},
@@ -11,14 +11,17 @@ lazy_static! {
     static ref JSON: serde_json::Value = json!(
         {
             "id": "precomp_0",
+            "fr": 60,
+            "nm": "Example",
+            "xt": 0,
             "layers": []
         }
     );
     static ref PRECOMP: Precomposition = Precomposition {
         id: "precomp_0".to_string(),
-        name: None,
-        frame_rate: None,
-        extra: BoolInt::False,
+        name: Some("Example".to_string()),
+        frame_rate: Some(Number::from(60)),
+        extra: Some(BoolInt::False),
         layers: vec![]
     };
 }
