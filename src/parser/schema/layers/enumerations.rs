@@ -82,24 +82,6 @@ pub enum GradientType {
     Radial = 2,
 }
 
-/// Style at the end of a stoked line
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum LineCap {
-    Butt = 1,
-    Round = 2,
-    Square = 3,
-}
-
-/// Style at a sharp corner of a stoked line
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum LineJoin {
-    Miter = 1,
-    Round = 2,
-    Bevel = 3,
-}
-
 /// How masks interact with each other. See https://helpx.adobe.com/after-effects/using/alpha-channels-masks-mattes.html
 pub enum MaskMode {} // todo
 
@@ -142,9 +124,6 @@ pub enum StarType {
     Star = 1,
     Polygon = 2,
 }
-
-/// Type of a dash item in a stroked line
-pub enum StrokeDashType {} // todo
 
 #[repr(u8)]
 #[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]

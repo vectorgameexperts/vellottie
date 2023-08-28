@@ -1,14 +1,17 @@
 pub(crate) mod common;
 pub mod ellipse;
+pub mod enumerations;
 pub mod group;
 pub mod polystar;
 pub mod rectangle;
+pub mod stroke;
 pub mod transform;
 
-use self::{rectangle::RectangleShape, transform::TransformShape};
-use crate::parser::{
-    breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
+use self::{
+    rectangle::RectangleShape, stroke::StrokeShape, transform::TransformShape,
 };
+use crate::parser::breadcrumb::Breadcrumb;
+use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
@@ -33,6 +36,7 @@ pub enum Shape {
     /// An ellipse, defined by its center point and width and height.
     Ellipse(EllipseShape),
     Transform(TransformShape),
+    Stroke(StrokeShape),
     // TODO: model other shapes
 }
 
@@ -137,6 +141,23 @@ impl Shape {
             ShapeType::Transform => Shape::Transform(TransformShape {
                 properties,
                 transform: Transform::from_obj(breadcrumb, root)?,
+            }),
+            ShapeType::Stroke => Shape::Stroke(StrokeShape {
+                properties,
+                line_cap: root
+                    .extract_type(breadcrumb, "key", ValueType::EnumInt)
+                    .ok(),
+                line_join: root
+                    .extract_type(breadcrumb, "key", ValueType::EnumInt)
+                    .ok(),
+                miter_limit: root.extract_number(breadcrumb, "key").ok(),
+                miter_limit_alt: root
+                    .extract_type(breadcrumb, "key", ValueType::Scalar2d)
+                    .ok(),
+                opacity: todo!(),
+                stroke_width: todo!(),
+                dash_array: todo!(),
+                stroke_color: todo!(),
             }),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)
