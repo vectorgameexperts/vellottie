@@ -5,25 +5,25 @@ pub mod polystar;
 pub mod rectangle;
 pub mod transform;
 
-use self::rectangle::RectangleShape;
-use self::transform::TransformShape;
-use super::layer::animated_properties::AnimatedNumber;
-use super::layer::transform::Transform;
-use crate::parser::breadcrumb::Breadcrumb;
-use crate::parser::models::layer::animated_properties::AnimatedVector;
-use crate::parser::util::MapExt;
-use crate::parser::{error::ValueType, Error};
+use self::{rectangle::RectangleShape, transform::TransformShape};
+use super::layer::{animated_properties::AnimatedNumber, transform::Transform};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType,
+    models::layer::animated_properties::AnimatedVector, util::MapExt, Error,
+};
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
 
 pub use self::common::ShapeProperties;
 
-/// Lottie considers everything related to vector data as a "shape". All shapes share the properties in `shapes::common::Properties`.
+/// Lottie considers everything related to vector data as a "shape". All shapes
+/// share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum Shape {
-    /// A group is a shape that can contain other shapes (including other groups)
+    /// A group is a shape that can contain other shapes (including other
+    /// groups)
     Group(GroupShape),
     /// A rectangle, defined by its center point and size.
     Rectangle(RectangleShape),
@@ -76,7 +76,10 @@ pub enum ShapeType {
 }
 
 impl Shape {
-    pub fn from_json(breadcrumb: &mut Breadcrumb, v: &serde_json::Value) -> Result<Shape, Error> {
+    pub fn from_json(
+        breadcrumb: &mut Breadcrumb,
+        v: &serde_json::Value,
+    ) -> Result<Shape, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Shape,
@@ -93,7 +96,10 @@ impl Shape {
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_obj(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
+                size: AnimatedVector::from_obj(
+                    breadcrumb,
+                    &root.extract_obj(breadcrumb, "s")?,
+                )?,
             }),
             ShapeType::Rectangle => Shape::Rectangle(RectangleShape {
                 properties,
@@ -101,7 +107,10 @@ impl Shape {
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_obj(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
+                size: AnimatedVector::from_obj(
+                    breadcrumb,
+                    &root.extract_obj(breadcrumb, "s")?,
+                )?,
                 rounded_corner_radius: AnimatedNumber::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "r")?,

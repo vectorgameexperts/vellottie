@@ -1,10 +1,8 @@
-use crate::parser::breadcrumb::Breadcrumb;
-use crate::parser::error::ValueType;
-use crate::parser::models::BoolInt;
-use crate::parser::util::MapExt;
-use crate::parser::Error;
-use serde::{de::Deserializer, Serializer};
-use serde::{Deserialize, Serialize};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType, models::BoolInt, util::MapExt,
+    Error,
+};
+use serde::{de::Deserializer, Deserialize, Serialize, Serializer};
 use serde_json::{Number, Value};
 
 /// Represents a (static) image

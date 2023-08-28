@@ -21,13 +21,15 @@ pub enum PathVar {
 impl PathVar {
     pub fn get_children(&self) -> usize {
         match self {
-            PathVar::Named { children, .. } | PathVar::Unnamed { children, .. } => *children,
+            PathVar::Named { children, .. }
+            | PathVar::Unnamed { children, .. } => *children,
         }
     }
 
     pub fn increment_children(&mut self) {
         match self {
-            PathVar::Named { children, .. } | PathVar::Unnamed { children, .. } => *children += 1,
+            PathVar::Named { children, .. }
+            | PathVar::Unnamed { children, .. } => *children += 1,
         }
     }
 }

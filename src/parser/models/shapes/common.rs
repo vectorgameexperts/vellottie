@@ -1,7 +1,7 @@
 use super::ShapeType;
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, models::layer::enumerations::BlendMode, util::MapExt,
-    Error,
+    breadcrumb::Breadcrumb, error::ValueType,
+    models::layer::enumerations::BlendMode, util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
@@ -41,9 +41,11 @@ impl ShapeProperties {
     ) -> Result<Self, Error> {
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
-        let shape_type: ShapeType = obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
+        let shape_type: ShapeType =
+            obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let hidden = obj.extract_bool(breadcrumb, "hd").ok();
-        let blend_mode = obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();
+        let blend_mode =
+            obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();
         let index_in_expression = obj.extract_number(breadcrumb, "ix").ok();
         let css_class = obj.extract_string(breadcrumb, "cl").ok();
         let id = obj.extract_string(breadcrumb, "ln").ok();

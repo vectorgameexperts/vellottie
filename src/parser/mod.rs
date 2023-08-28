@@ -31,6 +31,8 @@ pub fn from_serde_str(s: &str) -> Result<Lottie, serde_json::Error> {
     serde_json::from_str(s)
 }
 
-pub fn from_serde_json(v: serde_json::Value) -> Result<Lottie, serde_json::Error> {
+pub fn from_serde_json(
+    v: serde_json::Value,
+) -> Result<Lottie, serde_json::Error> {
     serde_json::from_value(v)
 }

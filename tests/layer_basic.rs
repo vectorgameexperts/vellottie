@@ -7,14 +7,19 @@ use vellottie::parser::{
     breadcrumb::Breadcrumb,
     models::{
         layer::{
-            animated_properties::{AnimatedNumber, AnimatedVector, StaticNumber, StaticVector},
+            animated_properties::{
+                AnimatedNumber, AnimatedVector, StaticNumber, StaticVector,
+            },
             common::LayerProperties,
             enumerations::LayerType,
             shape::ShapeLayer,
             transform::Transform,
             Layer,
         },
-        shapes::{ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties, ShapeType},
+        shapes::{
+            ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties,
+            ShapeType,
+        },
         BoolInt,
     },
 };
@@ -94,7 +99,9 @@ lazy_static! {
     static ref LAYER: Layer = Layer::Shape(ShapeLayer {
         properties: LayerProperties {
             name: Some("Ellipse".to_string()),
-            match_name: Some("{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}".to_string()),
+            match_name: Some(
+                "{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}".to_string()
+            ),
             three_dimensional: Some(BoolInt::False),
             layer_type: LayerType::Shape,
             index: Some(Number::from(1)),
@@ -147,7 +154,9 @@ lazy_static! {
         shapes: vec![Shape::Group(GroupShape {
             properties: ShapeProperties {
                 name: Some("Group".to_string()),
-                match_name: Some("{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}".to_string()),
+                match_name: Some(
+                    "{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}".to_string()
+                ),
                 shape_type: ShapeType::Group,
                 hidden: None,
                 blend_mode: None,
@@ -159,7 +168,9 @@ lazy_static! {
             shapes: vec![Shape::Ellipse(EllipseShape {
                 properties: ShapeProperties {
                     name: Some("Ellipse".to_string()),
-                    match_name: Some("{2aabac6e-1dd8-41b0-b60b-baf75ccb6318}".to_string()),
+                    match_name: Some(
+                        "{2aabac6e-1dd8-41b0-b60b-baf75ccb6318}".to_string()
+                    ),
                     shape_type: ShapeType::Ellipse,
                     hidden: None,
                     blend_mode: None,

@@ -30,7 +30,8 @@ pub struct PolyStar {
     pub star_type: StarType,
 
     // todo:
-    /// If sy is 1 (star) you also have attributes defining the inner ends of the star:
+    /// If sy is 1 (star) you also have attributes defining the inner ends of
+    /// the star:
 
     /// Points
     #[serde(rename = "lr")]

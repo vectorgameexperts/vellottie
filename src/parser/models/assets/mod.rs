@@ -2,7 +2,9 @@ pub mod image;
 pub mod precomposition;
 
 use self::{image::Image, precomposition::Precomposition};
-use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -15,7 +17,10 @@ pub enum Asset {
 }
 
 impl Asset {
-    pub fn from_json(breadcrumb: &mut Breadcrumb, v: &serde_json::Value) -> Result<Self, Error> {
+    pub fn from_json(
+        breadcrumb: &mut Breadcrumb,
+        v: &serde_json::Value,
+    ) -> Result<Self, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Object,

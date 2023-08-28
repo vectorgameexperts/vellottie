@@ -1,5 +1,7 @@
 use super::{assets::Asset, layer::Layer, BoolInt};
-use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 use std::fmt::Display;
@@ -20,7 +22,8 @@ pub struct Lottie {
     /// "In Point", which frame the animation starts at (usually 0)
     #[serde(rename = "ip")]
     pub in_point: Number,
-    /// "Out Point", which frame the animation stops/loops at, which makes this the duration in frames when `ip` is 0
+    /// "Out Point", which frame the animation stops/loops at, which makes this
+    /// the duration in frames when `ip` is 0
     #[serde(rename = "op")]
     pub out_point: Number,
     /// Width of the animation
@@ -65,7 +68,8 @@ impl Lottie {
 
         // Assets
         let mut assets = vec![];
-        let json_assets = root.extract_arr(&breadcrumb, "assets").unwrap_or_default();
+        let json_assets =
+            root.extract_arr(&breadcrumb, "assets").unwrap_or_default();
         breadcrumb.enter(ValueType::Array, Some("assets"));
         for v in json_assets {
             let asset = Asset::from_json(&mut breadcrumb, &v)?;

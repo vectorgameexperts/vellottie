@@ -1,14 +1,14 @@
 //! Transform - https://lottiefiles.github.io/lottie-docs/concepts/#transform
 
 use super::animated_properties::{AnimatedNumber, AnimatedVector};
-use crate::parser::util::MapExt;
-use crate::parser::{breadcrumb::Breadcrumb, error::Error};
+use crate::parser::{breadcrumb::Breadcrumb, error::Error, util::MapExt};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct Transform {
-    /// Position (relative to its parent) around which transformations are applied (ie: center for rotation / scale)
+    /// Position (relative to its parent) around which transformations are
+    /// applied (ie: center for rotation / scale)
     #[serde(rename = "a")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub anchor_point: Option<AnimatedVector>,
@@ -28,7 +28,8 @@ pub struct Transform {
     #[serde(rename = "sk")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skew: Option<AnimatedNumber>,
-    /// Direction at which skew is applied, in degrees (0 skews along the X axis, 90 along the Y axis)
+    /// Direction at which skew is applied, in degrees (0 skews along the X
+    /// axis, 90 along the Y axis)
     #[serde(rename = "sa")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skew_axis: Option<AnimatedNumber>,

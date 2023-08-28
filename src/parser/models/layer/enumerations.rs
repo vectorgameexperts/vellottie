@@ -60,7 +60,8 @@ pub enum Composite {
 pub enum FillRule {
     /// Everything is colored (You can think of this as an OR)
     NonZero = 1,
-    /// Colored based on intersections and path direction, can be used to create "holes"
+    /// Colored based on intersections and path direction, can be used to
+    /// create "holes"
     EvenOdd = 2,
 }
 
@@ -176,7 +177,8 @@ pub enum TextJustify {
     JustifyWithLastLineFull = 6,
 }
 
-/// Defines the function used to determine the interpolating factor on a text range selector.
+/// Defines the function used to determine the interpolating factor on a text
+/// range selector.
 #[repr(u8)]
 #[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
 pub enum TextShape {

@@ -72,7 +72,11 @@ impl AnimatedVector {
         } else {
             AnimatedVector::Static(StaticVector {
                 animated,
-                value: obj.extract_type(breadcrumb, "k", ValueType::Scalar2d)?,
+                value: obj.extract_type(
+                    breadcrumb,
+                    "k",
+                    ValueType::Scalar2d,
+                )?,
             })
         };
         breadcrumb.exit();

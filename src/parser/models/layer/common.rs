@@ -4,7 +4,9 @@ use super::{
     enumerations::{BlendMode, LayerType},
     BoolInt, Transform,
 };
-use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
@@ -19,7 +21,8 @@ pub struct LayerProperties {
     #[serde(rename = "mn")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub match_name: Option<String>,
-    /// Whether the layer is 3D. Lottie doesn't actually support 3D stuff so this should always be 0
+    /// Whether the layer is 3D. Lottie doesn't actually support 3D stuff so
+    /// this should always be 0
     #[serde(rename = "ddd", default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub three_dimensional: Option<BoolInt>,
@@ -65,11 +68,21 @@ pub struct LayerProperties {
     /// Effects for the layer
     #[serde(rename = "ef")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub effects: Option<()>, // TODO: array of Custom Effect or Drop Shadow Effect or Fill Effect or Gaussian Blur Effect or Set Matte Effect or Pro Levels Effect or Stroke Effect or Tint Effect or Tritone Effect or Radial Wipe or Wavy Effect or Puppet Effect or Spherize Effect or Mesh Warp Effect or Displacement Map Effect or Twirl Effect
+    pub effects: Option<()>, /* TODO: array of Custom Effect or Drop Shadow
+                              * Effect or Fill Effect or Gaussian Blur
+                              * Effect or Set Matte Effect or Pro Levels
+                              * Effect or Stroke Effect or Tint Effect or
+                              * Tritone Effect or Radial Wipe or Wavy Effect
+                              * or Puppet Effect or Spherize Effect or Mesh
+                              * Warp Effect or Displacement Map Effect or
+                              * Twirl Effect */
     /// Layer styles
     #[serde(rename = "sy")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub styles: Option<()>, // TODO: array of Layer Stroke or Drop Shadow or Inner Shadow or Outer Glow or Inner Glow or Bevel Emboss or Satin or Color Overlay or Gradient Overlay
+    pub styles: Option<()>, /* TODO: array of Layer Stroke or Drop Shadow or
+                             * Inner Shadow or Outer Glow or Inner Glow or
+                             * Bevel Emboss or Satin or Color Overlay or
+                             * Gradient Overlay */
     /// Layer transform
     #[serde(rename = "ks")]
     pub transform: Transform,
@@ -77,7 +90,8 @@ pub struct LayerProperties {
     #[serde(rename = "ao", default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotate_to_match_anim_pos_path: Option<BoolInt>,
-    /// Index of the layer used as matte, if omitted assume the layer above the current one
+    /// Index of the layer used as matte, if omitted assume the layer above the
+    /// current one
     #[serde(rename = "tp")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matte_layer_index: Option<Number>,
@@ -125,7 +139,8 @@ impl LayerProperties {
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
         let three_dimensional = obj.extract_bool_int(breadcrumb, "ddd").ok();
         let hidden = obj.extract_bool(breadcrumb, "hd").ok();
-        let layer_type: LayerType = obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
+        let layer_type: LayerType =
+            obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let index = obj.extract_number(breadcrumb, "ind").ok();
         let parent_index = obj.extract_number(breadcrumb, "parent").ok();
         let time_stretch = obj.extract_number(breadcrumb, "sr").ok();
@@ -133,14 +148,16 @@ impl LayerProperties {
         let out_point = obj.extract_number(breadcrumb, "op")?;
         let start_time = obj.extract_number(breadcrumb, "st")?;
         let matte_target = obj.extract_bool_int(breadcrumb, "td").ok();
-        let rotate_to_match_anim_pos_path = obj.extract_bool_int(breadcrumb, "ao").ok();
+        let rotate_to_match_anim_pos_path =
+            obj.extract_bool_int(breadcrumb, "ao").ok();
         let matte_layer_index = obj.extract_number(breadcrumb, "tp").ok();
         let has_mask = obj.extract_bool(breadcrumb, "hasmask").ok();
         let motion_blur = obj.extract_bool(breadcrumb, "mb").ok();
         let css_class = obj.extract_string(breadcrumb, "cl").ok();
         let id = obj.extract_string(breadcrumb, "ln").ok();
         let tag_name = obj.extract_string(breadcrumb, "tg").ok();
-        let tranform_before_mask_deprecated = obj.extract_string(breadcrumb, "cp").ok();
+        let tranform_before_mask_deprecated =
+            obj.extract_string(breadcrumb, "cp").ok();
         let transform_before_mask = obj.extract_bool_int(breadcrumb, "ct").ok();
         let transform = {
             let obj = obj.extract_obj(breadcrumb, "ks")?;

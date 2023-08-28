@@ -1,41 +1,71 @@
-use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, models::BoolInt, Error};
+use crate::parser::{
+    breadcrumb::Breadcrumb, error::ValueType, models::BoolInt, Error,
+};
 use log::trace;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Number, Value};
 use std::{borrow::Borrow, fmt::Display, hash::Hash};
 
 pub trait MapExt {
-    fn extract_value<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<&Value, Error>
+    fn extract_value<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<&Value, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_string<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<String, Error>
+    fn extract_string<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<String, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_number<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Number, Error>
+    fn extract_number<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Number, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_bool_int<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<BoolInt, Error>
+    fn extract_bool_int<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<BoolInt, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_bool<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<bool, Error>
+    fn extract_bool<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<bool, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_arr<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Vec<Value>, Error>
+    fn extract_arr<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Vec<Value>, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
 
-    fn extract_obj<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Map<String, Value>, Error>
+    fn extract_obj<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Map<String, Value>, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display;
@@ -53,7 +83,11 @@ pub trait MapExt {
 }
 
 impl MapExt for &Map<String, Value> {
-    fn extract_value<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<&Value, Error>
+    fn extract_value<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<&Value, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -65,7 +99,11 @@ impl MapExt for &Map<String, Value> {
         })
     }
 
-    fn extract_string<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<String, Error>
+    fn extract_string<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<String, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -80,7 +118,11 @@ impl MapExt for &Map<String, Value> {
             .to_owned())
     }
 
-    fn extract_number<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Number, Error>
+    fn extract_number<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Number, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -95,7 +137,11 @@ impl MapExt for &Map<String, Value> {
         }
     }
 
-    fn extract_bool_int<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<BoolInt, Error>
+    fn extract_bool_int<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<BoolInt, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -116,7 +162,11 @@ impl MapExt for &Map<String, Value> {
             })
     }
 
-    fn extract_bool<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<bool, Error>
+    fn extract_bool<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<bool, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -131,7 +181,11 @@ impl MapExt for &Map<String, Value> {
             .to_owned())
     }
 
-    fn extract_arr<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Vec<Value>, Error>
+    fn extract_arr<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Vec<Value>, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -146,7 +200,11 @@ impl MapExt for &Map<String, Value> {
             .to_owned())
     }
 
-    fn extract_obj<Q>(&self, breadcrumb: &Breadcrumb, key: &Q) -> Result<Map<String, Value>, Error>
+    fn extract_obj<Q>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        key: &Q,
+    ) -> Result<Map<String, Value>, Error>
     where
         String: Borrow<Q>,
         Q: ?Sized + Ord + Eq + Hash + Display,
@@ -173,10 +231,11 @@ impl MapExt for &Map<String, Value> {
         T: for<'a> Deserialize<'a> + Serialize,
     {
         let x = self.extract_value(breadcrumb, key)?.to_owned();
-        let y: Result<T, Error> = serde_json::from_value(x).map_err(|_| Error::IncorrectType {
-            key: key.to_string(),
-            expected,
-        });
+        let y: Result<T, Error> =
+            serde_json::from_value(x).map_err(|_| Error::IncorrectType {
+                key: key.to_string(),
+                expected,
+            });
         y
     }
 }
