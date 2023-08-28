@@ -31,6 +31,16 @@ lazy_static! {
 }
 
 #[test]
+fn test_serde_deserialize() {
+    let actual = serde_json::from_value(JSON.to_owned());
+
+    match actual {
+        Ok(actual) => assert_eq!(*LOTTIE, actual),
+        Err(e) => panic!("{e}"),
+    }
+}
+
+#[test]
 fn test_deserialize() {
     let actual = crate::from_json(&JSON);
 

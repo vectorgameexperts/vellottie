@@ -186,6 +186,16 @@ lazy_static! {
     });
 }
 
+#[test]
+fn test_serde_deserialize() {
+    let actual = serde_json::from_value(JSON.to_owned());
+
+    match actual {
+        Ok(actual) => assert_eq!(*LAYER, actual),
+        Err(e) => panic!("{e}"),
+    }
+}
+
 #[test_log::test]
 fn test_deserialize() {
     let actual = Layer::from_json(&mut Breadcrumb::new(), &JSON);

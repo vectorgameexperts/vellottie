@@ -27,6 +27,16 @@ lazy_static! {
 }
 
 #[test]
+fn test_serde_deserialize() {
+    let actual = serde_json::from_value(JSON.to_owned());
+
+    match actual {
+        Ok(actual) => assert_eq!(*PRECOMP, actual),
+        Err(e) => panic!("{e}"),
+    }
+}
+
+#[test]
 fn test_deserialize() {
     let obj = JSON.as_object().unwrap();
     let actual = Precomposition::from_obj(&mut Breadcrumb::new(), obj);
