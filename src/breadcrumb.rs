@@ -62,8 +62,8 @@ pub struct Breadcrumb {
     path: Vec<PathVar>,
 }
 
-impl Breadcrumb {
-    pub fn new() -> Self {
+impl Default for Breadcrumb {
+    fn default() -> Self {
         Self {
             path: vec![PathVar::Unnamed {
                 pos: 0,
@@ -71,6 +71,12 @@ impl Breadcrumb {
                 children: 0,
             }],
         }
+    }
+}
+
+impl Breadcrumb {
+    pub fn new() -> Self {
+        Self::default()
     }
 
     pub fn rename_root(&mut self, name: String) {
