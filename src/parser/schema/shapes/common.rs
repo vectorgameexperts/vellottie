@@ -1,6 +1,6 @@
 use super::ShapeType;
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType,
     schema::layers::enumerations::BlendMode, util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};

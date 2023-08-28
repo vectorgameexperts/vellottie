@@ -1,6 +1,6 @@
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
 };
 use serde::{de::Deserializer, Deserialize, Serialize, Serializer};
 use serde_json::{Number, Value};

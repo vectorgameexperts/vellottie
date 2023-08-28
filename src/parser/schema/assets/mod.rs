@@ -3,7 +3,7 @@ pub mod precomposition;
 
 use self::{image::Image, precomposition::Precomposition};
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 

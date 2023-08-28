@@ -7,7 +7,7 @@ use self::{common::LayerProperties, enumerations::LayerType};
 use super::{animated_properties::AnimatedNumber, shapes::Shape};
 use crate::parser::{
     breadcrumb::Breadcrumb,
-    error::ValueType,
+    breadcrumb::ValueType,
     util::{self},
     Error,
 };

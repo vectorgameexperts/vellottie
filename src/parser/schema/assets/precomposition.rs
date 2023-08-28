@@ -1,6 +1,6 @@
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, schema::layers::Layer,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, schema::layers::Layer,
     util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};

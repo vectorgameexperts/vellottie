@@ -7,7 +7,7 @@ pub mod transform;
 
 use self::{rectangle::RectangleShape, transform::TransformShape};
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
 };
 use ellipse::EllipseShape;
 use group::GroupShape;

@@ -1,7 +1,7 @@
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb,
-    error::ValueType,
+    breadcrumb::ValueType,
     util::{self},
     Error,
 };
@@ -65,7 +65,7 @@ impl AnimatedVector {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_anon(ValueType::AnimatedVector);
+        breadcrumb.enter_unnamed(ValueType::AnimatedVector);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
         let vector = if animated == BoolInt::True {
             todo!();
@@ -143,7 +143,7 @@ impl AnimatedNumber {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_anon(ValueType::AnimatedNumber);
+        breadcrumb.enter_unnamed(ValueType::AnimatedNumber);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
         let number = if animated == BoolInt::True {
             todo!();

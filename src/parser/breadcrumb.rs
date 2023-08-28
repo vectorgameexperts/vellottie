@@ -1,8 +1,64 @@
 use log::trace;
 use std::fmt::{self, Display};
 
-use crate::parser::error::ValueType;
+/// An named value type for error propagation and reflection.
+#[derive(Debug, Clone, Copy)]
+pub enum ValueType {
+    Null,
+    Bool,
+    Object,
+    Number,
+    BoolInt,
+    EnumInt,
+    String,
+    Array,
+    Scalar2d,
 
+    Lottie,
+    Asset,
+    Image,
+    Precomposition,
+    Layer,
+    Shape,
+    Transform,
+    AnimatedVector,
+    StaticVector,
+    AnimatedNumber,
+    StaticNumber,
+}
+
+impl Display for ValueType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                ValueType::Null => "null",
+                ValueType::Bool => "boolean",
+                ValueType::Object => "object",
+                ValueType::Number => "number",
+                ValueType::BoolInt => "0 or 1",
+                ValueType::EnumInt => "0 to 255",
+                ValueType::String => "string",
+                ValueType::Array => "array",
+                ValueType::Scalar2d => "[number, number]",
+                ValueType::Asset => "Asset",
+                ValueType::Layer => "Layer",
+                ValueType::Shape => "Shape",
+                ValueType::Lottie => "Lottie",
+                ValueType::Image => "Image",
+                ValueType::Precomposition => "Precomposition",
+                ValueType::Transform => "Transform",
+                ValueType::AnimatedVector => "AnimatedVector",
+                ValueType::StaticVector => "StaticVector",
+                ValueType::AnimatedNumber => "AnimatedNumber",
+                ValueType::StaticNumber => "StaticNumber",
+            }
+        )
+    }
+}
+
+/// A breadcrumb entry
 #[derive(Clone, Debug)]
 pub enum PathVar {
     Named {
@@ -59,6 +115,7 @@ impl Display for PathVar {
     }
 }
 
+/// A data structure used to help unwind when parsing a Lottie Animation.
 #[derive(Clone, Debug)]
 pub struct Breadcrumb {
     path: Vec<PathVar>,
@@ -77,10 +134,12 @@ impl Default for Breadcrumb {
 }
 
 impl Breadcrumb {
+    /// Create a new breadcrumb trail. One is created for every file parse.
     pub fn new() -> Self {
         Self::default()
     }
 
+    /// Rename the root element, if the Animation had a "nm" (name).
     pub fn rename_root(&mut self, name: String) {
         let (pos, val, children) = match self.path[0] {
             PathVar::Named {
@@ -98,6 +157,7 @@ impl Breadcrumb {
         }
     }
 
+    /// Enter an object field and append it to the breadcrumb trail.
     pub fn enter<S>(&mut self, val: ValueType, name: Option<S>)
     where
         S: Into<String>,
@@ -122,7 +182,8 @@ impl Breadcrumb {
         self.path.push(path);
     }
 
-    pub fn enter_anon(&mut self, val: ValueType) {
+    /// Enter an unnamed object field and append it to the breadcrumb trail.
+    pub fn enter_unnamed(&mut self, val: ValueType) {
         let parent = self.path.last_mut().expect("no parent in breadcrumb");
         parent.increment_children();
         let path = PathVar::Unnamed {
@@ -134,6 +195,7 @@ impl Breadcrumb {
         self.path.push(path);
     }
 
+    /// Exit the current object, and remove it from the breadcrumb trail.
     pub fn exit(&mut self) {
         assert!(self.path.len() > 1, "request to exit with no parent");
         let path = self.path.pop().unwrap();
@@ -164,7 +226,7 @@ impl fmt::Display for Breadcrumb {
 #[cfg(test)]
 mod tests {
     use super::Breadcrumb;
-    use crate::parser::error::ValueType;
+    use crate::parser::breadcrumb::ValueType;
 
     #[test]
     fn test_empty() {
@@ -206,9 +268,9 @@ mod tests {
     #[test]
     fn test_anon() {
         let mut breadcrumb = Breadcrumb::new();
-        breadcrumb.enter_anon(ValueType::Layer);
+        breadcrumb.enter_unnamed(ValueType::Layer);
         breadcrumb.exit();
-        breadcrumb.enter_anon(ValueType::Layer);
+        breadcrumb.enter_unnamed(ValueType::Layer);
         assert_eq!("(root)>(unnamed Layer)#2", breadcrumb.to_string());
     }
 }
