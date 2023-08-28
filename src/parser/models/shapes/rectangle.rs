@@ -1,5 +1,5 @@
 use crate::parser::models::{
-    layer::animated_properties::AnimatedNumber,
+    animated_properties::AnimatedNumber,
     shapes::{AnimatedVector, ShapeProperties},
 };
 use serde::{Deserialize, Serialize};

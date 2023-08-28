@@ -2,10 +2,11 @@
 
 use super::{
     enumerations::{BlendMode, LayerType},
-    BoolInt, Transform,
+    BoolInt,
 };
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
+    breadcrumb::Breadcrumb, error::ValueType, models::transform::Transform,
+    util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};

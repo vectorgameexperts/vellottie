@@ -5,7 +5,7 @@ use crate::parser::{breadcrumb::Breadcrumb, error::Error, util::MapExt};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Transform {
     /// Position (relative to its parent) around which transformations are
     /// applied (ie: center for rotation / scale)
@@ -49,8 +49,7 @@ impl Transform {
             .ok();
         let position = obj
             .extract_obj(breadcrumb, "p")
-            .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))
-            .ok();
+            .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))?;
         let scale = obj
             .extract_obj(breadcrumb, "s")
             .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))

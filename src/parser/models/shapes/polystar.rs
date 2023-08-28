@@ -1,6 +1,6 @@
-use crate::parser::models::layer::{
+use crate::parser::models::{
     animated_properties::{AnimatedNumber, AnimatedVector},
-    enumerations::StarType,
+    layer::enumerations::StarType,
 };
 use serde::{Deserialize, Serialize};
 

@@ -1,15 +1,10 @@
-pub mod animated_properties;
 pub mod common;
 pub mod enumerations;
 pub mod precomposition;
 pub mod shape;
-pub mod transform;
 
-use self::{
-    animated_properties::AnimatedNumber, common::LayerProperties,
-    enumerations::LayerType, transform::Transform,
-};
-use super::{shapes::Shape, BoolInt};
+use self::{common::LayerProperties, enumerations::LayerType};
+use super::{animated_properties::AnimatedNumber, shapes::Shape, BoolInt};
 use crate::parser::{
     breadcrumb::Breadcrumb,
     error::ValueType,

@@ -6,16 +6,19 @@ pub mod rectangle;
 pub mod transform;
 
 use self::{rectangle::RectangleShape, transform::TransformShape};
-use super::layer::{animated_properties::AnimatedNumber, transform::Transform};
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType,
-    models::layer::animated_properties::AnimatedVector, util::MapExt, Error,
+    breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
 };
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
 
 pub use self::common::ShapeProperties;
+
+use super::{
+    animated_properties::{AnimatedNumber, AnimatedVector},
+    transform::Transform,
+};
 
 /// Lottie considers everything related to vector data as a "shape". All shapes
 /// share the properties in `shapes::common::Properties`.

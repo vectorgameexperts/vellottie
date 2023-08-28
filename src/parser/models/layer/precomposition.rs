@@ -1,12 +1,14 @@
-use super::{animated_properties::AnimatedNumber, common};
+use crate::parser::models::animated_properties::AnimatedNumber;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
+
+use super::common::LayerProperties;
 
 /// Renders a Precomposition
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct PrecompositionLayer {
     #[serde(flatten)]
-    pub properties: common::LayerProperties,
+    pub properties: LayerProperties,
     /// ID of the precomp as specified in the assets
     #[serde(rename = "refID")]
     pub precomp_id: String,
