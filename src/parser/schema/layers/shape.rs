@@ -1,7 +1,7 @@
 //! Shapes - https://lottiefiles.github.io/lottie-docs/shapes/
 
 use super::common;
-use crate::parser::models::shapes::Shape;
+use crate::parser::schema::shapes::Shape;
 use serde::{Deserialize, Serialize};
 
 /// Has an array of shapes

@@ -1,4 +1,4 @@
-use crate::parser::models::{
+use crate::parser::schema::{
     animated_properties::AnimatedVector, shapes::ShapeProperties,
 };
 use serde::{Deserialize, Serialize};

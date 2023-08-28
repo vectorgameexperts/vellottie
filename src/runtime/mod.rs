@@ -1,17 +1,17 @@
 // Copyright 2023 Google LLC
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+mod render;
+
+use std::collections::HashMap;
+use std::ops::Range;
+
 /// Re-export vello.
 pub use vello;
 
 pub mod model;
 
-mod render;
-
 pub use render::{RenderSink, Renderer};
-
-use std::collections::HashMap;
-use std::ops::Range;
 
 /// Model of a Lottie file.
 #[derive(Clone, Default, Debug)]
@@ -36,7 +36,7 @@ impl Composition {
     pub fn from_bytes(
         bytes: impl AsRef<[u8]>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        crate::import::import_composition(bytes)
+        todo!("crate::import::import_composition(bytes)")
     }
 
     /// Returns a t value for the specified time in seconds.

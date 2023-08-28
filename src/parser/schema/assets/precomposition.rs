@@ -1,9 +1,7 @@
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
-    breadcrumb::Breadcrumb,
-    error::ValueType,
-    models::{layer::Layer, BoolInt},
-    util::MapExt,
-    Error,
+    breadcrumb::Breadcrumb, error::ValueType, schema::layers::Layer,
+    util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};

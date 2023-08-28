@@ -4,7 +4,9 @@ use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
-    models::{assets::precomposition::Precomposition, BoolInt},
+    schema::{
+        assets::precomposition::Precomposition, helpers::int_boolean::BoolInt,
+    },
 };
 
 lazy_static! {

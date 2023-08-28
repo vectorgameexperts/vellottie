@@ -1,4 +1,5 @@
-use super::{assets::Asset, layer::Layer, BoolInt};
+use super::{assets::Asset, layers::Layer};
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error,
 };

@@ -1,11 +1,9 @@
 #![allow(deprecated)]
 
-use super::{
-    enumerations::{BlendMode, LayerType},
-    BoolInt,
-};
+use super::enumerations::{BlendMode, LayerType};
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
-    breadcrumb::Breadcrumb, error::ValueType, models::transform::Transform,
+    breadcrumb::Breadcrumb, error::ValueType, schema::transform::Transform,
     util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};

@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
-    models::{assets::image::Image, BoolInt},
+    schema::{assets::image::Image, helpers::int_boolean::BoolInt},
 };
 
 lazy_static! {

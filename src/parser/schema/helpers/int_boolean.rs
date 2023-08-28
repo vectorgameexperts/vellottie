@@ -1,10 +1,3 @@
-pub mod animated_properties;
-pub mod assets;
-pub mod layer;
-pub mod lottie;
-pub mod shapes;
-pub mod transform;
-
 use serde_repr::{Deserialize_repr, Serialize_repr};
 #[derive(
     Deserialize_repr, Serialize_repr, PartialEq, Default, Debug, Clone,

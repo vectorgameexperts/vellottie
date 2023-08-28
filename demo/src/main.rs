@@ -14,11 +14,9 @@
 //
 // Also licensed under MIT license, at your choice.
 
-use std::{fs, time::Instant};
-
 use anyhow::Result;
 use clap::Parser;
-use velato::Composition;
+use std::{fs, time::Instant};
 use vello::RendererOptions;
 use vello::{
     block_on_wgpu,
@@ -27,6 +25,7 @@ use vello::{
     util::RenderContext,
     RenderParams, Renderer, Scene, SceneBuilder,
 };
+use vellottie::runtime::Composition;
 
 use winit::{event_loop::EventLoop, window::Window};
 
@@ -41,7 +40,12 @@ struct Args {
     scale: Option<f64>,
 }
 
-async fn run(event_loop: EventLoop<()>, window: Window, args: Args, composition: Composition) {
+async fn run(
+    event_loop: EventLoop<()>,
+    window: Window,
+    args: Args,
+    composition: Composition,
+) {
     use winit::{event::*, event_loop::ControlFlow};
     let mut render_cx = RenderContext::new().unwrap();
     let size = window.inner_size();
@@ -49,7 +53,7 @@ async fn run(event_loop: EventLoop<()>, window: Window, args: Args, composition:
         .create_surface(&window, size.width, size.height)
         .await;
     let device_handle = &render_cx.devices[surface.dev_id];
-    let mut velato_renderer = velato::Renderer::new();
+    let mut velato_renderer = vellottie::runtime::Renderer::new();
     let mut renderer = Renderer::new(
         &device_handle.device,
         &RendererOptions {
@@ -169,7 +173,8 @@ fn main() -> Result<()> {
     let event_loop = EventLoop::new();
     let contents = fs::read(&args.file)?;
     // TODO: Implement proper error handling in velato so that anyhow can be properly used here
-    let composition = velato::Composition::from_bytes(&contents).unwrap();
+    let composition =
+        vellottie::runtime::Composition::from_bytes(&contents).unwrap();
     let window = WindowBuilder::new()
         .with_inner_size(LogicalSize::new(1044, 800))
         .with_resizable(true)

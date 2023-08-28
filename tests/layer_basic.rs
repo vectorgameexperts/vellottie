@@ -5,22 +5,20 @@ use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
-    models::{
-        layer::{
-            animated_properties::{
-                AnimatedNumber, AnimatedVector, StaticNumber, StaticVector,
-            },
-            common::LayerProperties,
-            enumerations::LayerType,
-            shape::ShapeLayer,
-            transform::Transform,
-            Layer,
+    schema::{
+        animated_properties::{
+            AnimatedNumber, AnimatedVector, StaticNumber, StaticVector,
+        },
+        helpers::int_boolean::BoolInt,
+        layers::{
+            common::LayerProperties, enumerations::LayerType,
+            shape::ShapeLayer, Layer,
         },
         shapes::{
             ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties,
             ShapeType,
         },
-        BoolInt,
+        transform::Transform,
     },
 };
 
@@ -113,10 +111,10 @@ lazy_static! {
                     animated: BoolInt::False,
                     value: [Number::from(256), Number::from(256)],
                 })),
-                position: Some(AnimatedVector::Static(StaticVector {
+                position: AnimatedVector::Static(StaticVector {
                     animated: BoolInt::False,
                     value: [Number::from(256), Number::from(256)],
-                })),
+                }),
                 scale: Some(AnimatedVector::Static(StaticVector {
                     animated: BoolInt::False,
                     value: [Number::from(100), Number::from(100)],

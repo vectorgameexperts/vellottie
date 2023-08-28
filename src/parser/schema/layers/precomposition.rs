@@ -1,4 +1,4 @@
-use crate::parser::models::animated_properties::AnimatedNumber;
+use crate::parser::schema::animated_properties::AnimatedNumber;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 

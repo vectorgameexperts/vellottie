@@ -3,7 +3,7 @@ mod error;
 pub mod breadcrumb;
 pub(crate) mod util;
 
-pub mod models;
+pub mod schema;
 
 pub use error::Error;
-pub use models::lottie::Lottie;
+pub use schema::lottie::Lottie;

@@ -1,4 +1,4 @@
-use super::BoolInt;
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb,
     error::ValueType,

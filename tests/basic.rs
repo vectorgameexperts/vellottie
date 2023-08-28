@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
-use vellottie::parser::{models::BoolInt, *};
+use vellottie::parser::{schema::helpers::int_boolean::BoolInt, *};
 
 lazy_static! {
     static ref JSON: serde_json::Value = json!(
@@ -42,7 +42,7 @@ fn test_serde_deserialize() {
 
 #[test]
 fn test_deserialize() {
-    let actual = crate::from_json(&JSON);
+    let actual = Lottie::from_json(&JSON);
 
     match actual {
         Ok(actual) => assert_eq!(*LOTTIE, actual),
