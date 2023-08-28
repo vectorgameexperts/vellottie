@@ -39,15 +39,15 @@ impl Display for PathVar {
             "{}",
             match self {
                 Self::Named { pos, name, .. } => {
-                    if *pos > 0 {
-                        format!("\"{name}\" @ {pos}")
+                    if *pos > 1 {
+                        format!("\"{name}\"#{pos}")
                     } else {
                         format!("\"{name}\"")
                     }
                 }
                 Self::Unnamed { pos, val, .. } => {
-                    if *pos > 0 {
-                        format!("(unnamed {val}) @ {pos}")
+                    if *pos > 1 {
+                        format!("(unnamed {val})#{pos}")
                     } else {
                         format!("(unnamed {val})")
                     }
@@ -150,5 +150,58 @@ impl fmt::Display for Breadcrumb {
                 .collect::<Vec<String>>()
                 .join(">")
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::error::ValueType;
+
+    use super::Breadcrumb;
+
+    #[test]
+    fn test_empty() {
+        let breadcrumb = Breadcrumb::new();
+        assert_eq!("(root)", breadcrumb.to_string());
+    }
+
+    #[test]
+    fn test_renamed_root() {
+        let mut breadcrumb = Breadcrumb::new();
+        breadcrumb.rename_root("Example Lottie".to_string());
+        assert_eq!("\"Example Lottie\"", breadcrumb.to_string());
+    }
+
+    #[test]
+    fn test_renamed_one_child() {
+        let mut breadcrumb = Breadcrumb::new();
+        breadcrumb.enter(ValueType::Shape, Some("Shape1"));
+        assert_eq!("(root)>\"Shape1\"", breadcrumb.to_string());
+    }
+
+    #[test]
+    fn test_renamed_two_children() {
+        let mut breadcrumb = Breadcrumb::new();
+        breadcrumb.enter(ValueType::Shape, Some("Shape"));
+        breadcrumb.exit();
+        breadcrumb.enter(ValueType::Shape, Some("Shape"));
+        assert_eq!("(root)>\"Shape\"#2", breadcrumb.to_string());
+    }
+
+    #[test]
+    fn test_renamed_level_two() {
+        let mut breadcrumb = Breadcrumb::new();
+        breadcrumb.enter(ValueType::Array, Some("Group"));
+        breadcrumb.enter(ValueType::Shape, Some("Shape"));
+        assert_eq!("(root)>\"Group\">\"Shape\"", breadcrumb.to_string());
+    }
+
+    #[test]
+    fn test_anon() {
+        let mut breadcrumb = Breadcrumb::new();
+        breadcrumb.enter_anon(ValueType::Layer);
+        breadcrumb.exit();
+        breadcrumb.enter_anon(ValueType::Layer);
+        assert_eq!("(root)>(unnamed Layer)#2", breadcrumb.to_string());
     }
 }
