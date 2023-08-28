@@ -1,4 +1,5 @@
 use crate::breadcrumb::Breadcrumb;
+use crate::error::ValueType;
 use crate::models::BoolInt;
 use crate::util::MapExt;
 use crate::Error;
@@ -67,11 +68,15 @@ where
 }
 
 impl Image {
-    pub fn from_object(
+    pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        let id = obj.extract_string(breadcrumb, "id")?;
+        let id = obj.extract_string(breadcrumb, "id");
+        breadcrumb.enter(ValueType::Image, id.as_ref().ok());
+
+        //Extract
+        let id = id?;
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let dir = obj.extract_string(breadcrumb, "u")?;
         let file_name = obj.extract_string(breadcrumb, "p")?;
@@ -82,6 +87,8 @@ impl Image {
             .extract_string(breadcrumb, "t")
             .ok()
             .map(|t| t == *"seq");
+
+        breadcrumb.exit();
         Ok(Self {
             id,
             name,

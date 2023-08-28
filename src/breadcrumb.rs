@@ -1,34 +1,135 @@
 use log::trace;
-use std::fmt;
+use std::fmt::{self, Display};
 
-#[derive(Clone, Default)]
+use crate::error::ValueType;
+
+#[derive(Clone, Debug)]
+pub enum PathVar {
+    Named {
+        pos: usize,
+        name: String,
+        val: ValueType,
+        children: usize,
+    },
+    Unnamed {
+        pos: usize,
+        val: ValueType,
+        children: usize,
+    },
+}
+
+impl PathVar {
+    pub fn get_children(&self) -> usize {
+        match self {
+            PathVar::Named { children, .. } | PathVar::Unnamed { children, .. } => *children,
+        }
+    }
+
+    pub fn increment_children(&mut self) {
+        match self {
+            PathVar::Named { children, .. } | PathVar::Unnamed { children, .. } => *children += 1,
+        }
+    }
+}
+
+impl Display for PathVar {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Named { pos, name, .. } => {
+                    if *pos > 0 {
+                        format!("\"{name}\" @ {pos}")
+                    } else {
+                        format!("\"{name}\"")
+                    }
+                }
+                Self::Unnamed { pos, val, .. } => {
+                    if *pos > 0 {
+                        format!("(unnamed {val}) @ {pos}")
+                    } else {
+                        format!("(unnamed {val})")
+                    }
+                }
+            }
+        )
+    }
+}
+
+#[derive(Clone, Debug)]
 pub struct Breadcrumb {
-    path: Vec<String>,
+    path: Vec<PathVar>,
 }
 
 impl Breadcrumb {
     pub fn new() -> Self {
-        Self::default()
+        Self {
+            path: vec![PathVar::Unnamed {
+                pos: 0,
+                val: ValueType::Lottie,
+                children: 0,
+            }],
+        }
     }
 
-    pub fn enter(&mut self, path: impl Into<String>) {
-        let path = path.into();
+    pub fn rename_root(&mut self, name: String) {
+        let (pos, val, children) = match self.path[0] {
+            PathVar::Named {
+                pos, children, val, ..
+            }
+            | PathVar::Unnamed {
+                pos, children, val, ..
+            } => (pos, val, children),
+        };
+        self.path[0] = PathVar::Named {
+            name,
+            pos,
+            val,
+            children,
+        }
+    }
+
+    pub fn enter<S>(&mut self, val: ValueType, name: Option<S>)
+    where
+        S: Into<String>,
+    {
+        let parent = self.path.last_mut().expect("no parent in breadcrumb");
+        parent.increment_children();
+
+        let path = match name {
+            Some(name) => PathVar::Named {
+                pos: parent.get_children(),
+                name: name.into(),
+                val,
+                children: 0,
+            },
+            None => PathVar::Unnamed {
+                pos: parent.get_children(),
+                val,
+                children: 0,
+            },
+        };
+        trace!("entering {path}");
+        self.path.push(path);
+    }
+
+    pub fn enter_anon(&mut self, val: ValueType) {
+        let parent = self.path.last_mut().expect("no parent in breadcrumb");
+        parent.increment_children();
+        let path = PathVar::Unnamed {
+            pos: parent.get_children(),
+            val,
+            children: 0,
+        };
         trace!("entering {path}");
         self.path.push(path);
     }
 
     pub fn exit(&mut self) {
-        if let Some(path) = self.path.pop() {
-            trace!("exited {path}");
-        }
-    }
-}
-
-impl fmt::Debug for Breadcrumb {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Breadcrumb")
-            .field("path", &format!("{}", self))
-            .finish()
+        assert!(self.path.len() > 1, "request to exit with no parent");
+        let path = self.path.pop().unwrap();
+        trace!("exited {path}");
     }
 }
 
@@ -36,12 +137,18 @@ impl fmt::Display for Breadcrumb {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}",
-            if self.path.is_empty() {
-                "(root)".to_string()
-            } else {
-                self.path.join(">")
-            }
+            "{}{}{}",
+            match &self.path[0] {
+                PathVar::Named { name, .. } => format!("\"{name}\""),
+                PathVar::Unnamed { .. } => "(root)".to_string(),
+            },
+            if self.path.len() > 1 { ">" } else { "" },
+            self.path
+                .iter()
+                .skip(1)
+                .map(PathVar::to_string)
+                .collect::<Vec<String>>()
+                .join(">")
         )
     }
 }

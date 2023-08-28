@@ -9,7 +9,7 @@ use self::{
     animated_properties::AnimatedNumber, common::LayerProperties, enumerations::LayerType,
     transform::Transform,
 };
-use super::BoolInt;
+use super::{shapes::Shape, BoolInt};
 use crate::{
     breadcrumb::Breadcrumb,
     error::ValueType,
@@ -60,23 +60,35 @@ impl Layer {
             expected: ValueType::Layer,
         })?;
         let name = root.extract_string(breadcrumb, "nm").ok();
-        breadcrumb.enter(name.clone().unwrap_or("(unnamed layer)".to_string()));
+        breadcrumb.enter(ValueType::Layer, name.clone());
 
+        //Extract
         let properties = LayerProperties::from_obj(breadcrumb, root)?;
-
         let layer = match properties.layer_type {
             LayerType::Precomposition => Layer::Precomposition(PrecompositionLayer {
                 properties,
                 precomp_id: root.extract_string(breadcrumb, "refID")?,
                 width: root.extract_number(breadcrumb, "w")?,
                 height: root.extract_number(breadcrumb, "h")?,
-                time_remap: AnimatedNumber::from_object(breadcrumb, root)?,
+                time_remap: AnimatedNumber::from_obj(breadcrumb, root)?,
             }),
-            LayerType::Shape => Layer::Shape(ShapeLayer::from_properties_and_object(
-                breadcrumb, properties, root,
-            )?),
+            LayerType::Shape => Layer::Shape(ShapeLayer {
+                properties,
+                shapes: {
+                    let mut shapes = vec![];
+                    let json_shapes = root.extract_arr(breadcrumb, "shapes")?;
+                    breadcrumb.enter(ValueType::Array, Some("shapes"));
+                    for v in json_shapes {
+                        let shape = Shape::from_json(breadcrumb, &v)?;
+                        shapes.push(shape);
+                    }
+                    breadcrumb.exit();
+                    shapes
+                },
+            }),
             _ => todo!(),
         };
+
         breadcrumb.exit();
         Ok(layer)
     }

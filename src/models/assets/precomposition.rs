@@ -1,5 +1,6 @@
 use crate::{
     breadcrumb::Breadcrumb,
+    error::ValueType,
     models::{layer::Layer, BoolInt},
     util::MapExt,
     Error,
@@ -30,21 +31,28 @@ pub struct Precomposition {
 }
 
 impl Precomposition {
-    pub fn from_object(
+    pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        let id = obj.extract_string(breadcrumb, "id")?;
+        let id = obj.extract_string(breadcrumb, "id");
+        breadcrumb.enter(ValueType::Precomposition, id.as_ref().ok());
+
+        // Extract
+        let id = id?;
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let frame_rate = obj.extract_number(breadcrumb, "fr").ok();
         let extra = obj.extract_bool_int(breadcrumb, "xt").ok();
         let mut layers = vec![];
-        for v in obj.extract_arr(breadcrumb, "layers")? {
-            breadcrumb.enter("layers".to_string());
+        let json_layers = obj.extract_arr(breadcrumb, "layers")?;
+        breadcrumb.enter(ValueType::Array, Some("layers"));
+        for v in json_layers {
             let layer = Layer::from_json(breadcrumb, &v)?;
             layers.push(layer);
-            breadcrumb.exit();
         }
+        breadcrumb.exit();
+
+        breadcrumb.exit();
         Ok(Self {
             id,
             name,

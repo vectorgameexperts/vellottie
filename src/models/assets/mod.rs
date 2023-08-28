@@ -20,15 +20,16 @@ impl Asset {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Object,
         })?;
-        let id = root.extract_string(breadcrumb, "id")?;
-        breadcrumb.enter(id);
+        let id = root.extract_string(breadcrumb, "id");
+        breadcrumb.enter(ValueType::Asset, id.as_ref().ok());
         // Extract
+        let id = id?;
         let asset = if root.contains_key("layers") {
             // Asset is a precomposition
-            Asset::Precomposition(Precomposition::from_object(breadcrumb, root)?)
+            Asset::Precomposition(Precomposition::from_obj(breadcrumb, root)?)
         } else if root.contains_key("p") {
             // Asset is an image
-            Asset::Image(Image::from_object(breadcrumb, root)?)
+            Asset::Image(Image::from_obj(breadcrumb, root)?)
         } else {
             return Err(Error::UnexpectedChild {
                 breadcrumb: breadcrumb.clone(),

@@ -61,19 +61,22 @@ pub enum AnimatedVector {
 }
 
 impl AnimatedVector {
-    pub fn from_object(
+    pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
+        breadcrumb.enter_anon(ValueType::AnimatedVector);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
-        if animated == BoolInt::True {
+        let vector = if animated == BoolInt::True {
             todo!();
         } else {
-            Ok(AnimatedVector::Static(StaticVector {
+            AnimatedVector::Static(StaticVector {
                 animated,
                 value: obj.extract_type(breadcrumb, "k", ValueType::Scalar2d)?,
-            }))
-        }
+            })
+        };
+        breadcrumb.exit();
+        Ok(vector)
     }
 }
 
@@ -132,18 +135,21 @@ pub enum AnimatedNumber {
 }
 
 impl AnimatedNumber {
-    pub fn from_object(
+    pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
+        breadcrumb.enter_anon(ValueType::AnimatedNumber);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
-        if animated == BoolInt::True {
+        let number = if animated == BoolInt::True {
             todo!();
         } else {
-            Ok(AnimatedNumber::Static(StaticNumber {
+            AnimatedNumber::Static(StaticNumber {
                 animated,
                 value: obj.extract_number(breadcrumb, "k")?,
-            }))
-        }
+            })
+        };
+        breadcrumb.exit();
+        Ok(number)
     }
 }

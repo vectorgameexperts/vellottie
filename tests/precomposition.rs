@@ -29,7 +29,7 @@ lazy_static! {
 #[test]
 fn test_deserialize() {
     let obj = JSON.as_object().unwrap();
-    let actual = Precomposition::from_object(&mut Breadcrumb::new(), obj);
+    let actual = Precomposition::from_obj(&mut Breadcrumb::new(), obj);
 
     match actual {
         Ok(actual) => assert_eq!(*PRECOMP, actual),

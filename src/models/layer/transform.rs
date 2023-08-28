@@ -39,38 +39,37 @@ pub struct Transform {
 }
 
 impl Transform {
-    pub fn from_object(
+    pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter("ks");
         let anchor_point = obj
             .extract_obj(breadcrumb, "a")
-            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))
             .ok();
         let position = obj
             .extract_obj(breadcrumb, "p")
-            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))
             .ok();
         let scale = obj
             .extract_obj(breadcrumb, "s")
-            .and_then(|obj| AnimatedVector::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedVector::from_obj(breadcrumb, &obj))
             .ok();
         let rotation = obj
             .extract_obj(breadcrumb, "r")
-            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedNumber::from_obj(breadcrumb, &obj))
             .ok();
         let skew = obj
             .extract_obj(breadcrumb, "sk")
-            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedNumber::from_obj(breadcrumb, &obj))
             .ok();
         let skew_axis = obj
             .extract_obj(breadcrumb, "sa")
-            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedNumber::from_obj(breadcrumb, &obj))
             .ok();
         let opacity = obj
             .extract_obj(breadcrumb, "o")
-            .and_then(|obj| AnimatedNumber::from_object(breadcrumb, &obj))
+            .and_then(|obj| AnimatedNumber::from_obj(breadcrumb, &obj))
             .ok();
         let transform = Transform {
             anchor_point,
@@ -81,7 +80,6 @@ impl Transform {
             skew_axis,
             opacity,
         };
-        breadcrumb.exit();
         Ok(transform)
     }
 }

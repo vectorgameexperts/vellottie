@@ -82,27 +82,27 @@ impl Shape {
             expected: ValueType::Shape,
         })?;
         let name = root.extract_string(breadcrumb, "nm").ok();
-        breadcrumb.enter(name.clone().unwrap_or("(unnamed shape)".to_string()));
+        breadcrumb.enter(ValueType::Shape, name);
 
+        // Extract
         let properties = ShapeProperties::from_obj(breadcrumb, root)?;
-
         let shape = match &properties.shape_type {
             ShapeType::Ellipse => Shape::Ellipse(EllipseShape {
                 properties,
-                position: AnimatedVector::from_object(
+                position: AnimatedVector::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_object(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
+                size: AnimatedVector::from_obj(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
             }),
             ShapeType::Rectangle => Shape::Rectangle(RectangleShape {
                 properties,
-                position: AnimatedVector::from_object(
+                position: AnimatedVector::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_object(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
-                rounded_corner_radius: AnimatedNumber::from_object(
+                size: AnimatedVector::from_obj(breadcrumb, &root.extract_obj(breadcrumb, "s")?)?,
+                rounded_corner_radius: AnimatedNumber::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "r")?,
                 )?,
@@ -112,18 +112,19 @@ impl Shape {
                 num_properties: root.extract_number(breadcrumb, "np").ok(),
                 shapes: {
                     let mut shapes = vec![];
-                    for s in root.extract_arr(breadcrumb, "it").unwrap_or_default() {
-                        breadcrumb.enter("it");
-                        let shape = Shape::from_json(breadcrumb, &s)?;
+                    let json_shapes = root.extract_arr(breadcrumb, "it")?;
+                    breadcrumb.enter(ValueType::Array, Some("it"));
+                    for v in json_shapes {
+                        let shape = Shape::from_json(breadcrumb, &v)?;
                         shapes.push(shape);
-                        breadcrumb.exit();
                     }
+                    breadcrumb.exit();
                     shapes
                 },
             }),
             ShapeType::Transform => Shape::Transform(TransformShape {
                 properties,
-                transform: Transform::from_object(breadcrumb, root)?,
+                transform: Transform::from_obj(breadcrumb, root)?,
             }),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)

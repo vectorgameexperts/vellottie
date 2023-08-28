@@ -142,7 +142,13 @@ impl LayerProperties {
         let tag_name = obj.extract_string(breadcrumb, "tg").ok();
         let tranform_before_mask_deprecated = obj.extract_string(breadcrumb, "cp").ok();
         let transform_before_mask = obj.extract_bool_int(breadcrumb, "ct").ok();
-        let transform = Transform::from_object(breadcrumb, &obj.extract_obj(breadcrumb, "ks")?)?;
+        let transform = {
+            let obj = obj.extract_obj(breadcrumb, "ks")?;
+            breadcrumb.enter(ValueType::Transform, Some("ks"));
+            let transform = Transform::from_obj(breadcrumb, &obj)?;
+            breadcrumb.exit();
+            transform
+        };
         let blend_mode: Option<BlendMode> =
             obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();
         Ok(LayerProperties {

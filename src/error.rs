@@ -1,7 +1,7 @@
 use crate::breadcrumb::Breadcrumb;
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum ValueType {
     Null,
     Bool,
@@ -13,10 +13,17 @@ pub enum ValueType {
     Array,
     Scalar2d,
 
-    // Named
+    Lottie,
     Asset,
+    Image,
+    Precomposition,
     Layer,
     Shape,
+    Transform,
+    AnimatedVector,
+    StaticVector,
+    AnimatedNumber,
+    StaticNumber,
 }
 
 impl Display for ValueType {
@@ -24,7 +31,7 @@ impl Display for ValueType {
         write!(
             f,
             "{}",
-            match &self {
+            match self {
                 ValueType::Null => "null",
                 ValueType::Bool => "boolean",
                 ValueType::Object => "object",
@@ -34,10 +41,17 @@ impl Display for ValueType {
                 ValueType::String => "string",
                 ValueType::Array => "array",
                 ValueType::Scalar2d => "[number, number]",
-
-                ValueType::Asset => "Image or Precomposition",
-                ValueType::Layer => "array of Precomposition Layer or Solid Color Layer or Image Layer or Null Layer or Shape Layer or Text Layer or Audio Layer or Camera Layer or Data Layer",
-                ValueType::Shape => "Rectangle or Ellipse or PolyStar or Path or Fill or Stroke or Gradient Fill or Gradient Stroke or No Style or Group or Transform or Repeater or Trim or Rounded Corners or Pucker / Bloat or Merge or Twist or Offset Path or Zig Zag"
+                ValueType::Asset => "Asset",
+                ValueType::Layer => "Layer",
+                ValueType::Shape => "Shape",
+                ValueType::Lottie => "Lottie",
+                ValueType::Image => "Image",
+                ValueType::Precomposition => "Precomposition",
+                ValueType::Transform => "Transform",
+                ValueType::AnimatedVector => "AnimatedVector",
+                ValueType::StaticVector => "StaticVector",
+                ValueType::AnimatedNumber => "AnimatedNumber",
+                ValueType::StaticNumber => "StaticNumber",
             }
         )
     }
