@@ -2,7 +2,7 @@ pub mod image;
 pub mod precomposition;
 
 use self::{image::Image, precomposition::Precomposition};
-use crate::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]

@@ -1,5 +1,5 @@
 use super::ShapeType;
-use crate::{
+use crate::parser::{
     breadcrumb::Breadcrumb, error::ValueType, models::layer::enumerations::BlendMode, util::MapExt,
     Error,
 };

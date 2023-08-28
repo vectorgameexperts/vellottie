@@ -1,4 +1,4 @@
-use crate::breadcrumb::Breadcrumb;
+use crate::parser::breadcrumb::Breadcrumb;
 use std::fmt::Display;
 
 #[derive(Debug, Clone, Copy)]

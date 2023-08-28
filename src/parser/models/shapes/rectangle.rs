@@ -1,6 +1,6 @@
-use crate::models::layer::animated_properties::AnimatedNumber;
-use crate::models::shapes::AnimatedVector;
-use crate::models::shapes::ShapeProperties;
+use crate::parser::models::layer::animated_properties::AnimatedNumber;
+use crate::parser::models::shapes::AnimatedVector;
+use crate::parser::models::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
 
 /// A rectangle, defined by its center point and size.

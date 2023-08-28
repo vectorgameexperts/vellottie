@@ -1,9 +1,8 @@
-use serde::{Deserialize, Serialize};
-
-use crate::models::layer::{
+use crate::parser::models::layer::{
     animated_properties::{AnimatedNumber, AnimatedVector},
     enumerations::StarType,
 };
+use serde::{Deserialize, Serialize};
 
 /// Regular polygon or star.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]

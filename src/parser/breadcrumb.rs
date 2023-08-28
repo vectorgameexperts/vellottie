@@ -1,7 +1,7 @@
 use log::trace;
 use std::fmt::{self, Display};
 
-use crate::error::ValueType;
+use crate::parser::error::ValueType;
 
 #[derive(Clone, Debug)]
 pub enum PathVar {
@@ -161,9 +161,8 @@ impl fmt::Display for Breadcrumb {
 
 #[cfg(test)]
 mod tests {
-    use crate::error::ValueType;
-
     use super::Breadcrumb;
+    use crate::parser::error::ValueType;
 
     #[test]
     fn test_empty() {

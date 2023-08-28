@@ -1,5 +1,5 @@
 use super::BoolInt;
-use crate::{
+use crate::parser::{
     breadcrumb::Breadcrumb,
     error::ValueType,
     util::{self},

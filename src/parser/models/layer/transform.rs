@@ -1,8 +1,8 @@
 //! Transform - https://lottiefiles.github.io/lottie-docs/concepts/#transform
 
 use super::animated_properties::{AnimatedNumber, AnimatedVector};
-use crate::util::MapExt;
-use crate::{breadcrumb::Breadcrumb, error::Error};
+use crate::parser::util::MapExt;
+use crate::parser::{breadcrumb::Breadcrumb, error::Error};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 

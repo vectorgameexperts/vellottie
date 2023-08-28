@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
-use vellottie::{
+use vellottie::parser::{
     breadcrumb::Breadcrumb,
     models::{assets::image::Image, BoolInt},
 };

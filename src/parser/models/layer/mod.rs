@@ -10,7 +10,7 @@ use self::{
     transform::Transform,
 };
 use super::{shapes::Shape, BoolInt};
-use crate::{
+use crate::parser::{
     breadcrumb::Breadcrumb,
     error::ValueType,
     util::{self},

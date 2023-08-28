@@ -1,8 +1,8 @@
-use crate::breadcrumb::Breadcrumb;
-use crate::error::ValueType;
-use crate::models::BoolInt;
-use crate::util::MapExt;
-use crate::Error;
+use crate::parser::breadcrumb::Breadcrumb;
+use crate::parser::error::ValueType;
+use crate::parser::models::BoolInt;
+use crate::parser::util::MapExt;
+use crate::parser::Error;
 use serde::{de::Deserializer, Serializer};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};

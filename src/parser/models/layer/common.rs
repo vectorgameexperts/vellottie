@@ -4,7 +4,7 @@ use super::{
     enumerations::{BlendMode, LayerType},
     BoolInt, Transform,
 };
-use crate::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 

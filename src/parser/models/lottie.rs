@@ -1,5 +1,5 @@
 use super::{assets::Asset, layer::Layer, BoolInt};
-use crate::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
+use crate::parser::{breadcrumb::Breadcrumb, error::ValueType, util::MapExt, Error};
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 use std::fmt::Display;
@@ -39,7 +39,7 @@ pub struct Lottie {
     pub assets: Option<Vec<Asset>>,
     /// List of layers
     #[serde(default)]
-    pub layers: Vec<crate::models::layer::Layer>,
+    pub layers: Vec<Layer>,
 }
 
 impl Lottie {

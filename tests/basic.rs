@@ -1,6 +1,6 @@
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
-use vellottie::{models::BoolInt, *};
+use vellottie::parser::{models::BoolInt, *};
 
 lazy_static! {
     static ref JSON: serde_json::Value = json!(

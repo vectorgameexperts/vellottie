@@ -1,5 +1,5 @@
-use crate::models::layer::animated_properties::AnimatedVector;
-use crate::models::shapes::ShapeProperties;
+use crate::parser::models::layer::animated_properties::AnimatedVector;
+use crate::parser::models::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
