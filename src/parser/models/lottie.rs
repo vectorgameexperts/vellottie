@@ -46,6 +46,31 @@ pub struct Lottie {
 }
 
 impl Lottie {
+    pub fn from_slice(b: &[u8]) -> Result<Lottie, Error> {
+        let json_tree: serde_json::Value = serde_json::from_slice(b)?;
+        Self::from_json(&json_tree)
+    }
+
+    pub fn from_str(s: &str) -> Result<Lottie, Error> {
+        let json_tree: serde_json::Value = serde_json::from_str(s)
+            .map_err(|e| Error::FileNotJson(Box::new(e)))?;
+        Self::from_json(&json_tree)
+    }
+
+    pub fn from_serde_slice(v: &[u8]) -> Result<Lottie, serde_json::Error> {
+        serde_json::from_slice(v)
+    }
+
+    pub fn from_serde_str(s: &str) -> Result<Lottie, serde_json::Error> {
+        serde_json::from_str(s)
+    }
+
+    pub fn from_serde_json(
+        v: serde_json::Value,
+    ) -> Result<Lottie, serde_json::Error> {
+        serde_json::from_value(v)
+    }
+
     pub fn to_json(&self) -> serde_json::value::Value {
         serde_json::to_value(self).unwrap()
     }

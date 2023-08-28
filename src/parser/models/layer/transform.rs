@@ -14,8 +14,7 @@ pub struct Transform {
     pub anchor_point: Option<AnimatedVector>,
     /// Position / Translation
     #[serde(rename = "p")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub position: Option<AnimatedVector>,
+    pub position: AnimatedVector,
     /// Scale factor, 100 for no scaling
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
