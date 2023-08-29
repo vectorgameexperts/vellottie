@@ -82,9 +82,6 @@ pub enum GradientType {
     Radial = 2,
 }
 
-/// How masks interact with each other. See https://helpx.adobe.com/after-effects/using/alpha-channels-masks-mattes.html
-pub enum MaskMode {} // todo
-
 /// How a layer should mask another layer
 #[repr(u8)]
 #[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
