@@ -6,8 +6,7 @@ use vellottie::{parser::Lottie, *};
 fn test_deserialize() {
     let actual = Lottie::from_str(JSON);
 
-    match actual {
-        Err(e) => panic!("{e}"),
-        _ => {}
+    if let Err(e) = actual {
+        panic!("{e}");
     }
 }
