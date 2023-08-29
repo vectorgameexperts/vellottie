@@ -1,12 +1,13 @@
 // Copyright 2023 Google LLC
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use crate::parser::models::layer::precomposition::PrecompositionLayer;
-use crate::parser::models::layer::shape::ShapeLayer;
+use crate::parser::schema::animated_properties::AnimatedVector;
+use crate::parser::schema::layers::precomposition::PrecompositionLayer;
+use crate::parser::schema::layers::shape::ShapeLayer;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    animated, Content, GroupTransform, Layer, Mask, Value,
+    self, animated, Content, GroupTransform, Layer, Lerp, Mask, Value,
 };
 use crate::runtime::Composition;
 use std::collections::HashMap;
@@ -25,7 +26,7 @@ pub fn import_composition(
     let mut idmap: HashMap<usize, usize> = HashMap::default();
     for asset in &source.assets {
         match asset {
-            parser::models::assets::Asset::Precomposition(precomp) => {
+            parser::schema::assets::Asset::Precomposition(precomp) => {
                 idmap.clear();
                 let mut layers = vec![];
                 let mut mask_layer = None;
@@ -83,21 +84,21 @@ pub fn import_composition(
 }
 
 fn conv_layer(
-    source: &parser::models::layer::Layer,
+    source: &parser::schema::layers::Layer,
 ) -> Option<(Layer, usize, Option<BlendMode>)> {
     let mut layer = Layer::default();
     let params;
     match source {
-        parser::models::layer::Layer::Null(value) => {
+        parser::schema::layers::Layer::Null(value) => {
             params = setup_layer(value, &mut layer);
         }
-        parser::models::layer::Layer::PreComp(value) => {
+        parser::schema::layers::Layer::PreComp(value) => {
             params = setup_layer(value, &mut layer);
             let name = value.mixin.ref_id.clone();
             let time_remap = conv_scalar(&value.mixin.time_remapping);
             layer.content = Content::Instance { name, time_remap };
         }
-        parser::models::layer::Layer::Shape(value) => {
+        parser::schema::layers::Layer::Shape(value) => {
             params = setup_layer(value, &mut layer);
             let mut shapes = vec![];
             for shape in &value.mixin.shapes {
@@ -114,15 +115,14 @@ fn conv_layer(
 }
 
 fn setup_layer(
-    source: &parser::models::layer::Layer,
+    source: &parser::schema::layers::Layer,
     target: &mut Layer,
 ) -> (usize, Option<BlendMode>) {
     let source = match source {
-        parser::models::layer::Layer::Precomposition(PrecompositionLayer {
-            properties,
-            ..
-        }) => properties,
-        parser::models::layer::Layer::Shape(ShapeLayer {
+        parser::schema::layers::Layer::Precomposition(
+            PrecompositionLayer { properties, .. },
+        ) => properties,
+        parser::schema::layers::Layer::Shape(ShapeLayer {
             properties, ..
         }) => properties,
     };
@@ -168,11 +168,11 @@ fn setup_layer(
 }
 
 fn conv_transform(
-    value: &parser::models::layer::transform::Transform,
-) -> (parser::models::layer::transform::Transform, Value<f32>) {
+    value: &parser::schema::transform::Transform,
+) -> (parser::schema::transform::Transform, Value<f32>) {
     let transform = animated::Transform {
         anchor: conv_point(&value.anchor_point),
-        position: Position::Point(conv_point(&value.position)),
+        position: Position::Point(conv_point(&value.position)), // todo
         scale: conv_vec2(&value.scale),
         rotation: conv_scalar(&value.rotation),
         skew: conv_scalar(&value.skew),
@@ -183,7 +183,7 @@ fn conv_transform(
 }
 
 fn conv_shape_transform(
-    value: &parser::models::layer::transform::Transform,
+    value: &parser::schema::transform::Transform,
 ) -> GroupTransform {
     let transform = animated::Transform {
         anchor: conv_point(&value.anchor_point),
@@ -255,7 +255,7 @@ fn conv_multi<T: Lerp>(
     }
 }
 
-fn conv_point(value: &bodymovin::properties::MultiDimensional) -> Value<Point> {
+fn conv_point(value: &AnimatedVector) -> Value<Point> {
     conv_multi(value, |x| {
         Point::new(
             x.get(0).copied().unwrap_or(0.0),
@@ -555,7 +555,7 @@ fn conv_spline(
 }
 
 fn conv_blend_mode(
-    value: &parser::models::layer::enumerations::BlendMode,
+    value: &parser::schema::layers::enumerations::BlendMode,
 ) -> Option<BlendMode> {
     Some(match value {
         Normal => return None,
