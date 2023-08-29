@@ -13,7 +13,7 @@ pub struct AnimatedPosition {
     pub property_index: Option<Number>,
     /// Whether the property is animated
     #[serde(rename = "a")]
-    pub animated: Option<BoolInt>,
+    pub animated: BoolInt,
     /// The expression for the property.
     #[serde(rename = "x")]
     pub expression: Option<String>,
@@ -31,7 +31,7 @@ pub struct AnimatedPosition {
 pub struct StaticValue {
     /// Array of static values.
     #[serde(rename = "k")]
-    static_value: Vec<Number>,
+    static_value: [Number; 2],
 }
 
 /// Animated value variant containing keyframes.
