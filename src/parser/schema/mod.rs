@@ -1,11 +1,12 @@
-//! The schema for a Lottie `Animation` type.
+//! The schema for a Lottie `Animation`.
 //!
-//! Schema: https://lottiefiles.github.io/lottie-docs/schema/lottie.schema.json
+//! Raw schema: https://lottiefiles.github.io/lottie-docs/schema/lottie.schema.json
+//!
 
 pub mod animated_properties;
 pub mod animation;
 pub mod assets;
-// todo constants
+pub mod constants;
 // todo effect-values
 // todo effects
 pub mod helpers;
