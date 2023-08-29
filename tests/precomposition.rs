@@ -5,7 +5,9 @@ use serde_json::{json, Number};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
-        assets::precomposition::Precomposition, helpers::int_boolean::BoolInt,
+        animation::composition::Composition,
+        assets::{asset::Asset, precomposition::Precomposition},
+        helpers::int_boolean::BoolInt,
     },
 };
 
@@ -20,11 +22,13 @@ lazy_static! {
         }
     );
     static ref PRECOMP: Precomposition = Precomposition {
-        id: "precomp_0".to_string(),
-        name: Some("Example".to_string()),
+        asset: Asset {
+            id: "precomp_0".to_string(),
+            name: Some("Example".to_string()),
+        },
+        composition: Composition { layers: vec![] },
         frame_rate: Some(Number::from(60)),
         extra: Some(BoolInt::False),
-        layers: vec![]
     };
 }
 

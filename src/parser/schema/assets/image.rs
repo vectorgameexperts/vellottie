@@ -1,36 +1,23 @@
-use crate::parser::schema::helpers::int_boolean::BoolInt;
+use super::file_asset::FileAsset;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
 };
 use serde::{de::Deserializer, Deserialize, Serialize, Serializer};
 use serde_json::{Number, Value};
 
-/// Represents a (static) image
+/// External image
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct Image {
-    /// Unique identifier used by layers when referencing this asset
-    #[serde(rename = "id")]
-    pub id: String,
-    /// Human readable name
-    #[serde(rename = "nm")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    /// Path to the directory containing a file
-    #[serde(rename = "u")]
-    pub dir: String,
-    /// Filename or data url
-    #[serde(rename = "p")]
-    pub file_name: String,
-    /// Whether the file is embedded
-    #[serde(rename = "e", default)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub embedded: Option<BoolInt>,
+    #[serde(flatten)]
+    pub file_asset: FileAsset,
     /// Width of the image
     #[serde(rename = "w")]
-    pub width: Number,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub width: Option<Number>,
     /// Height of the image
     #[serde(rename = "h")]
-    pub height: Number,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub height: Option<Number>,
     /// Mark as part of an image sequence if present.
     #[serde(
         rename = "t",
@@ -73,14 +60,9 @@ impl Image {
         let id = obj.extract_string(breadcrumb, "id");
         breadcrumb.enter(ValueType::Image, id.as_ref().ok());
 
-        //Extract
-        let id = id?;
-        let name = obj.extract_string(breadcrumb, "nm").ok();
-        let dir = obj.extract_string(breadcrumb, "u")?;
-        let file_name = obj.extract_string(breadcrumb, "p")?;
-        let embedded = obj.extract_bool_int(breadcrumb, "e").ok();
-        let width = obj.extract_number(breadcrumb, "w")?;
-        let height = obj.extract_number(breadcrumb, "h")?;
+        let file_asset = FileAsset::from_obj(breadcrumb, obj)?;
+        let width = obj.extract_number(breadcrumb, "w").ok();
+        let height = obj.extract_number(breadcrumb, "h").ok();
         let sequence = obj
             .extract_string(breadcrumb, "t")
             .ok()
@@ -88,11 +70,7 @@ impl Image {
 
         breadcrumb.exit();
         Ok(Self {
-            id,
-            name,
-            dir,
-            file_name,
-            embedded,
+            file_asset,
             width,
             height,
             sequence,

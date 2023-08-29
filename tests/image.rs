@@ -2,7 +2,10 @@ use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
-    schema::{assets::image::Image, helpers::int_boolean::BoolInt},
+    schema::{
+        assets::{asset::Asset, file_asset::FileAsset, image::Image},
+        helpers::int_boolean::BoolInt,
+    },
 };
 
 lazy_static! {
@@ -12,18 +15,21 @@ lazy_static! {
             "h": 512,
             "w": 512,
             "e": 1,
-            "u": "",
             "p": "data:image/png;base64,..."
         }
     );
     static ref IMAGE: Image = Image {
-        name: None,
-        id: "my image".to_string(),
-        height: Number::from(512),
-        width: Number::from(512),
-        embedded: Some(BoolInt::True),
-        dir: "".to_string(),
-        file_name: "data:image/png;base64,...".to_string(),
+        file_asset: FileAsset {
+            asset: Asset {
+                id: "my image".to_string(),
+                name: None
+            },
+            dir: None,
+            file_name: "data:image/png;base64,...".to_string(),
+            embedded: Some(BoolInt::True),
+        },
+        height: Some(Number::from(512)),
+        width: Some(Number::from(512)),
         sequence: None
     };
 }

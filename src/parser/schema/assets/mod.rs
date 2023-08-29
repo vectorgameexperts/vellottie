@@ -1,3 +1,5 @@
+pub mod asset;
+pub mod file_asset;
 pub mod image;
 pub mod precomposition;
 
@@ -9,14 +11,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum Asset {
+pub enum AnyAsset {
     Image(Image),
     Precomposition(Precomposition),
     // unimplemented - Sound(Sound),
     // unimplemented - DataSource(DataSource),
 }
 
-impl Asset {
+impl AnyAsset {
     pub fn from_json(
         breadcrumb: &mut Breadcrumb,
         v: &serde_json::Value,
@@ -31,10 +33,12 @@ impl Asset {
         let id = id?;
         let asset = if root.contains_key("layers") {
             // Asset is a precomposition
-            Asset::Precomposition(Precomposition::from_obj(breadcrumb, root)?)
+            AnyAsset::Precomposition(Precomposition::from_obj(
+                breadcrumb, root,
+            )?)
         } else if root.contains_key("p") {
             // Asset is an image
-            Asset::Image(Image::from_obj(breadcrumb, root)?)
+            AnyAsset::Image(Image::from_obj(breadcrumb, root)?)
         } else {
             return Err(Error::UnexpectedChild {
                 breadcrumb: breadcrumb.clone(),

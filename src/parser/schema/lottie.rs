@@ -1,4 +1,4 @@
-use super::{assets::Asset, layers::Layer};
+use super::{assets::AnyAsset, layers::Layer};
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
@@ -40,7 +40,7 @@ pub struct Lottie {
     /// List of assets that can be referenced by layers
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub assets: Option<Vec<Asset>>,
+    pub assets: Option<Vec<AnyAsset>>,
     /// List of layers
     #[serde(default)]
     pub layers: Vec<Layer>,
@@ -98,7 +98,7 @@ impl Lottie {
             root.extract_arr(&breadcrumb, "assets").unwrap_or_default();
         breadcrumb.enter(ValueType::Array, Some("assets"));
         for v in json_assets {
-            let asset = Asset::from_json(&mut breadcrumb, &v)?;
+            let asset = AnyAsset::from_json(&mut breadcrumb, &v)?;
             assets.push(asset);
         }
         breadcrumb.exit();
