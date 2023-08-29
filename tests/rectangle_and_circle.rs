@@ -1,10 +1,10 @@
-pub const JSON: &str = include_str!("rectangle_and_circle.rs");
+pub const JSON: &str = include_str!("rectangle_and_circle.json");
 
-use vellottie::*;
+use vellottie::{parser::Lottie, *};
 
 #[test]
 fn test_deserialize() {
-    let actual = crate::from_str(JSON);
+    let actual = Lottie::from_str(JSON);
 
     match actual {
         Err(e) => panic!("{e}"),
