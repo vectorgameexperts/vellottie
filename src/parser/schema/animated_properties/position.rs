@@ -70,11 +70,13 @@ impl Position {
                 animated: obj.extract_bool_int(breadcrumb, "a")?,
                 expression: obj.extract_string(breadcrumb, "x").ok(),
                 length: obj.extract_number(breadcrumb, "l").ok(),
-                value: obj.extract_type(
-                    breadcrumb,
-                    "k",
-                    ValueType::Scalar2d,
-                )?,
+                value: PositionValue::Static(PositionStaticValue {
+                    static_value: obj.extract_type(
+                        breadcrumb,
+                        "k",
+                        ValueType::Scalar2d,
+                    )?,
+                }),
             }
         };
         breadcrumb.exit();

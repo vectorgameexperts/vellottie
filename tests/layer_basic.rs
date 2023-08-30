@@ -212,17 +212,12 @@ lazy_static! {
                     expression: None,
                     length: None,
                     value: PositionValue::Static(PositionStaticValue {
-                        static_value: [Number::from(256), Number::from(256)],
+                        static_value: [
+                            Number::from_f64(303.9044776119403).unwrap(),
+                            Number::from_f64(324.9671641791045).unwrap()
+                        ],
                     }),
                 },
-
-                // MultiDimensional::Static(StaticVector {
-                //     animated: BoolInt::False,
-                //     value: [
-                //         Number::from_f64(303.9044776119403).unwrap(),
-                //         Number::from_f64(324.9671641791045).unwrap()
-                //     ]
-                // }),
                 size: MultiDimensional::Static(MultiDimensionalValue {
                     animated_property_base: AnimatedPropertyBase {
                         property_index: None,
