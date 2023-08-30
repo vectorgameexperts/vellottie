@@ -1,6 +1,6 @@
 use crate::parser::schema::{
     animated_properties::{position::Position, value::Scalar},
-    layers::enumerations::StarType,
+    constants::star_type::StarType,
 };
 use serde::{Deserialize, Serialize};
 

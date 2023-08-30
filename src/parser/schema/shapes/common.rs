@@ -1,7 +1,7 @@
 use super::ShapeType;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType,
-    schema::layers::enumerations::BlendMode, util::MapExt, Error,
+    schema::constants::blend_mode::BlendMode, util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
