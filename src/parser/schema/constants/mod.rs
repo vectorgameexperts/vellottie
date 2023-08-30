@@ -1,6 +1,6 @@
+pub mod line_join;
 pub mod mask_mode;
 pub mod stroke_dash_type;
-// todo line-join
 // todo fill-rule
 // todo line-cap
 // todo trim-multiple-shapes
