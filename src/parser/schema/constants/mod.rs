@@ -3,11 +3,11 @@ pub mod font_path_origin;
 pub mod line_cap;
 pub mod line_join;
 pub mod mask_mode;
+pub mod shape_direction;
 pub mod stroke_dash_type;
 pub mod text_justify;
 pub mod text_shape;
 pub mod trim_multiple_shapes;
-// todo shape-direction
 // todo text-based
 // todo gradient-type
 // todo matte-mode
