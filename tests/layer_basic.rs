@@ -4,13 +4,13 @@ use lazy_static::lazy_static;
 use serde_json::{json, Number};
 use vellottie::parser::breadcrumb::ValueType::StaticVector;
 use vellottie::parser::schema::animated_properties::position::{
-    Position, PositionStaticValue, PositionValue,
+    Position, PositionValue,
 };
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
         animated_properties::{
-            animated_property::AnimatedPropertyBase,
+            animated_property::AnimatedPropertyPrelude,
             multi_dimensional::{MultiDimensional, MultiDimensionalValue},
             value::{Scalar, ScalarValue},
         },
@@ -117,21 +117,23 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static(PositionStaticValue {
-                        static_value: [Number::from(256), Number::from(256)],
-                    }),
+                    value: PositionValue::Static([
+                        Number::from(256),
+                        Number::from(256)
+                    ],),
                 }),
                 position: Position {
                     property_index: None,
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static(PositionStaticValue {
-                        static_value: [Number::from(256), Number::from(256)],
-                    }),
+                    value: PositionValue::Static([
+                        Number::from(256),
+                        Number::from(256)
+                    ],),
                 },
                 scale: Some(MultiDimensional::Static(MultiDimensionalValue {
-                    animated_property_base: AnimatedPropertyBase {
+                    prelude: AnimatedPropertyPrelude {
                         property_index: None,
                         animated: BoolInt::False,
                         expression: None,
@@ -140,7 +142,7 @@ lazy_static! {
                     value: [Number::from(100), Number::from(100)],
                 })),
                 rotation: Some(Scalar::Static(ScalarValue {
-                    animated_property_base: AnimatedPropertyBase {
+                    prelude: AnimatedPropertyPrelude {
                         property_index: None,
                         animated: BoolInt::False,
                         expression: None,
@@ -149,7 +151,7 @@ lazy_static! {
                     value: Number::from(0),
                 })),
                 opacity: Some(Scalar::Static(ScalarValue {
-                    animated_property_base: AnimatedPropertyBase {
+                    prelude: AnimatedPropertyPrelude {
                         property_index: None,
                         animated: BoolInt::False,
                         expression: None,
@@ -211,15 +213,13 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static(PositionStaticValue {
-                        static_value: [
-                            Number::from_f64(303.9044776119403).unwrap(),
-                            Number::from_f64(324.9671641791045).unwrap()
-                        ],
-                    }),
+                    value: PositionValue::Static([
+                        Number::from_f64(303.9044776119403).unwrap(),
+                        Number::from_f64(324.9671641791045).unwrap()
+                    ],),
                 },
                 size: MultiDimensional::Static(MultiDimensionalValue {
-                    animated_property_base: AnimatedPropertyBase {
+                    prelude: AnimatedPropertyPrelude {
                         property_index: None,
                         animated: BoolInt::False,
                         expression: None,

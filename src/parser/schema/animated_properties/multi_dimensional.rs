@@ -8,7 +8,7 @@ use crate::parser::{
     Error,
 };
 
-use super::animated_property::{AnimatedProperty, AnimatedPropertyBase};
+use super::animated_property::{AnimatedProperty, AnimatedPropertyPrelude};
 
 /// Animated Vector
 ///
@@ -24,7 +24,7 @@ pub enum MultiDimensional {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct MultiDimensionalValue {
     #[serde(flatten)]
-    pub animated_property_base: AnimatedPropertyBase,
+    pub prelude: AnimatedPropertyPrelude,
     /// A single component array.
     #[serde(rename = "k")]
     pub value: [Number; 2],
@@ -41,7 +41,7 @@ impl MultiDimensional {
             todo!();
         } else {
             MultiDimensional::Static(MultiDimensionalValue {
-                animated_property_base: AnimatedPropertyBase {
+                prelude: AnimatedPropertyPrelude {
                     property_index: obj.extract_number(breadcrumb, "ix").ok(),
                     animated: obj.extract_bool_int(breadcrumb, "a")?,
                     expression: obj.extract_string(breadcrumb, "x").ok(),

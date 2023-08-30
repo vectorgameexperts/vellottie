@@ -7,7 +7,7 @@ use super::keyframe::Keyframe;
 
 /// An animatable property that holds an array of numbers.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct AnimatedPropertyBase {
+pub struct AnimatedPropertyPrelude {
     /// Property Index
     #[serde(rename = "ix")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,7 +29,7 @@ pub struct AnimatedPropertyBase {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct AnimatedProperty {
     #[serde(flatten)]
-    pub animated_property: AnimatedPropertyBase,
+    pub animated_property: AnimatedPropertyPrelude,
     /// Animated value variant containing keyframes.
     #[serde(rename = "k")]
     pub animated_value: Vec<Keyframe>,

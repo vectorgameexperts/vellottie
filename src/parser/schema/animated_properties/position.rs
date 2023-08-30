@@ -30,32 +30,16 @@ pub struct Position {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub length: Option<Number>,
     /// The value variant (Animated or Static).
-    #[serde(flatten)]
+    #[serde(rename = "k")]
     pub value: PositionValue,
-}
-
-/// Animated value variant containing keyframes.
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct PositionAnimatedValue {
-    /// Array of keyframes.
-    #[serde(rename = "k")]
-    animated_value: Vec<PositionKeyframe>,
-}
-
-/// Static value variant containing an array of numbers.
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct PositionStaticValue {
-    /// Array of static values.
-    #[serde(rename = "k")]
-    pub static_value: [Number; 2],
 }
 
 /// Represents the two possible value variants for the animated position property.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum PositionValue {
-    Animated(PositionAnimatedValue),
-    Static(PositionStaticValue),
+    Animated(Vec<PositionKeyframe>),
+    Static([Number; 2]),
 }
 
 impl Position {
@@ -73,13 +57,11 @@ impl Position {
                 animated: obj.extract_bool_int(breadcrumb, "a")?,
                 expression: obj.extract_string(breadcrumb, "x").ok(),
                 length: obj.extract_number(breadcrumb, "l").ok(),
-                value: PositionValue::Static(PositionStaticValue {
-                    static_value: obj.extract_type(
-                        breadcrumb,
-                        "k",
-                        ValueType::Scalar2d,
-                    )?,
-                }),
+                value: PositionValue::Static(obj.extract_type(
+                    breadcrumb,
+                    "k",
+                    ValueType::Scalar2d,
+                )?),
             }
         };
         breadcrumb.exit();
