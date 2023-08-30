@@ -1,14 +1,12 @@
-use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-
+use super::position_keyframe::PositionKeyframe;
 use crate::parser::{
     breadcrumb::{Breadcrumb, ValueType},
     schema::helpers::int_boolean::BoolInt,
     util::MapExt,
     Error,
 };
-
-use super::position_keyframe::PositionKeyframe;
+use serde::{Deserialize, Serialize};
+use serde_json::{Number, Value};
 
 /// An animatable property to represent a position in space
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -31,13 +29,13 @@ pub struct Position {
     pub length: Option<Number>,
     /// The value variant (Animated or Static).
     #[serde(rename = "k")]
-    pub value: PositionValue,
+    pub value: PositionValueK,
 }
 
-/// Represents the two possible value variants for the animated position property.
+/// The possible values of "k" in a [`Position`].
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum PositionValue {
+pub enum PositionValueK {
     Animated(Vec<PositionKeyframe>),
     Static([Number; 2]),
 }
@@ -47,7 +45,7 @@ impl Position {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_unnamed(ValueType::AnimatedVector);
+        breadcrumb.enter_unnamed(ValueType::Position);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
         let vector = if animated == BoolInt::True {
             todo!();
@@ -57,7 +55,7 @@ impl Position {
                 animated: obj.extract_bool_int(breadcrumb, "a")?,
                 expression: obj.extract_string(breadcrumb, "x").ok(),
                 length: obj.extract_number(breadcrumb, "l").ok(),
-                value: PositionValue::Static(obj.extract_type(
+                value: PositionValueK::Static(obj.extract_type(
                     breadcrumb,
                     "k",
                     ValueType::Scalar2d,

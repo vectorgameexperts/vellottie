@@ -2,8 +2,9 @@
 #![allow(deprecated)]
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
+use vellottie::parser::schema::animated_properties::animated_property::AnimatedPropertyK;
 use vellottie::parser::schema::animated_properties::position::{
-    Position, PositionValue,
+    Position, PositionValueK,
 };
 use vellottie::parser::schema::helpers::transform::Transform;
 use vellottie::parser::{
@@ -11,8 +12,7 @@ use vellottie::parser::{
     schema::{
         animated_properties::{
             animated_property::AnimatedProperty,
-            multi_dimensional::{MultiDimensional, MultiDimensionalValue},
-            value::{FloatValue, FloatValueK},
+            multi_dimensional::MultiDimensional, value::FloatValue,
         },
         helpers::int_boolean::BoolInt,
         layers::{
@@ -116,7 +116,7 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static([
+                    value: PositionValueK::Static([
                         Number::from(256),
                         Number::from(256)
                     ],),
@@ -126,25 +126,40 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static([
+                    value: PositionValueK::Static([
                         Number::from(256),
                         Number::from(256)
                     ],),
                 },
                 scale: Some(MultiDimensional {
-                    animated_property: AnimatedProperty::default(),
-                    value: MultiDimensionalValue::Static([
-                        Number::from(100),
-                        Number::from(100)
-                    ]),
+                    animated_property: AnimatedProperty {
+                        animated: BoolInt::False,
+                        property_index: None,
+                        expression: None,
+                        slot_id: None,
+                        value: AnimatedPropertyK::Static([
+                            Number::from(100),
+                            Number::from(100)
+                        ])
+                    }
                 }),
                 rotation: Some(FloatValue {
-                    animated_property: AnimatedProperty::default(),
-                    value: FloatValueK::Static(Number::from(0)),
+                    animated_property: AnimatedProperty {
+                        animated: BoolInt::False,
+                        property_index: None,
+                        expression: None,
+                        slot_id: None,
+                        value: AnimatedPropertyK::Static(Number::from(0))
+                    },
                 }),
                 opacity: Some(FloatValue {
-                    animated_property: AnimatedProperty::default(),
-                    value: FloatValueK::Static(Number::from(100)),
+                    animated_property: AnimatedProperty {
+                        animated: BoolInt::False,
+                        property_index: None,
+                        expression: None,
+                        slot_id: None,
+                        value: AnimatedPropertyK::Static(Number::from(100))
+                    }
                 }),
                 skew: None,
                 skew_axis: None,
@@ -200,17 +215,22 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValue::Static([
+                    value: PositionValueK::Static([
                         Number::from_f64(303.9044776119403).unwrap(),
                         Number::from_f64(324.9671641791045).unwrap()
                     ],),
                 },
                 size: MultiDimensional {
-                    animated_property: AnimatedProperty::default(),
-                    value: MultiDimensionalValue::Static([
-                        Number::from_f64(205.46865671641788).unwrap(),
-                        Number::from_f64(204.6089552238806).unwrap()
-                    ]),
+                    animated_property: AnimatedProperty {
+                        animated: BoolInt::False,
+                        property_index: None,
+                        expression: None,
+                        slot_id: None,
+                        value: AnimatedPropertyK::Static([
+                            Number::from_f64(205.46865671641788).unwrap(),
+                            Number::from_f64(204.6089552238806).unwrap()
+                        ])
+                    }
                 },
             })]
         }),]

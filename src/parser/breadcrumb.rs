@@ -21,10 +21,16 @@ pub enum ValueType {
     Layer,
     Shape,
     Transform,
+
+    // Animated property types
     Value,
+    ColorValue,
+    MultiDimensional,
+    Position,
+
+    // I don't think these are necessary anymore?
     AnimatedVector,
     StaticVector,
-    AnimatedNumber,
     StaticNumber,
 }
 
@@ -52,9 +58,11 @@ impl Display for ValueType {
                 ValueType::Transform => "Transform",
                 ValueType::AnimatedVector => "AnimatedVector",
                 ValueType::StaticVector => "StaticVector",
-                ValueType::AnimatedNumber => "AnimatedNumber",
                 ValueType::StaticNumber => "StaticNumber",
                 ValueType::Value => "Value",
+                ValueType::ColorValue => "Color",
+                ValueType::MultiDimensional => "MultiDimensional",
+                ValueType::Position => "Position",
             }
         )
     }

@@ -1,7 +1,6 @@
+use super::keyframe::Keyframe;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
-
-use super::keyframe::Keyframe;
 
 /// Position Keyframe
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
