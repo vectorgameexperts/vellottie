@@ -1,5 +1,5 @@
 pub mod mask_mode;
-// todo stroke-dash-type
+pub mod stroke_dash_type;
 // todo line-join
 // todo fill-rule
 // todo line-cap
