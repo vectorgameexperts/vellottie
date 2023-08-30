@@ -14,7 +14,7 @@ pub struct ColorValue {
 /// The possible values of "k" in [`ColorValue`].
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-enum ColorValueK {
+pub enum ColorValueK {
     /// Keyframes specifies the value at a specific time and the interpolation function to reach the next keyframe.
     Animated(Vec<Keyframe>),
     /// Static value
