@@ -5,10 +5,10 @@ pub mod line_join;
 pub mod mask_mode;
 pub mod shape_direction;
 pub mod stroke_dash_type;
+pub mod text_based;
 pub mod text_justify;
 pub mod text_shape;
 pub mod trim_multiple_shapes;
-// todo text-based
 // todo gradient-type
 // todo matte-mode
 // todo blend-mode
