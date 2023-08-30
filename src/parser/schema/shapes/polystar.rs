@@ -1,5 +1,5 @@
 use crate::parser::schema::{
-    animated_properties::{position::Position, value::Scalar},
+    animated_properties::{position::Position, value::FloatValue},
     constants::star_type::StarType,
 };
 use serde::{Deserialize, Serialize};
@@ -15,16 +15,16 @@ pub struct PolyStar {
     pub position: Position,
     /// Outer Radius
     #[serde(rename = "or")]
-    pub outer_radius: Scalar,
+    pub outer_radius: FloatValue,
     /// Outer Roundness as a percentage
     #[serde(rename = "os")]
-    pub outer_roundness: Scalar,
+    pub outer_roundness: FloatValue,
     /// Rotation, clockwise in degrees
     #[serde(rename = "r")]
-    pub rotation: Scalar,
+    pub rotation: FloatValue,
     /// Points
     #[serde(rename = "pt")]
-    pub points: Scalar,
+    pub points: FloatValue,
     /// Star type, 1 for Star, 2 for Polygon
     #[serde(rename = "sy")]
     pub star_type: StarType,
@@ -32,8 +32,8 @@ pub struct PolyStar {
     /// the star:
     /// Points
     #[serde(rename = "lr")]
-    pub inner_radius: Option<Scalar>,
+    pub inner_radius: Option<FloatValue>,
     /// Star type, 1 for Star, 2 for Polygon
     #[serde(rename = "ls")]
-    pub inner_roundness: Option<Scalar>,
+    pub inner_roundness: Option<FloatValue>,
 }

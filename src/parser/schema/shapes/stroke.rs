@@ -1,5 +1,5 @@
 use crate::parser::schema::animated_properties::{
-    multi_dimensional::MultiDimensional, value::Scalar,
+    multi_dimensional::MultiDimensional, value::FloatValue,
 };
 use crate::parser::schema::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
@@ -26,13 +26,13 @@ pub struct StrokeShape {
     pub miter_limit: Option<Number>,
     /// Animatable alternative to miter_limit
     #[serde(rename = "ml2")]
-    pub miter_limit_alt: Option<Scalar>,
+    pub miter_limit_alt: Option<FloatValue>,
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]
-    pub opacity: Scalar,
+    pub opacity: FloatValue,
     /// Stroke width
     #[serde(rename = "w")]
-    pub stroke_width: Scalar,
+    pub stroke_width: FloatValue,
     /// Dashed line definition
     #[serde(rename = "d")]
     pub dash_array: Option<Vec<StrokeDash>>,

@@ -1,6 +1,7 @@
 use crate::parser::schema::{
     animated_properties::{
-        multi_dimensional::MultiDimensional, position::Position, value::Scalar,
+        multi_dimensional::MultiDimensional, position::Position,
+        value::FloatValue,
     },
     shapes::ShapeProperties,
 };
@@ -19,5 +20,5 @@ pub struct RectangleShape {
     pub size: MultiDimensional,
     /// Rounded corners radius
     #[serde(rename = "r")]
-    pub rounded_corner_radius: Scalar,
+    pub rounded_corner_radius: FloatValue,
 }

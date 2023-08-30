@@ -4,7 +4,7 @@ pub mod precomposition;
 pub mod shape;
 
 use self::{common::LayerProperties, enumerations::LayerType};
-use super::{animated_properties::value::Scalar, shapes::Shape};
+use super::{animated_properties::value::FloatValue, shapes::Shape};
 use crate::parser::{
     breadcrumb::Breadcrumb,
     breadcrumb::ValueType,
@@ -70,7 +70,7 @@ impl Layer {
                     precomp_id: root.extract_string(breadcrumb, "refID")?,
                     width: root.extract_number(breadcrumb, "w")?,
                     height: root.extract_number(breadcrumb, "h")?,
-                    time_remap: Scalar::from_obj(
+                    time_remap: FloatValue::from_obj(
                         breadcrumb,
                         &root.extract_obj(breadcrumb, "tm")?,
                     )?,

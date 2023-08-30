@@ -43,7 +43,7 @@ pub use self::common::ShapeProperties;
 
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
-use super::animated_properties::value::Scalar;
+use super::animated_properties::value::FloatValue;
 use super::transform::Transform;
 
 /// Lottie considers everything related to vector data as a "shape". All shapes
@@ -162,7 +162,7 @@ impl Shape {
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "s")?,
                 )?,
-                rounded_corner_radius: Scalar::from_obj(
+                rounded_corner_radius: FloatValue::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "r")?,
                 )?,

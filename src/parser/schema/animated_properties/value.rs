@@ -12,23 +12,25 @@ use serde_json::{Number, Value};
 ///
 /// An animatable property that holds a float.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct Scalar {
+pub struct FloatValue {
     #[serde(flatten)]
     pub animated_property: AnimatedProperty,
     /// A single value.
     #[serde(rename = "k")]
-    pub value: ScalarValue,
+    pub value: FloatValueK,
 }
 
-/// Static value variant of a single float number.
+/// The possible values of "k" in [`FloatValue`].
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum ScalarValue {
+pub enum FloatValueK {
+    /// Keyframes specifies the value at a specific time and the interpolation function to reach the next keyframe.
     Animated(Vec<Keyframe>),
+    /// Static value
     Static(Number),
 }
 
-impl Scalar {
+impl FloatValue {
     pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
@@ -39,14 +41,14 @@ impl Scalar {
         let number = if animated == BoolInt::True {
             todo!();
         } else {
-            Scalar {
+            FloatValue {
                 animated_property: AnimatedProperty {
                     property_index: obj.extract_number(breadcrumb, "ix").ok(),
                     animated,
                     expression: obj.extract_string(breadcrumb, "x").ok(),
                     slot_id: obj.extract_string(breadcrumb, "sid").ok(),
                 },
-                value: ScalarValue::Static(
+                value: FloatValueK::Static(
                     obj.extract_number(breadcrumb, "k")?,
                 ),
             }

@@ -1,6 +1,6 @@
 //! Transform - https://lottiefiles.github.io/lottie-docs/concepts/#transform
 use crate::parser::schema::animated_properties::{
-    multi_dimensional::MultiDimensional, position::Position, value::Scalar,
+    multi_dimensional::MultiDimensional, position::Position, value::FloatValue,
 };
 use crate::parser::{breadcrumb::Breadcrumb, error::Error, util::MapExt};
 use serde::{Deserialize, Serialize};
@@ -23,11 +23,11 @@ pub struct Transform {
     /// Rotation in degrees, clockwise
     #[serde(rename = "r")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rotation: Option<Scalar>,
+    pub rotation: Option<FloatValue>,
     /// Skew amount as an angle in degrees
     #[serde(rename = "sk")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skew: Option<Scalar>,
+    pub skew: Option<FloatValue>,
     /// Direction at which skew is applied, in degrees (0 skews along the X
     /// axis, 90 along the Y axis)
     #[serde(rename = "sa")]
@@ -36,7 +36,7 @@ pub struct Transform {
     /// Opacity, 100 for fully opaque
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opacity: Option<Scalar>,
+    pub opacity: Option<FloatValue>,
 }
 
 impl Transform {
@@ -57,11 +57,11 @@ impl Transform {
             .ok();
         let rotation = obj
             .extract_obj(breadcrumb, "r")
-            .and_then(|obj| Scalar::from_obj(breadcrumb, &obj))
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
             .ok();
         let skew = obj
             .extract_obj(breadcrumb, "sk")
-            .and_then(|obj| Scalar::from_obj(breadcrumb, &obj))
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
             .ok();
         let skew_axis = obj
             .extract_obj(breadcrumb, "sa")
@@ -69,7 +69,7 @@ impl Transform {
             .ok();
         let opacity = obj
             .extract_obj(breadcrumb, "o")
-            .and_then(|obj| Scalar::from_obj(breadcrumb, &obj))
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
             .ok();
         let transform = Transform {
             anchor_point,

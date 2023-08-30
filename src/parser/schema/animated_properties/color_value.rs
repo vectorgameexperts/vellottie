@@ -11,6 +11,7 @@ pub struct ColorValue {
     pub value: ColorValueK,
 }
 
+/// The possible values of "k" in [`ColorValue`].
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 enum ColorValueK {

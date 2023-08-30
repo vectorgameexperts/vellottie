@@ -1,5 +1,5 @@
 use crate::parser::schema::{
-    animated_properties::value::Scalar, constants::mask_mode::MaskMode,
+    animated_properties::value::FloatValue, constants::mask_mode::MaskMode,
 };
 use serde::{Deserialize, Serialize};
 
@@ -34,7 +34,7 @@ pub struct Mask {
     /// Opacity
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opacity: Option<Scalar>,
+    pub opacity: Option<FloatValue>,
 
     /// Mode
     #[serde(rename = "mode")]
@@ -44,5 +44,5 @@ pub struct Mask {
     /// Expand
     #[serde(rename = "x")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub expand: Option<Scalar>,
+    pub expand: Option<FloatValue>,
 }

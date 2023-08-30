@@ -1,4 +1,4 @@
-use crate::parser::schema::shapes::Scalar;
+use crate::parser::schema::shapes::FloatValue;
 use serde::{Deserialize, Serialize};
 
 /// Interpolates the shape with its center point and bezier tangents with the opposite direction
@@ -10,5 +10,5 @@ pub struct PuckerBloatShape {
     /// Amount as a percentage
     #[serde(rename = "a")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub amount: Option<Scalar>,
+    pub amount: Option<FloatValue>,
 }

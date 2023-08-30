@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 
-use crate::parser::schema::animated_properties::value::Scalar;
+use crate::parser::schema::animated_properties::value::FloatValue;
 
 use super::common::LayerProperties;
 
@@ -21,5 +21,5 @@ pub struct PrecompositionLayer {
     pub height: Number,
     /// Time Remapping
     #[serde(rename = "tm")]
-    pub time_remap: Scalar,
+    pub time_remap: FloatValue,
 }

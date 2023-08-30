@@ -11,7 +11,7 @@ use vellottie::parser::{
         animated_properties::{
             animated_property::AnimatedProperty,
             multi_dimensional::{MultiDimensional, MultiDimensionalValue},
-            value::{Scalar, ScalarValue},
+            value::{FloatValue, FloatValueK},
         },
         helpers::int_boolean::BoolInt,
         layers::{
@@ -138,13 +138,13 @@ lazy_static! {
                         Number::from(100)
                     ]),
                 }),
-                rotation: Some(Scalar {
+                rotation: Some(FloatValue {
                     animated_property: AnimatedProperty::default(),
-                    value: ScalarValue::Static(Number::from(0)),
+                    value: FloatValueK::Static(Number::from(0)),
                 }),
-                opacity: Some(Scalar {
+                opacity: Some(FloatValue {
                     animated_property: AnimatedProperty::default(),
-                    value: ScalarValue::Static(Number::from(100)),
+                    value: FloatValueK::Static(Number::from(100)),
                 }),
                 skew: None,
                 skew_axis: None,

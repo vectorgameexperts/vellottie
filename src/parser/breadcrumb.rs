@@ -21,6 +21,7 @@ pub enum ValueType {
     Layer,
     Shape,
     Transform,
+    Value,
     AnimatedVector,
     StaticVector,
     AnimatedNumber,
@@ -53,6 +54,7 @@ impl Display for ValueType {
                 ValueType::StaticVector => "StaticVector",
                 ValueType::AnimatedNumber => "AnimatedNumber",
                 ValueType::StaticNumber => "StaticNumber",
+                ValueType::Value => "Value",
             }
         )
     }
