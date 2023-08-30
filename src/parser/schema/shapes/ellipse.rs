@@ -1,5 +1,8 @@
 use crate::parser::schema::{
-    animated_properties::AnimatedVector, shapes::ShapeProperties,
+    animated_properties::{
+        multi_dimensional::MultiDimensional, position::Position,
+    },
+    shapes::ShapeProperties,
 };
 use serde::{Deserialize, Serialize};
 
@@ -9,8 +12,8 @@ pub struct EllipseShape {
     pub properties: ShapeProperties,
     /// Position
     #[serde(rename = "p")]
-    pub position: AnimatedVector,
+    pub position: Position,
     /// Size
     #[serde(rename = "s")]
-    pub size: AnimatedVector,
+    pub size: MultiDimensional,
 }

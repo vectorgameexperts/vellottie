@@ -1,13 +1,18 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Number;
+use serde_json::{Number, Value};
 
-use crate::parser::schema::helpers::int_boolean::BoolInt;
+use crate::parser::{
+    breadcrumb::{Breadcrumb, ValueType},
+    schema::helpers::int_boolean::BoolInt,
+    util::MapExt,
+    Error,
+};
 
 use super::position_keyframe::PositionKeyframe;
 
 /// An animatable property to represent a position in space
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct AnimatedPosition {
+pub struct Position {
     /// The index of the property.
     #[serde(rename = "ix")]
     pub property_index: Option<Number>,
@@ -26,26 +31,53 @@ pub struct AnimatedPosition {
     pub value: PositionValue,
 }
 
-/// Static value variant containing an array of numbers.
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct StaticValue {
-    /// Array of static values.
-    #[serde(rename = "k")]
-    static_value: [Number; 2],
-}
-
 /// Animated value variant containing keyframes.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct AnimatedValue {
+pub struct PositionAnimatedValue {
     /// Array of keyframes.
     #[serde(rename = "k")]
     animated_value: Vec<PositionKeyframe>,
+}
+
+/// Static value variant containing an array of numbers.
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+pub struct PositionStaticValue {
+    /// Array of static values.
+    #[serde(rename = "k")]
+    pub static_value: [Number; 2],
 }
 
 /// Represents the two possible value variants for the animated position property.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum PositionValue {
-    Static(StaticValue),
-    Animated(AnimatedValue),
+    Animated(PositionAnimatedValue),
+    Static(PositionStaticValue),
+}
+
+impl Position {
+    pub fn from_obj(
+        breadcrumb: &mut Breadcrumb,
+        obj: &serde_json::map::Map<String, Value>,
+    ) -> Result<Self, Error> {
+        breadcrumb.enter_unnamed(ValueType::AnimatedVector);
+        let animated = obj.extract_bool_int(breadcrumb, "a")?;
+        let vector = if animated == BoolInt::True {
+            todo!();
+        } else {
+            Position {
+                property_index: obj.extract_number(breadcrumb, "ix").ok(),
+                animated: obj.extract_bool_int(breadcrumb, "a")?,
+                expression: obj.extract_string(breadcrumb, "x").ok(),
+                length: obj.extract_number(breadcrumb, "l").ok(),
+                value: obj.extract_type(
+                    breadcrumb,
+                    "k",
+                    ValueType::Scalar2d,
+                )?,
+            }
+        };
+        breadcrumb.exit();
+        Ok(vector)
+    }
 }

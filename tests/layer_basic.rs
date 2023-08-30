@@ -1,13 +1,18 @@
 #![recursion_limit = "512"]
 #![allow(deprecated)]
-
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
+use vellottie::parser::breadcrumb::ValueType::StaticVector;
+use vellottie::parser::schema::animated_properties::position::{
+    Position, PositionStaticValue, PositionValue,
+};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
         animated_properties::{
-            AnimatedNumber, AnimatedVector, StaticNumber, StaticVector,
+            animated_property::AnimatedPropertyBase,
+            multi_dimensional::{MultiDimensional, MultiDimensionalValue},
+            value::{Scalar, ScalarValue},
         },
         helpers::int_boolean::BoolInt,
         layers::{
@@ -107,24 +112,49 @@ lazy_static! {
             in_point: Number::from(0),
             out_point: Number::from(180),
             transform: Transform {
-                anchor_point: Some(AnimatedVector::Static(StaticVector {
+                anchor_point: Some(Position {
+                    property_index: None,
                     animated: BoolInt::False,
-                    value: [Number::from(256), Number::from(256)],
-                })),
-                position: AnimatedVector::Static(StaticVector {
-                    animated: BoolInt::False,
-                    value: [Number::from(256), Number::from(256)],
+                    expression: None,
+                    length: None,
+                    value: PositionValue::Static(PositionStaticValue {
+                        static_value: [Number::from(256), Number::from(256)],
+                    }),
                 }),
-                scale: Some(AnimatedVector::Static(StaticVector {
+                position: Position {
+                    property_index: None,
                     animated: BoolInt::False,
+                    expression: None,
+                    length: None,
+                    value: PositionValue::Static(PositionStaticValue {
+                        static_value: [Number::from(256), Number::from(256)],
+                    }),
+                },
+                scale: Some(MultiDimensional::Static(MultiDimensionalValue {
+                    animated_property_base: AnimatedPropertyBase {
+                        property_index: None,
+                        animated: BoolInt::False,
+                        expression: None,
+                        slot_id: None,
+                    },
                     value: [Number::from(100), Number::from(100)],
                 })),
-                rotation: Some(AnimatedNumber::Static(StaticNumber {
-                    animated: BoolInt::False,
+                rotation: Some(Scalar::Static(ScalarValue {
+                    animated_property_base: AnimatedPropertyBase {
+                        property_index: None,
+                        animated: BoolInt::False,
+                        expression: None,
+                        slot_id: None,
+                    },
                     value: Number::from(0),
                 })),
-                opacity: Some(AnimatedNumber::Static(StaticNumber {
-                    animated: BoolInt::False,
+                opacity: Some(Scalar::Static(ScalarValue {
+                    animated_property_base: AnimatedPropertyBase {
+                        property_index: None,
+                        animated: BoolInt::False,
+                        expression: None,
+                        slot_id: None,
+                    },
                     value: Number::from(100),
                 })),
                 skew: None,
@@ -176,19 +206,34 @@ lazy_static! {
                     css_class: None,
                     id: None
                 },
-                position: AnimatedVector::Static(StaticVector {
+                position: Position {
+                    property_index: None,
                     animated: BoolInt::False,
-                    value: [
-                        Number::from_f64(303.9044776119403).unwrap(),
-                        Number::from_f64(324.9671641791045).unwrap()
-                    ]
-                }),
-                size: AnimatedVector::Static(StaticVector {
-                    animated: BoolInt::False,
+                    expression: None,
+                    length: None,
+                    value: PositionValue::Static(PositionStaticValue {
+                        static_value: [Number::from(256), Number::from(256)],
+                    }),
+                },
+
+                // MultiDimensional::Static(StaticVector {
+                //     animated: BoolInt::False,
+                //     value: [
+                //         Number::from_f64(303.9044776119403).unwrap(),
+                //         Number::from_f64(324.9671641791045).unwrap()
+                //     ]
+                // }),
+                size: MultiDimensional::Static(MultiDimensionalValue {
+                    animated_property_base: AnimatedPropertyBase {
+                        property_index: None,
+                        animated: BoolInt::False,
+                        expression: None,
+                        slot_id: None,
+                    },
                     value: [
                         Number::from_f64(205.46865671641788).unwrap(),
                         Number::from_f64(204.6089552238806).unwrap()
-                    ]
+                    ],
                 }),
             })]
         }),]
