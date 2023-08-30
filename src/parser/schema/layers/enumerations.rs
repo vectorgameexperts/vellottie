@@ -21,11 +21,3 @@ pub enum LayerType {
     Light = 14,
     Data = 15,
 }
-
-/// How to stack copies in a repeater
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum Composite {
-    Above = 1,
-    Below = 2,
-}

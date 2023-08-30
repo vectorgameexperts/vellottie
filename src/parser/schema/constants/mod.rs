@@ -1,4 +1,5 @@
 pub mod blend_mode;
+pub mod composite;
 pub mod fill_rule;
 pub mod font_path_origin;
 pub mod gradient_type;
@@ -17,4 +18,3 @@ pub mod text_justify;
 pub mod text_range_units;
 pub mod text_shape;
 pub mod trim_multiple_shapes;
-// todo composite
