@@ -4,6 +4,8 @@ use crate::parser::schema::{
     animated_properties::value::FloatValue, constants::composite::Composite,
 };
 
+use super::repeater_transform::RepeaterTransformShape;
+
 /// Duplicates previous shapes in a group
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -27,5 +29,5 @@ pub struct RepeaterShape {
 
     /// Transform applied to each copy
     #[serde(rename = "tr")]
-    pub transform: (), // todo repeater transform
+    pub transform: RepeaterTransformShape,
 }

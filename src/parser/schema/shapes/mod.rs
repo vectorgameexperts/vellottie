@@ -1,19 +1,19 @@
 pub(crate) mod common;
 pub mod ellipse;
 pub mod enumerations;
+pub mod fill;
 pub mod group;
 pub mod merge;
+pub mod offset_path;
 pub mod polystar;
 pub mod pucker_bloat;
 pub mod rectangle;
 pub mod repeater;
+pub mod repeater_transform;
+pub mod shape;
+pub mod shape_element;
 pub mod stroke;
 pub mod transform;
-// todo pub mod offset_path;
-// todo pub mod fill;
-// todo pub mod repeater_transform;
-// todo pub mod shape-element;
-// todo pub mod shape;
 // todo pub mod trim;
 // todo pub mod path;
 // todo pub mod gradient_stroke;
@@ -29,8 +29,10 @@ pub mod transform;
 // todo pub mod modifier;
 
 use self::{
-    merge::MergeShape, pucker_bloat::PuckerBloatShape,
-    rectangle::RectangleShape, repeater::RepeaterShape, stroke::StrokeShape,
+    fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
+    pucker_bloat::PuckerBloatShape, rectangle::RectangleShape,
+    repeater::RepeaterShape, repeater_transform::RepeaterTransformShape,
+    shape::GenericShape, shape_element::ShapeElementShape, stroke::StrokeShape,
     transform::TransformShape,
 };
 use crate::parser::breadcrumb::Breadcrumb;
@@ -38,6 +40,7 @@ use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
+use vello::glyph::fello::raw::Offset;
 
 pub use self::common::ShapeProperties;
 
@@ -64,11 +67,11 @@ pub enum Shape {
     PuckerBloat(PuckerBloatShape),
     Merge(MergeShape),
     Repeater(RepeaterShape),
-    // todo OffsetPath(offset_path),
-    // todo Fill(fill),
-    // todo RepeaterTransform(repeater_transform),
-    // todo ShapeElement(shape_element),
-    // todo Shape(shape),
+    OffsetPath(OffsetPathShape),
+    Fill(FillShape),
+    RepeaterTransform(RepeaterTransformShape),
+    ShapeElement(ShapeElementShape),
+    Shape(GenericShape),
     // todo Trim(trim),
     // todo Path(path),
     // todo GradientStroke(gradient_stroke),
