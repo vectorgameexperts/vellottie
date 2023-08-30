@@ -2,7 +2,6 @@
 #![allow(deprecated)]
 use lazy_static::lazy_static;
 use serde_json::{json, Number};
-use vellottie::parser::breadcrumb::ValueType::StaticVector;
 use vellottie::parser::schema::animated_properties::position::{
     Position, PositionValue,
 };
