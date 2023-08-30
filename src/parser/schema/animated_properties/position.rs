@@ -15,16 +15,19 @@ use super::position_keyframe::PositionKeyframe;
 pub struct Position {
     /// The index of the property.
     #[serde(rename = "ix")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub property_index: Option<Number>,
     /// Whether the property is animated
     #[serde(rename = "a")]
     pub animated: BoolInt,
     /// The expression for the property.
     #[serde(rename = "x")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub expression: Option<String>,
     /// Number of components in the value arrays.
     /// If present, values will be truncated or expanded to match this length when accessed from expressions.
     #[serde(rename = "l")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub length: Option<Number>,
     /// The value variant (Animated or Static).
     #[serde(flatten)]
