@@ -54,14 +54,6 @@ pub enum Composite {
     Below = 2,
 }
 
-/// Type of a gradient
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum GradientType {
-    Linear = 1,
-    Radial = 2,
-}
-
 /// How a layer should mask another layer
 #[repr(u8)]
 #[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
