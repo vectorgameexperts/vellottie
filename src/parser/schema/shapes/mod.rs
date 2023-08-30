@@ -2,13 +2,13 @@ pub(crate) mod common;
 pub mod ellipse;
 pub mod enumerations;
 pub mod group;
+pub mod merge;
 pub mod polystar;
 pub mod pucker_bloat;
 pub mod rectangle;
+pub mod repeater;
 pub mod stroke;
 pub mod transform;
-// todo pub mod merge;
-// todo pub mod repeater;
 // todo pub mod offset_path;
 // todo pub mod fill;
 // todo pub mod repeater_transform;
@@ -28,9 +28,10 @@ pub mod transform;
 // todo pub mod gradient;
 // todo pub mod modifier;
 
-use self::pucker_bloat::PuckerBloat;
 use self::{
-    rectangle::RectangleShape, stroke::StrokeShape, transform::TransformShape,
+    merge::MergeShape, pucker_bloat::PuckerBloatShape,
+    rectangle::RectangleShape, repeater::RepeaterShape, stroke::StrokeShape,
+    transform::TransformShape,
 };
 use crate::parser::breadcrumb::Breadcrumb;
 use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
@@ -60,9 +61,9 @@ pub enum Shape {
     Transform(TransformShape),
     Stroke(StrokeShape),
     // TODO: model other shapes
-    PuckerBloat(PuckerBloat),
-    // todo Merge(merge),
-    // todo Repeater(repeater),
+    PuckerBloat(PuckerBloatShape),
+    Merge(MergeShape),
+    Repeater(RepeaterShape),
     // todo OffsetPath(offset_path),
     // todo Fill(fill),
     // todo RepeaterTransform(repeater_transform),

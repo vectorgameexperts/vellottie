@@ -1,16 +1,16 @@
 use serde::{Deserialize, Serialize};
 
-use crate::parser::schema::animated_properties::value::Value;
+use crate::parser::schema::constants::merge_mode::MergeMode;
 
-/// Interpolates the shape with its center point and bezier tangents with the opposite direction
+/// Boolean operator on shapes
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct PuckerBloatShape {
+pub struct MergeShape {
     /// Shape Type
     #[serde(rename = "ty")]
     pub shape_type: String,
     /// Amount as a percentage
-    #[serde(rename = "a")]
+    #[serde(rename = "mm")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub amount: Option<Value>,
+    pub merge_mode: Option<MergeMode>,
 }
