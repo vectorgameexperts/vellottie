@@ -14,5 +14,5 @@ pub mod layers;
 pub mod lottie; // this should be "animation"
 pub mod shapes;
 pub mod styles;
-//todo text
+pub mod text;
 pub mod transform; // this should be under "helpers"

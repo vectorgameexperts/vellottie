@@ -2,6 +2,7 @@ pub mod common;
 pub mod enumerations;
 pub mod precomposition;
 pub mod shape;
+pub mod text;
 
 use self::{common::LayerProperties, enumerations::LayerType};
 use super::{animated_properties::AnimatedNumber, shapes::Shape};
@@ -14,6 +15,7 @@ use crate::parser::{
 use precomposition::PrecompositionLayer;
 use serde::{Deserialize, Serialize};
 use shape::ShapeLayer;
+use text::TextLayer;
 use util::MapExt;
 
 /// There are several layer types, which is specified by the 'ty' attribute. All
@@ -36,8 +38,7 @@ pub enum Layer {
     /// Has an array of shapes
     Shape(ShapeLayer),
     // Renders Text
-    // todo Text
-
+    Text(TextLayer),
     // unimplemented - Audio(AudioLayer),
     // unimplemented - VideoPlaceholder(VideoPlaceholderLayer)
     // unimplemented - Video(VideoLayer)
