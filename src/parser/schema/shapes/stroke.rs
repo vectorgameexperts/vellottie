@@ -1,5 +1,6 @@
-use crate::parser::schema::animated_properties::AnimatedNumber;
-use crate::parser::schema::animated_properties::AnimatedVector;
+use crate::parser::schema::animated_properties::{
+    multi_dimensional::MultiDimensional, value::Scalar,
+};
 use crate::parser::schema::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
@@ -25,17 +26,17 @@ pub struct StrokeShape {
     pub miter_limit: Option<Number>,
     /// Animatable alternative to miter_limit
     #[serde(rename = "ml2")]
-    pub miter_limit_alt: Option<AnimatedNumber>,
+    pub miter_limit_alt: Option<Scalar>,
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]
-    pub opacity: AnimatedNumber,
+    pub opacity: Scalar,
     /// Stroke width
     #[serde(rename = "w")]
-    pub stroke_width: AnimatedNumber,
+    pub stroke_width: Scalar,
     /// Dashed line definition
     #[serde(rename = "d")]
     pub dash_array: Option<Vec<StrokeDash>>,
     /// Stroke color
     #[serde(rename = "c")]
-    pub stroke_color: AnimatedVector,
+    pub stroke_color: MultiDimensional, // todo: stroke_color needs `Color` type, not generic multidimensional
 }

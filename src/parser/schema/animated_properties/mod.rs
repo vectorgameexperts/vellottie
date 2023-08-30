@@ -1,7 +1,3 @@
-#[allow(clippy::module_inception)]
-mod animated_properties;
-pub use animated_properties::*;
-
 pub mod animated_property;
 //todo pub mod color_value;
 //todo pub mod shape_keyframe;

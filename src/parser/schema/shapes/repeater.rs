@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::parser::schema::{
-    animated_properties::value::Value, constants::composite::Composite,
+    animated_properties::value::Scalar, constants::composite::Composite,
 };
 
 /// Duplicates previous shapes in a group
@@ -14,11 +14,11 @@ pub struct RepeaterShape {
 
     /// Number of copies
     #[serde(rename = "c")]
-    pub copies: Value,
+    pub copies: Scalar,
 
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub offset: Option<Value>,
+    pub offset: Option<Scalar>,
 
     /// Stacking order
     #[serde(rename = "m")]

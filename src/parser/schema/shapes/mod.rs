@@ -41,10 +41,10 @@ use serde::{Deserialize, Serialize};
 
 pub use self::common::ShapeProperties;
 
-use super::{
-    animated_properties::{AnimatedNumber, AnimatedVector},
-    transform::Transform,
-};
+use super::animated_properties::multi_dimensional::MultiDimensional;
+use super::animated_properties::position::Position;
+use super::animated_properties::value::Scalar;
+use super::transform::Transform;
 
 /// Lottie considers everything related to vector data as a "shape". All shapes
 /// share the properties in `shapes::common::Properties`.
@@ -143,26 +143,26 @@ impl Shape {
         let shape = match &properties.shape_type {
             ShapeType::Ellipse => Shape::Ellipse(EllipseShape {
                 properties,
-                position: AnimatedVector::from_obj(
+                position: Position::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_obj(
+                size: MultiDimensional::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "s")?,
                 )?,
             }),
             ShapeType::Rectangle => Shape::Rectangle(RectangleShape {
                 properties,
-                position: AnimatedVector::from_obj(
+                position: Position::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
                 )?,
-                size: AnimatedVector::from_obj(
+                size: MultiDimensional::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "s")?,
                 )?,
-                rounded_corner_radius: AnimatedNumber::from_obj(
+                rounded_corner_radius: Scalar::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "r")?,
                 )?,

@@ -1,6 +1,8 @@
 use crate::parser::schema::{
-    animated_properties::AnimatedNumber,
-    shapes::{AnimatedVector, ShapeProperties},
+    animated_properties::{
+        multi_dimensional::MultiDimensional, position::Position, value::Scalar,
+    },
+    shapes::ShapeProperties,
 };
 use serde::{Deserialize, Serialize};
 
@@ -11,11 +13,11 @@ pub struct RectangleShape {
     pub properties: ShapeProperties,
     /// Center of the rectangle
     #[serde(rename = "p")]
-    pub position: AnimatedVector,
+    pub position: Position,
     /// Size
     #[serde(rename = "s")]
-    pub size: AnimatedVector,
+    pub size: MultiDimensional,
     /// Rounded corners radius
     #[serde(rename = "r")]
-    pub rounded_corner_radius: AnimatedNumber,
+    pub rounded_corner_radius: Scalar,
 }

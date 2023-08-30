@@ -1,6 +1,6 @@
 pub const JSON: &str = include_str!("rectangle_and_circle.json");
 
-use vellottie::{parser::Lottie, *};
+use vellottie::parser::Lottie;
 
 #[test]
 fn test_deserialize() {

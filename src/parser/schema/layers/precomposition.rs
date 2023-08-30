@@ -1,6 +1,7 @@
-use crate::parser::schema::animated_properties::AnimatedNumber;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
+
+use crate::parser::schema::animated_properties::value::Scalar;
 
 use super::common::LayerProperties;
 
@@ -20,5 +21,5 @@ pub struct PrecompositionLayer {
     pub height: Number,
     /// Time Remapping
     #[serde(rename = "tm")]
-    pub time_remap: AnimatedNumber,
+    pub time_remap: Scalar,
 }
