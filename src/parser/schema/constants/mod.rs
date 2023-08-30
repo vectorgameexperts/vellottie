@@ -9,10 +9,10 @@ pub mod matte_mode;
 pub mod shape_direction;
 pub mod stroke_dash_type;
 pub mod text_based;
+pub mod text_caps;
 pub mod text_justify;
 pub mod text_shape;
 pub mod trim_multiple_shapes;
-// todo text-caps
 // todo star-type
 // todo text-range-units
 // todo text-grouping
