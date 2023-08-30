@@ -3,7 +3,7 @@ pub mod line_cap;
 pub mod line_join;
 pub mod mask_mode;
 pub mod stroke_dash_type;
-// todo trim-multiple-shapes
+pub mod trim_multiple_shapes;
 // todo font-path-origin
 // todo text-justify
 // todo text-shape
