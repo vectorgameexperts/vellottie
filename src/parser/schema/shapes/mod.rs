@@ -40,14 +40,13 @@ use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
-use vello::glyph::fello::raw::Offset;
 
 pub use self::common::ShapeProperties;
 
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
 use super::animated_properties::value::FloatValue;
-use super::transform::Transform;
+use super::helpers::transform::Transform;
 
 /// Lottie considers everything related to vector data as a "shape". All shapes
 /// share the properties in `shapes::common::Properties`.

@@ -1,5 +1,5 @@
 use super::{animated_property::AnimatedProperty, keyframe::Keyframe};
-use crate::parser::schema::helpers::{color::Color, int_boolean::BoolInt};
+use crate::parser::schema::helpers::color::Color;
 use serde::{Deserialize, Serialize};
 
 /// An animatable property that holds a Color.

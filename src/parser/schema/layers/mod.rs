@@ -59,7 +59,7 @@ impl Layer {
             expected: ValueType::Layer,
         })?;
         let name = root.extract_string(breadcrumb, "nm").ok();
-        breadcrumb.enter(ValueType::Layer, name.clone());
+        breadcrumb.enter(ValueType::Layer, name);
 
         //Extract
         let properties = LayerProperties::from_obj(breadcrumb, root)?;

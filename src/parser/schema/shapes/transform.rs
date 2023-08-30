@@ -1,4 +1,4 @@
-use crate::parser::schema::{shapes::ShapeProperties, transform::Transform};
+use crate::parser::schema::{shapes::ShapeProperties, helpers::transform::Transform};
 use serde::{Deserialize, Serialize};
 
 /// A rectangle, defined by its center point and size.

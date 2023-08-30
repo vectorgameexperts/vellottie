@@ -5,6 +5,7 @@ use serde_json::{json, Number};
 use vellottie::parser::schema::animated_properties::position::{
     Position, PositionValue,
 };
+use vellottie::parser::schema::helpers::transform::Transform;
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
@@ -22,7 +23,6 @@ use vellottie::parser::{
             ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties,
             ShapeType,
         },
-        transform::Transform,
     },
 };
 

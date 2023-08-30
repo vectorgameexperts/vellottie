@@ -3,9 +3,9 @@
 use super::enumerations::LayerType;
 use crate::parser::schema::constants::blend_mode::BlendMode;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
+use crate::parser::schema::helpers::transform::Transform;
 use crate::parser::{
-    breadcrumb::Breadcrumb, breadcrumb::ValueType,
-    schema::transform::Transform, util::MapExt, Error,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
@@ -173,7 +173,7 @@ impl LayerProperties {
             match_name,
             three_dimensional,
             hidden,
-            layer_type: layer_type.clone(),
+            layer_type,
             index,
             parent_index,
             time_stretch,
