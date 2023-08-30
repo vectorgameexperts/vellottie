@@ -54,15 +54,6 @@ pub enum Composite {
     Below = 2,
 }
 
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum FontPathOrigin {
-    Local = 0,
-    CssUrl = 1,
-    ScriptUrl = 2,
-    FontUrl = 3,
-}
-
 /// Type of a gradient
 #[repr(u8)]
 #[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
@@ -127,19 +118,6 @@ pub enum TextGrouping {
     Words = 2,
     Lines = 3,
     All = 4,
-}
-
-/// Text alignment / justification
-#[repr(u8)]
-#[derive(Deserialize_repr, Serialize_repr, Debug, Clone, PartialEq)]
-pub enum TextJustify {
-    Left = 0,
-    Right = 1,
-    Center = 2,
-    JustifyWithLastLineLeft = 3,
-    JustifyWithLastLineRight = 4,
-    JustifyWithLastLineCenter = 5,
-    JustifyWithLastLineFull = 6,
 }
 
 /// Defines the function used to determine the interpolating factor on a text
