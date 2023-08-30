@@ -1,6 +1,7 @@
 #![allow(deprecated)]
 
-use super::enumerations::{BlendMode, LayerType};
+use super::enumerations::LayerType;
+use crate::parser::schema::constants::blend_mode::BlendMode;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType,
