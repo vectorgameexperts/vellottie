@@ -1,16 +1,14 @@
-use serde::{Deserialize, Serialize};
-use serde_json::{Number, Value};
-
+use super::{animated_property::AnimatedProperty, keyframe::Keyframe};
 use crate::parser::{
     breadcrumb::{Breadcrumb, ValueType},
     schema::helpers::int_boolean::BoolInt,
     util::MapExt,
     Error,
 };
+use serde::{Deserialize, Serialize};
+use serde_json::{Number, Value};
 
-use super::{animated_property::AnimatedProperty, keyframe::Keyframe};
-
-/// Animated Number
+/// aka Value, in the Schema.
 ///
 /// An animatable property that holds a float.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -44,7 +42,7 @@ impl Scalar {
             Scalar {
                 animated_property: AnimatedProperty {
                     property_index: obj.extract_number(breadcrumb, "ix").ok(),
-                    animated: obj.extract_bool_int(breadcrumb, "a")?,
+                    animated,
                     expression: obj.extract_string(breadcrumb, "x").ok(),
                     slot_id: obj.extract_string(breadcrumb, "sid").ok(),
                 },

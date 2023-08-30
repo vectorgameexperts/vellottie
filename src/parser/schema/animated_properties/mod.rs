@@ -1,5 +1,5 @@
 pub mod animated_property;
-//todo pub mod color_value;
+pub mod color_value;
 //todo pub mod shape_keyframe;
 pub mod keyframe_base;
 pub mod multi_dimensional;
