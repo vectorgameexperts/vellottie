@@ -1,7 +1,7 @@
+pub mod fill_rule;
 pub mod line_join;
 pub mod mask_mode;
 pub mod stroke_dash_type;
-// todo fill-rule
 // todo line-cap
 // todo trim-multiple-shapes
 // todo font-path-origin
