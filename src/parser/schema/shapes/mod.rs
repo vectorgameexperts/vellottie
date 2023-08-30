@@ -3,10 +3,32 @@ pub mod ellipse;
 pub mod enumerations;
 pub mod group;
 pub mod polystar;
+pub mod pucker_bloat;
 pub mod rectangle;
 pub mod stroke;
 pub mod transform;
+// todo pub mod merge;
+// todo pub mod repeater;
+// todo pub mod offset_path;
+// todo pub mod fill;
+// todo pub mod repeater_transform;
+// todo pub mod shape-element;
+// todo pub mod shape;
+// todo pub mod trim;
+// todo pub mod path;
+// todo pub mod gradient_stroke;
+// todo pub mod stroke_dash;
+// todo pub mod shape_list;
+// todo pub mod zig_zag;
+// todo pub mod no_style;
+// todo pub mod base_stroke;
+// todo pub mod twist;
+// todo pub mod rounded_corners;
+// todo pub mod gradient_fill;
+// todo pub mod gradient;
+// todo pub mod modifier;
 
+use self::pucker_bloat::PuckerBloat;
 use self::{
     rectangle::RectangleShape, stroke::StrokeShape, transform::TransformShape,
 };
@@ -38,6 +60,27 @@ pub enum Shape {
     Transform(TransformShape),
     Stroke(StrokeShape),
     // TODO: model other shapes
+    PuckerBloat(PuckerBloat),
+    // todo Merge(merge),
+    // todo Repeater(repeater),
+    // todo OffsetPath(offset_path),
+    // todo Fill(fill),
+    // todo RepeaterTransform(repeater_transform),
+    // todo ShapeElement(shape_element),
+    // todo Shape(shape),
+    // todo Trim(trim),
+    // todo Path(path),
+    // todo GradientStroke(gradient_stroke),
+    // todo StrokeDash(stroke_dash),
+    // todo ShapeList(shape_list),
+    // todo ZigZag(zig_zag),
+    // todo no_style(no_style),
+    // todo BaseStroke(base_stroke),
+    // todo Twist(twist),
+    // todo RoundedCorners(rounded_corners),
+    // todo GradientFill(gradient_fill),
+    // todo gradient(gradient),
+    // todo modifier(modifier),
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
