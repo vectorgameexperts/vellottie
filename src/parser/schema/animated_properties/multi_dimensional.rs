@@ -8,26 +8,26 @@ use crate::parser::{
     Error,
 };
 
-use super::animated_property::{AnimatedProperty, AnimatedPropertyPrelude};
+use super::{animated_property::AnimatedProperty, keyframe::Keyframe};
 
 /// Animated Vector
 ///
 /// An animatable property that holds an array of numbers.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum MultiDimensional {
-    Animated(AnimatedProperty),
-    Static(MultiDimensionalValue),
+pub enum MultiDimensionalValue {
+    Animated(Vec<Keyframe>),
+    Static([Number; 2]),
 }
 
 /// Static value variant of a float component array.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct MultiDimensionalValue {
+pub struct MultiDimensional {
     #[serde(flatten)]
-    pub prelude: AnimatedPropertyPrelude,
+    pub animated_property: AnimatedProperty,
     /// A single component array.
     #[serde(rename = "k")]
-    pub value: [Number; 2],
+    pub value: MultiDimensionalValue,
 }
 
 impl MultiDimensional {
@@ -40,19 +40,19 @@ impl MultiDimensional {
         let vector = if animated == BoolInt::True {
             todo!();
         } else {
-            MultiDimensional::Static(MultiDimensionalValue {
-                prelude: AnimatedPropertyPrelude {
+            MultiDimensional {
+                animated_property: AnimatedProperty {
                     property_index: obj.extract_number(breadcrumb, "ix").ok(),
                     animated: obj.extract_bool_int(breadcrumb, "a")?,
                     expression: obj.extract_string(breadcrumb, "x").ok(),
                     slot_id: obj.extract_string(breadcrumb, "sid").ok(),
                 },
-                value: obj.extract_type(
+                value: MultiDimensionalValue::Static(obj.extract_type(
                     breadcrumb,
                     "k",
                     ValueType::Scalar2d,
-                )?,
-            })
+                )?),
+            }
         };
         breadcrumb.exit();
         Ok(vector)

@@ -14,6 +14,7 @@ pub struct Transform {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub anchor_point: Option<Position>,
     /// Position / Translation
+    // todo: need untagged enum for split vector variant
     #[serde(rename = "p")]
     pub position: Position,
     /// Scale factor, 100 for no scaling
@@ -21,6 +22,7 @@ pub struct Transform {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scale: Option<MultiDimensional>,
     /// Rotation in degrees, clockwise
+    // todo: need untagged enum for split vector variant
     #[serde(rename = "r")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rotation: Option<Scalar>,

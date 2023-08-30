@@ -8,26 +8,26 @@ use crate::parser::{
     Error,
 };
 
-use super::animated_property::{AnimatedProperty, AnimatedPropertyPrelude};
+use super::{animated_property::AnimatedProperty, keyframe::Keyframe};
 
 /// Animated Number
 ///
 /// An animatable property that holds a float.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-#[serde(untagged)]
-pub enum Scalar {
-    Animated(AnimatedProperty),
-    Static(ScalarValue),
+pub struct Scalar {
+    #[serde(flatten)]
+    pub animated_property: AnimatedProperty,
+    /// A single value.
+    #[serde(rename = "k")]
+    pub value: ScalarValue,
 }
 
 /// Static value variant of a single float number.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct ScalarValue {
-    #[serde(flatten)]
-    pub prelude: AnimatedPropertyPrelude,
-    /// A single value.
-    #[serde(rename = "k")]
-    pub value: Number,
+#[serde(untagged)]
+pub enum ScalarValue {
+    Animated(Vec<Keyframe>),
+    Static(Number),
 }
 
 impl Scalar {
@@ -41,15 +41,17 @@ impl Scalar {
         let number = if animated == BoolInt::True {
             todo!();
         } else {
-            Scalar::Static(ScalarValue {
-                prelude: AnimatedPropertyPrelude {
+            Scalar {
+                animated_property: AnimatedProperty {
                     property_index: obj.extract_number(breadcrumb, "ix").ok(),
                     animated: obj.extract_bool_int(breadcrumb, "a")?,
                     expression: obj.extract_string(breadcrumb, "x").ok(),
                     slot_id: obj.extract_string(breadcrumb, "sid").ok(),
                 },
-                value: obj.extract_number(breadcrumb, "k")?,
-            })
+                value: ScalarValue::Static(
+                    obj.extract_number(breadcrumb, "k")?,
+                ),
+            }
         };
         breadcrumb.exit();
         Ok(number)

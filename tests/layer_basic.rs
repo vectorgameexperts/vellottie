@@ -10,7 +10,7 @@ use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
         animated_properties::{
-            animated_property::AnimatedPropertyPrelude,
+            animated_property::AnimatedProperty,
             multi_dimensional::{MultiDimensional, MultiDimensionalValue},
             value::{Scalar, ScalarValue},
         },
@@ -132,33 +132,21 @@ lazy_static! {
                         Number::from(256)
                     ],),
                 },
-                scale: Some(MultiDimensional::Static(MultiDimensionalValue {
-                    prelude: AnimatedPropertyPrelude {
-                        property_index: None,
-                        animated: BoolInt::False,
-                        expression: None,
-                        slot_id: None,
-                    },
-                    value: [Number::from(100), Number::from(100)],
-                })),
-                rotation: Some(Scalar::Static(ScalarValue {
-                    prelude: AnimatedPropertyPrelude {
-                        property_index: None,
-                        animated: BoolInt::False,
-                        expression: None,
-                        slot_id: None,
-                    },
-                    value: Number::from(0),
-                })),
-                opacity: Some(Scalar::Static(ScalarValue {
-                    prelude: AnimatedPropertyPrelude {
-                        property_index: None,
-                        animated: BoolInt::False,
-                        expression: None,
-                        slot_id: None,
-                    },
-                    value: Number::from(100),
-                })),
+                scale: Some(MultiDimensional {
+                    animated_property: AnimatedProperty::default(),
+                    value: MultiDimensionalValue::Static([
+                        Number::from(100),
+                        Number::from(100)
+                    ]),
+                }),
+                rotation: Some(Scalar {
+                    animated_property: AnimatedProperty::default(),
+                    value: ScalarValue::Static(Number::from(0)),
+                }),
+                opacity: Some(Scalar {
+                    animated_property: AnimatedProperty::default(),
+                    value: ScalarValue::Static(Number::from(100)),
+                }),
                 skew: None,
                 skew_axis: None,
             },
@@ -218,18 +206,13 @@ lazy_static! {
                         Number::from_f64(324.9671641791045).unwrap()
                     ],),
                 },
-                size: MultiDimensional::Static(MultiDimensionalValue {
-                    prelude: AnimatedPropertyPrelude {
-                        property_index: None,
-                        animated: BoolInt::False,
-                        expression: None,
-                        slot_id: None,
-                    },
-                    value: [
+                size: MultiDimensional {
+                    animated_property: AnimatedProperty::default(),
+                    value: MultiDimensionalValue::Static([
                         Number::from_f64(205.46865671641788).unwrap(),
                         Number::from_f64(204.6089552238806).unwrap()
-                    ],
-                }),
+                    ]),
+                },
             })]
         }),]
     });

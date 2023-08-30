@@ -3,11 +3,9 @@ use serde_json::Number;
 
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 
-use super::keyframe::Keyframe;
-
 /// An animatable property that holds an array of numbers.
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct AnimatedPropertyPrelude {
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Default)]
+pub struct AnimatedProperty {
     /// Property Index
     #[serde(rename = "ix")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -23,14 +21,4 @@ pub struct AnimatedPropertyPrelude {
     #[serde(rename = "sid")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slot_id: Option<String>,
-}
-
-/// An animatable property that holds an array of numbers.
-#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct AnimatedProperty {
-    #[serde(flatten)]
-    pub animated_property: AnimatedPropertyPrelude,
-    /// Animated value variant containing keyframes.
-    #[serde(rename = "k")]
-    pub animated_value: Vec<Keyframe>,
 }
