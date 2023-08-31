@@ -27,6 +27,11 @@ pub enum ValueType {
     ColorValue,
     MultiDimensional,
     Position,
+    ShapeProperty,
+    ShapeKeyframe,
+
+    // Helper types
+    Bezier,
 
     // I don't think these are necessary anymore?
     AnimatedVector,
@@ -56,13 +61,16 @@ impl Display for ValueType {
                 ValueType::Image => "Image",
                 ValueType::Precomposition => "Precomposition",
                 ValueType::Transform => "Transform",
-                ValueType::AnimatedVector => "AnimatedVector",
-                ValueType::StaticVector => "StaticVector",
-                ValueType::StaticNumber => "StaticNumber",
+                ValueType::AnimatedVector => "Animated Vector",
+                ValueType::StaticVector => "Static Vector",
+                ValueType::StaticNumber => "Static Number",
                 ValueType::Value => "Value",
                 ValueType::ColorValue => "Color",
-                ValueType::MultiDimensional => "MultiDimensional",
+                ValueType::MultiDimensional => "Multi Dimensional",
                 ValueType::Position => "Position",
+                ValueType::ShapeProperty => "Shape Property",
+                ValueType::ShapeKeyframe => "Shape Keyframe",
+                ValueType::Bezier => "Bezier",
             }
         )
     }

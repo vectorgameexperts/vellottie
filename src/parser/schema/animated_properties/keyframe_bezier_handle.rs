@@ -1,5 +1,10 @@
+use crate::parser::{
+    breadcrumb::{Breadcrumb, ValueType},
+    util::MapExt,
+    Error,
+};
 use serde::{Deserialize, Serialize};
-use serde_json::Number;
+use serde_json::{Number, Value};
 
 /// Represents a keyframe bezier handle.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -24,4 +29,21 @@ pub enum KeyframeComponent {
     ArrayOfValues(Vec<Number>),
     /// Single component value.
     SingleValue(Number),
+}
+
+impl KeyframeBezierHandle {
+    pub fn from_obj(
+        breadcrumb: &mut Breadcrumb,
+        obj: &serde_json::map::Map<String, Value>,
+    ) -> Result<Self, Error> {
+        breadcrumb.enter_unnamed(ValueType::ShapeProperty);
+        let x_coordinate =
+            obj.extract_type(breadcrumb, "x", ValueType::Number)?;
+        let y_coordinate =
+            obj.extract_type(breadcrumb, "y", ValueType::Number)?;
+        Ok(Self {
+            x_coordinate,
+            y_coordinate,
+        })
+    }
 }

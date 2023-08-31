@@ -1,9 +1,38 @@
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{breadcrumb::Breadcrumb, breadcrumb::ValueType, Error};
 use log::trace;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Number, Value};
 use std::{borrow::Borrow, fmt::Display, hash::Hash};
+
+pub trait ValueExt {
+    fn cast_dyn<T>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        expected: ValueType,
+    ) -> Result<T, Error>
+    where
+        T: DeserializeOwned + Serialize;
+}
+
+impl ValueExt for serde_json::Value {
+    fn cast_dyn<T>(
+        &self,
+        breadcrumb: &Breadcrumb,
+        expected: ValueType,
+    ) -> Result<T, Error>
+    where
+        T: DeserializeOwned,
+    {
+        serde_json::from_value(self.clone()).map_err(|_| {
+            Error::UnexpectedChild {
+                breadcrumb: breadcrumb.clone(),
+                expected,
+            }
+        })
+    }
+}
 
 pub trait MapExt {
     fn extract_value<Q>(
