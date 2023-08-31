@@ -1,8 +1,8 @@
 pub mod animated_property;
 pub mod color_value;
-//todo pub mod shape_keyframe;
 pub mod keyframe_base;
 pub mod multi_dimensional;
+pub mod shape_keyframe;
 //todo pub mod shape_property;
 pub mod keyframe;
 pub mod keyframe_bezier_handle;
