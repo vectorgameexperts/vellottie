@@ -25,6 +25,7 @@ pub enum ValueType {
     // Animated property types
     Value,
     ColorValue,
+    GradientColors,
     MultiDimensional,
     Position,
     Rotation,
@@ -68,6 +69,7 @@ impl Display for ValueType {
                 ValueType::StaticNumber => "Static Number",
                 ValueType::Value => "Value",
                 ValueType::ColorValue => "Color",
+                ValueType::GradientColors => "Gradient Colors",
                 ValueType::MultiDimensional => "Multi Dimensional",
                 ValueType::Position => "Position",
                 ValueType::Rotation => "Rotation",
