@@ -36,8 +36,7 @@ impl Composition {
     pub fn from_bytes(
         bytes: impl AsRef<[u8]>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
-        // crate::import::import_composition(bytes);
-        todo!("crate::import::import_composition(bytes)")
+        crate::import::import_composition(bytes)
     }
 
     /// Returns a t value for the specified time in seconds.
