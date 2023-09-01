@@ -4,12 +4,14 @@ use crate::parser::schema::{
 };
 use serde::{Deserialize, Serialize};
 
+use super::ShapeProperties;
+
 /// Solid fill color
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct FillShape {
     /// Shape Type
-    #[serde(rename = "ty")]
-    pub shape_type: String,
+    #[serde(flatten)]
+    pub properties: ShapeProperties,
 
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]

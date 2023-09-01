@@ -192,14 +192,14 @@ impl Shape {
             ShapeType::Stroke => Shape::Stroke(StrokeShape {
                 properties,
                 line_cap: root
-                    .extract_type(breadcrumb, "key", ValueType::EnumInt)
+                    .extract_type(breadcrumb, "lc", ValueType::EnumInt)
                     .ok(),
                 line_join: root
-                    .extract_type(breadcrumb, "key", ValueType::EnumInt)
+                    .extract_type(breadcrumb, "lj", ValueType::EnumInt)
                     .ok(),
-                miter_limit: root.extract_number(breadcrumb, "key").ok(),
+                miter_limit: root.extract_number(breadcrumb, "ml").ok(),
                 miter_limit_alt: root
-                    .extract_type(breadcrumb, "key", ValueType::Scalar2d)
+                    .extract_type(breadcrumb, "ml2", ValueType::Scalar2d)
                     .ok(),
                 opacity: root
                     .extract_obj(breadcrumb, "o")
@@ -212,6 +212,19 @@ impl Shape {
                     .and_then(|obj| ColorValue::from_obj(breadcrumb, &obj))?,
                 dash_array: root
                     .extract_type(breadcrumb, "d", ValueType::EnumStr)
+                    .ok(),
+            }),
+            ShapeType::Fill => Shape::Fill(FillShape {
+                properties,
+                opacity: root
+                    .extract_obj(breadcrumb, "o")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+                    .ok(),
+                color: root
+                    .extract_obj(breadcrumb, "c")
+                    .and_then(|obj| ColorValue::from_obj(breadcrumb, &obj))?,
+                fill_rule: root
+                    .extract_type(breadcrumb, "r", ValueType::EnumInt)
                     .ok(),
             }),
             other_shape => {
