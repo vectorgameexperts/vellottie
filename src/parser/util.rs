@@ -142,6 +142,7 @@ impl MapExt for &Map<String, Value> {
             .ok_or_else(|| Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::String,
+                breadcrumb: breadcrumb.clone(),
             })?
             .to_owned())
     }
@@ -161,6 +162,7 @@ impl MapExt for &Map<String, Value> {
             _ => Err(Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::Number,
+                breadcrumb: breadcrumb.clone(),
             }),
         }
     }
@@ -179,6 +181,7 @@ impl MapExt for &Map<String, Value> {
             .ok_or(Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::BoolInt,
+                breadcrumb: breadcrumb.clone(),
             })
             .and_then(|i| match i {
                 0 => Ok(BoolInt::False),
@@ -186,6 +189,7 @@ impl MapExt for &Map<String, Value> {
                 _ => Err(Error::IncorrectType {
                     key: key.to_string(),
                     expected: ValueType::BoolInt,
+                    breadcrumb: breadcrumb.clone(),
                 }),
             })
     }
@@ -205,6 +209,7 @@ impl MapExt for &Map<String, Value> {
             .ok_or_else(|| Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::Bool,
+                breadcrumb: breadcrumb.clone(),
             })?
             .to_owned())
     }
@@ -224,6 +229,7 @@ impl MapExt for &Map<String, Value> {
             .ok_or_else(|| Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::Array,
+                breadcrumb: breadcrumb.clone(),
             })?
             .to_owned())
     }
@@ -243,6 +249,7 @@ impl MapExt for &Map<String, Value> {
             .ok_or_else(|| Error::IncorrectType {
                 key: key.to_string(),
                 expected: ValueType::Object,
+                breadcrumb: breadcrumb.clone(),
             })?
             .to_owned())
     }
@@ -263,6 +270,7 @@ impl MapExt for &Map<String, Value> {
             serde_json::from_value(x).map_err(|_| Error::IncorrectType {
                 key: key.to_string(),
                 expected,
+                breadcrumb: breadcrumb.clone(),
             });
         y
     }

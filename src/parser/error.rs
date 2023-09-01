@@ -21,6 +21,12 @@ pub enum Error {
         expected: ValueType,
     },
 
-    #[error("'{key}' is the wrong type, expected: {expected}")]
-    IncorrectType { key: String, expected: ValueType },
+    #[error(
+        "'{key}' is the wrong type, expected: {expected} in path {breadcrumb}"
+    )]
+    IncorrectType {
+        key: String,
+        expected: ValueType,
+        breadcrumb: Breadcrumb,
+    },
 }
