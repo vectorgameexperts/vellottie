@@ -1,42 +1,71 @@
 use super::layer_style::LayerStyle;
 use crate::parser::{
-    breadcrumb::Breadcrumb,
-    schema::animated_properties::{color_value::ColorValue, value::FloatValue},
+    breadcrumb::{Breadcrumb, ValueType},
+    schema::{
+        animated_properties::{
+            color_value::ColorValue, gradient_colors::GradientColors,
+            value::FloatValue,
+        },
+        constants::gradient_type::GradientType,
+    },
     util::MapExt,
     Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// Style applied to a layer
+///
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct SatinStyle {
+pub struct GradientOverlayStyle {
     #[serde(flatten)]
     pub layer_style: LayerStyle,
+    ///
     #[serde(rename = "bm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blend_mode: Option<FloatValue>,
+    ///
     #[serde(rename = "c")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<ColorValue>,
+    ///
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<FloatValue>,
+    ///
+    #[serde(rename = "gf")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gradient: Option<GradientColors>,
+    ///
+    #[serde(rename = "gs")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub smoothness: Option<FloatValue>,
+    ///
     #[serde(rename = "a")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub angle: Option<FloatValue>,
-    #[serde(rename = "d")]
+    ///
+    #[serde(rename = "gt")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distance: Option<FloatValue>,
+    pub gradient_type: Option<GradientType>,
+    ///
+    #[serde(rename = "re")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reverse: Option<FloatValue>,
+    /// Align with layer
+    #[serde(rename = "al")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub align: Option<FloatValue>,
+    ///
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size: Option<FloatValue>,
-    #[serde(rename = "in")]
+    pub scale: Option<FloatValue>,
+    ///
+    #[serde(rename = "of")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub invert: Option<FloatValue>,
+    pub offset: Option<FloatValue>,
 }
 
-impl SatinStyle {
+impl GradientOverlayStyle {
     pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
@@ -62,17 +91,34 @@ impl SatinStyle {
         } else {
             None
         };
-        let distance = if let Ok(obj) = obj.extract_obj(breadcrumb, "d") {
+        let offset = if let Ok(obj) = obj.extract_obj(breadcrumb, "d") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
         };
-        let size = if let Ok(obj) = obj.extract_obj(breadcrumb, "s") {
+        let scale = if let Ok(obj) = obj.extract_obj(breadcrumb, "s") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
         };
-        let invert = if let Ok(obj) = obj.extract_obj(breadcrumb, "in") {
+        let gradient = if let Ok(obj) = obj.extract_obj(breadcrumb, "gf") {
+            Some(GradientColors::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let gradient_type =
+            obj.extract_type(breadcrumb, "gt", ValueType::EnumInt).ok();
+        let smoothness = if let Ok(obj) = obj.extract_obj(breadcrumb, "gs") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let reverse = if let Ok(obj) = obj.extract_obj(breadcrumb, "re") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let align = if let Ok(obj) = obj.extract_obj(breadcrumb, "al") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
@@ -82,10 +128,14 @@ impl SatinStyle {
             blend_mode,
             color,
             opacity,
+            gradient,
+            smoothness,
             angle,
-            distance,
-            size,
-            invert,
+            gradient_type,
+            reverse,
+            align,
+            scale,
+            offset,
         })
     }
 }

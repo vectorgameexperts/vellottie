@@ -8,35 +8,42 @@ use crate::parser::{
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// Style applied to a layer
+///
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct SatinStyle {
+pub struct OuterGlowStyle {
     #[serde(flatten)]
     pub layer_style: LayerStyle,
+    ///
     #[serde(rename = "bm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blend_mode: Option<FloatValue>,
+    ///
     #[serde(rename = "c")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<ColorValue>,
+    ///
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<FloatValue>,
-    #[serde(rename = "a")]
+    ///
+    #[serde(rename = "r")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub angle: Option<FloatValue>,
-    #[serde(rename = "d")]
+    pub range: Option<FloatValue>,
+    ///
+    #[serde(rename = "ch")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distance: Option<FloatValue>,
-    #[serde(rename = "s")]
+    pub choke_spread: Option<FloatValue>,
+    ///
+    #[serde(rename = "no")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub size: Option<FloatValue>,
-    #[serde(rename = "in")]
+    pub noise: Option<FloatValue>,
+    ///
+    #[serde(rename = "j")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub invert: Option<FloatValue>,
+    pub jitter: Option<FloatValue>,
 }
 
-impl SatinStyle {
+impl OuterGlowStyle {
     pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
@@ -57,22 +64,22 @@ impl SatinStyle {
         } else {
             None
         };
-        let angle = if let Ok(obj) = obj.extract_obj(breadcrumb, "a") {
+        let choke_spread = if let Ok(obj) = obj.extract_obj(breadcrumb, "ch") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
         };
-        let distance = if let Ok(obj) = obj.extract_obj(breadcrumb, "d") {
+        let range = if let Ok(obj) = obj.extract_obj(breadcrumb, "r") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
         };
-        let size = if let Ok(obj) = obj.extract_obj(breadcrumb, "s") {
+        let noise = if let Ok(obj) = obj.extract_obj(breadcrumb, "no") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
         };
-        let invert = if let Ok(obj) = obj.extract_obj(breadcrumb, "in") {
+        let jitter = if let Ok(obj) = obj.extract_obj(breadcrumb, "j") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
@@ -82,10 +89,10 @@ impl SatinStyle {
             blend_mode,
             color,
             opacity,
-            angle,
-            distance,
-            size,
-            invert,
+            choke_spread,
+            range,
+            noise,
+            jitter,
         })
     }
 }
