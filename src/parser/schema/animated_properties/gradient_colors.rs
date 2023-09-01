@@ -13,8 +13,8 @@ use serde_json::{Number, Value};
 /// There are two possible layouts:
 /// - Without alpha, the colors are a sequence of offset, r, g, b
 /// - With alpha, same as above but at the end of the list there is a sequence of offset, alpha
-#[derive(Debug, Serialize, Deserialize)]
-struct GradientColors {
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+pub struct GradientColors {
     /// Colors in the gradient.
     #[serde(rename = "k")]
     colors: MultiDimensional,
