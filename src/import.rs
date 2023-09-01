@@ -1,85 +1,172 @@
 // Copyright 2023 Google LLC
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-use crate::parser::schema::animated_properties::AnimatedVector;
-use crate::parser::schema::layers::precomposition::PrecompositionLayer;
-use crate::parser::schema::layers::shape::ShapeLayer;
+use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
+use crate::parser::schema::animated_properties::value::FloatValue;
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    self, animated, Content, GroupTransform, Layer, Lerp, Mask, Value,
+    self, animated, Content, GroupTransform, Layer, Lerp, Time, Value,
 };
-use crate::runtime::Composition;
+use crate::runtime::{self, Composition};
+use lazy_static::lazy_static;
+use parser::schema;
 use std::collections::HashMap;
 use vello::kurbo::{Point, Size, Vec2};
-use vello::peniko::{self, BlendMode, Color, Compose, Mix};
+use vello::peniko::{self, BlendMode, Color, Mix};
+
+pub trait NumberExt {
+    fn unwrap_f32(&self) -> f32;
+    fn unwrap_u32(&self) -> u32;
+}
+
+impl NumberExt for serde_json::Number {
+    fn unwrap_f32(&self) -> f32 {
+        self.as_f64().expect("Could not get float from JSON Number") as f32
+    }
+
+    fn unwrap_u32(&self) -> u32 {
+        self.as_u64()
+            .expect("Could not get unsigned integer from JSON Number")
+            as u32
+    }
+}
+
+lazy_static! {
+    static ref FLOAT_VALUE_ZERO: FloatValue = FloatValue {
+        animated_property:
+            schema::animated_properties::animated_property::AnimatedProperty {
+                property_index: None,
+                animated: BoolInt::False,
+                expression: None,
+                slot_id: None,
+                value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
+                    serde_json::Number::from(0),
+                ),
+            },
+    };
+    static ref FLOAT_VALUE_ONE_HUNDRED: FloatValue = FloatValue {
+        animated_property:
+            schema::animated_properties::animated_property::AnimatedProperty {
+                property_index: None,
+                animated: BoolInt::False,
+                expression: None,
+                slot_id: None,
+                value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
+                    serde_json::Number::from(100),
+                ),
+            },
+    };
+
+    static ref MULTIDIM_ZERO: MultiDimensional =
+        MultiDimensional {
+            animated_property: schema::animated_properties::animated_property::AnimatedProperty {
+                property_index: None,
+                animated: BoolInt::False,
+                expression: None,
+                slot_id: None,
+                value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
+                    vec![serde_json::Number::from(0), serde_json::Number::from(0), serde_json::Number::from(0)],
+                ),
+            },
+        };
+    static ref MULTIDIM_ONE: MultiDimensional =
+        MultiDimensional {
+            animated_property: schema::animated_properties::animated_property::AnimatedProperty {
+                property_index: None,
+                animated: BoolInt::False,
+                expression: None,
+                slot_id: None,
+                value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
+                    vec![serde_json::Number::from(1), serde_json::Number::from(1), serde_json::Number::from(1)],
+                ),
+            },
+        };
+
+    static ref POSITION_ZERO: schema::animated_properties::position::Position = schema::animated_properties::position::Position {
+        property_index: None,
+        animated: BoolInt::False,
+        expression: None,
+        length: None,
+        value: schema::animated_properties::position::PositionValueK::Static([serde_json::Number::from(0), serde_json::Number::from(0)]),
+    };
+
+}
 
 pub fn import_composition(
     source: impl AsRef<[u8]>,
 ) -> Result<Composition, Box<dyn std::error::Error>> {
-    let source = Lottie::from_slice(source)?;
+    let source = Lottie::from_slice(source.as_ref())?;
     let mut target = Composition::default();
-    target.frame_rate = source.frame_rate as f32;
-    target.frames = source.in_point as f32..source.out_point as f32;
-    target.width = source.width as u32;
-    target.height = source.height as u32;
+    target.frame_rate = source.frame_rate.unwrap_f32();
+    target.frames = source.in_point.unwrap_f32()..source.out_point.unwrap_f32();
+    target.width = source.width.unwrap_u32();
+    target.height = source.height.unwrap_u32();
     let mut idmap: HashMap<usize, usize> = HashMap::default();
-    for asset in &source.assets {
-        match asset {
-            parser::schema::assets::Asset::Precomposition(precomp) => {
-                idmap.clear();
-                let mut layers = vec![];
-                let mut mask_layer = None;
-                for layer in &precomp.layers {
-                    let index = layers.len();
-                    if let Some((mut layer, id, mask_blend)) = conv_layer(layer)
-                    {
-                        if let (Some(mask_blend), Some(mask_layer)) =
-                            (mask_blend, mask_layer.take())
+    if let Some(assets) = source.assets {
+        for asset in assets {
+            match asset {
+                parser::schema::assets::AnyAsset::Precomposition(precomp) => {
+                    idmap.clear();
+                    let mut layers = vec![];
+                    let mut mask_layer = None;
+                    for layer in precomp.composition.layers.iter() {
+                        let index = layers.len();
+                        if let Some((mut layer, id, mask_blend)) =
+                            conv_layer(layer)
                         {
-                            layer.mask_layer = Some((mask_blend, mask_layer));
+                            if let (Some(mask_blend), Some(mask_layer)) =
+                                (mask_blend, mask_layer.take())
+                            {
+                                layer.mask_layer =
+                                    Some((mask_blend, mask_layer));
+                            }
+                            if layer.is_mask {
+                                mask_layer = Some(index);
+                            }
+                            idmap.insert(id, index);
+                            layers.push(layer);
                         }
-                        if layer.is_mask {
-                            mask_layer = Some(index);
+                    }
+                    for layer in &mut layers {
+                        if let Some(parent) = layer.parent {
+                            layer.parent = idmap.get(&parent).copied();
                         }
-                        idmap.insert(id, index);
-                        layers.push(layer);
                     }
+                    target.assets.insert(precomp.asset.id.clone(), layers);
                 }
-                for layer in &mut layers {
-                    if let Some(parent) = layer.parent {
-                        layer.parent = idmap.get(&parent).copied();
-                    }
+                asset => {
+                    unimplemented!("asset {:?} is not yet implemented", asset)
                 }
-                target.assets.insert(precomp.id.clone(), layers);
             }
-            _ => {}
         }
-    }
-    idmap.clear();
-    let mut layers = vec![];
-    let mut mask_layer = None;
-    for layer in &source.layers {
-        let index = layers.len();
-        if let Some((mut layer, id, mask_blend)) = conv_layer(layer) {
-            if let (Some(mask_blend), Some(mask_layer)) =
-                (mask_blend, mask_layer.take())
-            {
-                layer.mask_layer = Some((mask_blend, mask_layer));
+        idmap.clear();
+        let mut layers = vec![];
+        let mut mask_layer = None;
+        for layer in &source.layers {
+            let index = layers.len();
+            if let Some((mut layer, id, mask_blend)) = conv_layer(layer) {
+                if let (Some(mask_blend), Some(mask_layer)) =
+                    (mask_blend, mask_layer.take())
+                {
+                    layer.mask_layer = Some((mask_blend, mask_layer));
+                }
+                if layer.is_mask {
+                    mask_layer = Some(index);
+                }
+                idmap.insert(id, index);
+                layers.push(layer);
             }
-            if layer.is_mask {
-                mask_layer = Some(index);
+        }
+        for layer in &mut layers {
+            if let Some(parent) = layer.parent {
+                layer.parent = idmap.get(&parent).copied();
             }
-            idmap.insert(id, index);
-            layers.push(layer);
         }
+        target.layers = layers;
     }
-    for layer in &mut layers {
-        if let Some(parent) = layer.parent {
-            layer.parent = idmap.get(&parent).copied();
-        }
-    }
-    target.layers = layers;
+
     Ok(target)
 }
 
@@ -89,52 +176,51 @@ fn conv_layer(
     let mut layer = Layer::default();
     let params;
     match source {
-        parser::schema::layers::Layer::Null(value) => {
-            params = setup_layer(value, &mut layer);
-        }
-        parser::schema::layers::Layer::PreComp(value) => {
-            params = setup_layer(value, &mut layer);
-            let name = value.mixin.ref_id.clone();
-            let time_remap = conv_scalar(&value.mixin.time_remapping);
+        // TODO
+        // parser::schema::layers::Layer::Null(value) => {
+        //     params = setup_layer(value, &mut layer);
+        // }
+        parser::schema::layers::Layer::Precomposition(precomp_layer) => {
+            params = setup_precomp_layer(precomp_layer, &mut layer);
+            let name = precomp_layer.precomp_id.clone();
+            let time_remap = conv_scalar(&precomp_layer.time_remap);
             layer.content = Content::Instance { name, time_remap };
         }
-        parser::schema::layers::Layer::Shape(value) => {
-            params = setup_layer(value, &mut layer);
+        parser::schema::layers::Layer::Shape(shape_layer) => {
+            params = setup_shape_layer(shape_layer, &mut layer);
             let mut shapes = vec![];
-            for shape in &value.mixin.shapes {
+            for shape in &shape_layer.shapes {
                 if let Some(shape) = conv_shape(shape) {
                     shapes.push(shape);
                 }
             }
             layer.content = Content::Shape(shapes);
-        }
-        _ => return None,
+        } //_ => {}, // todo: handle other todo shapes here
     }
     let (id, matte_mode) = params;
     Some((layer, id, matte_mode))
 }
 
-fn setup_layer(
-    source: &parser::schema::layers::Layer,
+fn setup_precomp_layer(
+    source: &parser::schema::layers::precomposition::PrecompositionLayer,
     target: &mut Layer,
 ) -> (usize, Option<BlendMode>) {
-    let source = match source {
-        parser::schema::layers::Layer::Precomposition(
-            PrecompositionLayer { properties, .. },
-        ) => properties,
-        parser::schema::layers::Layer::Shape(ShapeLayer {
-            properties, ..
-        }) => properties,
-    };
-
-    target.name = source.name.clone().unwrap_or_default();
-    target.parent = source.parent.map(|i| i as usize);
-    let (transform, opacity) = conv_transform(&source.transform);
+    target.name = source.properties.name.clone().unwrap_or_default();
+    target.parent = source
+        .properties
+        .parent_index
+        .as_ref()
+        .map(|i| i.unwrap_u32() as usize);
+    let (transform, opacity) = conv_transform(&source.properties.transform);
     target.transform = transform;
     target.opacity = opacity;
-    target.width = source.width.unwrap_or(0) as _;
-    target.height = source.height.unwrap_or(0) as _;
-    target.is_mask = source.is_track_matte;
+    target.width = source.width.unwrap_u32();
+    target.height = source.height.unwrap_u32();
+    target.is_mask = source
+        .properties
+        .matte_target
+        .as_ref()
+        .map_or(false, |td| *td == BoolInt::True);
 
     // todo: Matte mode
     //let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
@@ -144,80 +230,255 @@ fn setup_layer(
     //        Compose::SrcOut.into()
     //    }
     //});
-    let matte_mode = Mix::Normal;
 
-    target.blend_mode = conv_blend_mode(&source.blend_mode);
+    target.blend_mode =
+        conv_blend_mode(source.properties.blend_mode.as_ref().unwrap_or(
+            &crate::parser::schema::constants::blend_mode::BlendMode::Normal,
+        ));
     if target.blend_mode == Some(peniko::Mix::Normal.into()) {
         target.blend_mode = None;
     }
-    target.frames = source.in_point as f32..source.out_point as f32;
-    target.stretch = source.stretch as f32;
-    target.start_frame = source.start_time as f32;
-    for mask_source in &source.masks {
-        if let Some(geometry) = conv_shape_geometry(&mask_source.points) {
-            let mode = peniko::BlendMode::default();
-            let opacity = conv_scalar(&mask_source.opacity);
-            target.masks.push(Mask {
-                mode,
-                geometry,
-                opacity,
-            })
-        }
+    target.frames = source.properties.in_point.unwrap_f32()
+        ..source.properties.out_point.unwrap_f32();
+    target.stretch = source
+        .properties
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+    target.start_frame = source.properties.start_time.unwrap_f32();
+    target.stretch = source
+        .properties
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+    // todo: masks
+    // for mask_source in &source.masks {
+    //     if let Some(geometry) = conv_shape_geometry(&mask_source.points) {
+    //         let mode = peniko::BlendMode::default();
+    //         let opacity = conv_scalar(&mask_source.opacity);
+    //         target.masks.push(Mask {
+    //             mode,
+    //             geometry,
+    //             opacity,
+    //         })
+    //     }
+    // }
+
+    // todo: matte mode
+    // let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
+    //     MatteMode::Normal => Mix::Normal.into(),
+    //     MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
+    //     MatteMode::InvertAlpha | MatteMode::InvertLuma => {
+    //         Compose::SrcOut.into()
+    //     }
+    // });
+
+    (
+        source
+            .properties
+            .index
+            .as_ref()
+            .map_or(0, |ind| ind.unwrap_u32()) as usize,
+        // todo: matte mode
+        Some(Mix::Normal.into()),
+    )
+}
+
+fn setup_shape_layer(
+    source: &parser::schema::layers::shape::ShapeLayer,
+    target: &mut Layer,
+) -> (usize, Option<BlendMode>) {
+    target.name = source.properties.name.clone().unwrap_or_default();
+    target.parent = source
+        .properties
+        .parent_index
+        .as_ref()
+        .map(|i| i.unwrap_u32() as usize);
+    let (transform, opacity) = conv_transform(&source.properties.transform);
+    target.transform = transform;
+    target.opacity = opacity;
+    target.is_mask = source
+        .properties
+        .matte_target
+        .as_ref()
+        .map_or(false, |td| *td == BoolInt::True);
+
+    // todo: Matte mode
+    //let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
+    //    MatteMode::Normal => Mix::Normal.into(),
+    //    MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
+    //    MatteMode::InvertAlpha | MatteMode::InvertLuma => {
+    //        Compose::SrcOut.into()
+    //    }
+    //});
+
+    target.blend_mode =
+        conv_blend_mode(source.properties.blend_mode.as_ref().unwrap_or(
+            &crate::parser::schema::constants::blend_mode::BlendMode::Normal,
+        ));
+    if target.blend_mode == Some(peniko::Mix::Normal.into()) {
+        target.blend_mode = None;
     }
-    (source.index as usize, matte_mode)
+    target.frames = source.properties.in_point.unwrap_f32()
+        ..source.properties.out_point.unwrap_f32();
+    target.stretch = source
+        .properties
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+    target.start_frame = source.properties.start_time.unwrap_f32();
+    target.stretch = source
+        .properties
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+    // todo: masks
+    // for mask_source in &source.masks {
+    //     if let Some(geometry) = conv_shape_geometry(&mask_source.points) {
+    //         let mode = peniko::BlendMode::default();
+    //         let opacity = conv_scalar(&mask_source.opacity);
+    //         target.masks.push(Mask {
+    //             mode,
+    //             geometry,
+    //             opacity,
+    //         })
+    //     }
+    // }
+
+    // todo: matte mode
+    // let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
+    //     MatteMode::Normal => Mix::Normal.into(),
+    //     MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
+    //     MatteMode::InvertAlpha | MatteMode::InvertLuma => {
+    //         Compose::SrcOut.into()
+    //     }
+    // });
+
+    (
+        source
+            .properties
+            .index
+            .as_ref()
+            .map_or(0, |ind| ind.unwrap_u32()) as usize,
+        // todo: matte mode
+        Some(Mix::Normal.into()),
+    )
 }
 
 fn conv_transform(
-    value: &parser::schema::transform::Transform,
-) -> (parser::schema::transform::Transform, Value<f32>) {
-    let transform = animated::Transform {
-        anchor: conv_point(&value.anchor_point),
-        position: Position::Point(conv_point(&value.position)), // todo
-        scale: conv_vec2(&value.scale),
-        rotation: conv_scalar(&value.rotation),
-        skew: conv_scalar(&value.skew),
-        skew_angle: conv_scalar(&value.skew_axis),
+    value: &parser::schema::helpers::transform::Transform,
+) -> (runtime::model::Transform, Value<f32>) {
+    let rotation_in = match &value.rotation {
+        Some(any_trans) => match any_trans {
+            parser::schema::helpers::transform::AnyTransformR::Rotation(float_value) => float_value,
+            // todo: need to actually handle split rotations
+            parser::schema::helpers::transform::AnyTransformR::SplitRotation { .. } => todo!(),
+        },
+        None => todo!("split rotation"),
     };
-    let opacity = conv_scalar(&value.opacity);
+
+    let position_in = match &value.position {
+        schema::helpers::transform::AnyTransformP::Position(position) => {
+            position
+        }
+        schema::helpers::transform::AnyTransformP::SplitVector(_) => {
+            // todo: split vectors
+            todo!("split vector");
+        }
+    };
+
+    let transform = animated::Transform {
+        anchor: conv_point(
+            value.anchor_point.as_ref().unwrap_or(&POSITION_ZERO),
+        ),
+        position: Position::Point(conv_point(position_in)), // todo
+        scale: conv_vec2(value.scale.as_ref().unwrap_or(&MULTIDIM_ONE)),
+        rotation: conv_scalar(rotation_in),
+        skew: conv_scalar(value.skew.as_ref().unwrap_or(&FLOAT_VALUE_ZERO)),
+        skew_angle: conv_scalar(
+            value.skew_axis.as_ref().unwrap_or(&FLOAT_VALUE_ZERO),
+        ),
+    };
+    let opacity =
+        conv_scalar(value.opacity.as_ref().unwrap_or(&FLOAT_VALUE_ONE_HUNDRED));
     (transform.to_model(), opacity)
 }
 
 fn conv_shape_transform(
-    value: &parser::schema::transform::Transform,
+    value: &parser::schema::shapes::transform::TransformShape,
 ) -> GroupTransform {
-    let transform = animated::Transform {
-        anchor: conv_point(&value.anchor_point),
-        position: Position::Point(conv_point(&value.position)),
-        scale: conv_vec2(&value.scale),
-        rotation: conv_scalar(&value.rotation),
-        skew: conv_scalar(&value.skew),
-        skew_angle: conv_scalar(&value.skew_axis),
+    let rotation_in = match &value.transform.rotation {
+        Some(any_trans) => match any_trans {
+            parser::schema::helpers::transform::AnyTransformR::Rotation(float_value) => float_value,
+            // todo: need to actually handle split rotations
+            parser::schema::helpers::transform::AnyTransformR::SplitRotation { .. } => &FLOAT_VALUE_ZERO,
+        },
+        None => &FLOAT_VALUE_ZERO,
     };
-    let opacity = conv_scalar(&value.opacity);
+    let position_in = match &value.transform.position {
+        schema::helpers::transform::AnyTransformP::Position(position) => {
+            position
+        }
+        schema::helpers::transform::AnyTransformP::SplitVector(_) => {
+            // todo: split vectors
+            todo!("split vector");
+        }
+    };
+
+    let transform = animated::Transform {
+        anchor: conv_point(
+            value
+                .transform
+                .anchor_point
+                .as_ref()
+                .unwrap_or(&POSITION_ZERO),
+        ),
+        position: Position::Point(conv_point(position_in)),
+        scale: conv_vec2(
+            value.transform.scale.as_ref().unwrap_or(&MULTIDIM_ONE),
+        ),
+        rotation: conv_scalar(rotation_in),
+        skew: conv_scalar(
+            value.transform.skew.as_ref().unwrap_or(&FLOAT_VALUE_ZERO),
+        ),
+        skew_angle: conv_scalar(
+            value
+                .transform
+                .skew_axis
+                .as_ref()
+                .unwrap_or(&FLOAT_VALUE_ZERO),
+        ),
+    };
+
+    let opacity = conv_scalar(
+        value
+            .transform
+            .opacity
+            .as_ref()
+            .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
+    );
+
     GroupTransform {
         transform: transform.to_model(),
         opacity,
     }
 }
 
-fn conv_scalar(value: &bodymovin::properties::Scalar) -> Value<f32> {
-    use bodymovin::properties::Value::*;
-    match &value.value {
-        Fixed(value) => Value::Fixed(*value as f32),
-        Animated(animated) => {
+fn conv_scalar(
+    float_value: &parser::schema::animated_properties::value::FloatValue,
+) -> Value<f32> {
+    use crate::parser::schema::animated_properties::animated_property::AnimatedPropertyK::*;
+    match &float_value.animated_property.value {
+        Static(number) => Value::Fixed(number.unwrap_f32()),
+        AnimatedValue(keyframes) => {
             let mut frames = vec![];
             let mut values = vec![];
-            let mut last_value = None;
-            for value in animated {
-                if let Some(data) =
-                    value.start_value.as_ref().or(last_value.flatten())
-                {
-                    frames.push(Time {
-                        frame: value.start_time as f32,
-                    });
-                    values.push(data.0 as f32);
-                }
-                last_value = Some(value.end_value.as_ref());
+            for keyframe in keyframes {
+                let start_time = keyframe.base.time.unwrap_f32();
+                let data = keyframe.value[0].unwrap_f32();
+                frames.push(crate::runtime::model::Time { frame: start_time });
+                values.push(data);
+                // todo: end_value deprecated but should we still push it if it exists?
             }
             Value::Animated(model::Animated {
                 times: frames,
@@ -228,24 +489,33 @@ fn conv_scalar(value: &bodymovin::properties::Scalar) -> Value<f32> {
 }
 
 fn conv_multi<T: Lerp>(
-    value: &bodymovin::properties::MultiDimensional,
+    multidimensional: &parser::schema::animated_properties::multi_dimensional::MultiDimensional,
     f: impl Fn(&Vec<f64>) -> T,
 ) -> Value<T> {
-    use bodymovin::properties::Value::*;
-    match &value.value {
-        Fixed(value) => Value::Fixed(f(value)),
-        Animated(animated) => {
+    use crate::parser::schema::animated_properties::animated_property::AnimatedPropertyK::*;
+
+    match &multidimensional.animated_property.value {
+        Static(components) => {
+            let value: Vec<f64> = components
+                .iter()
+                .map(|number| number.as_f64().unwrap())
+                .collect();
+            Value::Fixed(f(&value))
+        }
+        AnimatedValue(keyframes) => {
             let mut frames = vec![];
             let mut values = vec![];
-            let mut last_value = None;
-            for value in animated {
-                if let Some(data) = value.start_value.as_ref().or(last_value) {
-                    frames.push(Time {
-                        frame: value.start_time as f32,
-                    });
-                    values.push(f(data));
-                }
-                last_value = value.end_value.as_ref();
+            for keyframe in keyframes {
+                let data: Vec<f64> = keyframe
+                    .value
+                    .iter()
+                    .map(|number| number.as_f64().unwrap())
+                    .collect();
+                frames.push(Time {
+                    frame: keyframe.base.time.unwrap_f32(),
+                });
+                values.push(f(&data));
+                // todo: end_value deprecated but should we still append it if it exists?
             }
             Value::Animated(model::Animated {
                 times: frames,
@@ -255,8 +525,48 @@ fn conv_multi<T: Lerp>(
     }
 }
 
-fn conv_point(value: &AnimatedVector) -> Value<Point> {
-    conv_multi(value, |x| {
+fn conv_pos<T: Lerp>(
+    position: &parser::schema::animated_properties::position::Position,
+    f: impl Fn(&Vec<f64>) -> T,
+) -> Value<T> {
+    use crate::parser::schema::animated_properties::position::PositionValueK::*;
+
+    match &position.value {
+        Static(components) => {
+            let value: Vec<f64> = components
+                .iter()
+                .map(|number| number.as_f64().unwrap())
+                .collect();
+            Value::Fixed(f(&value))
+        }
+        Animated(keyframes) => {
+            let mut frames = vec![];
+            let mut values = vec![];
+            for keyframe in keyframes {
+                let data: Vec<f64> = keyframe
+                    .keyframe
+                    .value
+                    .iter()
+                    .map(|number| number.as_f64().unwrap())
+                    .collect();
+                frames.push(Time {
+                    frame: keyframe.keyframe.base.time.unwrap_f32(),
+                });
+                values.push(f(&data));
+                // todo: end_value deprecated but should we still append it if it exists?
+            }
+            Value::Animated(model::Animated {
+                times: frames,
+                values,
+            })
+        }
+    }
+}
+
+fn conv_point(
+    value: &schema::animated_properties::position::Position,
+) -> Value<Point> {
+    conv_pos(value, |x| {
         Point::new(
             x.get(0).copied().unwrap_or(0.0),
             x.get(1).copied().unwrap_or(0.0),
@@ -264,7 +574,7 @@ fn conv_point(value: &AnimatedVector) -> Value<Point> {
     })
 }
 
-fn conv_color(value: &bodymovin::properties::MultiDimensional) -> Value<Color> {
+fn _conv_color(value: &MultiDimensional) -> Value<Color> {
     conv_multi(value, |x| {
         Color::rgb(
             x.get(0).copied().unwrap_or(0.0),
@@ -274,7 +584,7 @@ fn conv_color(value: &bodymovin::properties::MultiDimensional) -> Value<Color> {
     })
 }
 
-fn conv_vec2(value: &bodymovin::properties::MultiDimensional) -> Value<Vec2> {
+fn conv_vec2(value: &MultiDimensional) -> Value<Vec2> {
     conv_multi(value, |x| {
         Vec2::new(
             x.get(0).copied().unwrap_or(0.0),
@@ -283,7 +593,7 @@ fn conv_vec2(value: &bodymovin::properties::MultiDimensional) -> Value<Vec2> {
     })
 }
 
-fn conv_size(value: &bodymovin::properties::MultiDimensional) -> Value<Size> {
+fn conv_size(value: &MultiDimensional) -> Value<Size> {
     conv_multi(value, |x| {
         Size::new(
             x.get(0).copied().unwrap_or(0.0),
@@ -292,156 +602,164 @@ fn conv_size(value: &bodymovin::properties::MultiDimensional) -> Value<Size> {
     })
 }
 
-fn conv_gradient_colors(
-    value: &bodymovin::helpers::GradientColors,
-) -> ColorStops {
-    use bodymovin::properties::Value::*;
-    let count = value.count as usize;
-    match &value.colors.value {
-        Fixed(value) => {
-            let mut stops = fixed::ColorStops::new();
-            for chunk in value.chunks_exact(4) {
-                stops.push(
-                    (
-                        chunk[0] as f32,
-                        fixed::Color::rgba(chunk[1], chunk[2], chunk[3], 1.0),
-                    )
-                        .into(),
-                )
-            }
-            ColorStops::Fixed(stops)
-        }
-        Animated(animated) => {
-            let mut frames = vec![];
-            let mut values = vec![];
-            let mut last_value = None;
-            for value in animated {
-                if let Some(data) =
-                    value.start_value.as_ref().or(last_value.flatten())
-                {
-                    frames.push(Time {
-                        frame: value.start_time as f32,
-                    });
-                    values.push(
-                        data.iter().map(|x| *x as f32).collect::<Vec<_>>(),
-                    );
-                }
-                last_value = Some(value.end_value.as_ref());
-            }
-            ColorStops::Animated(animated::ColorStops {
-                frames,
-                values,
-                count,
-            })
-        }
-    }
-}
+// todo
+// fn conv_gradient_colors(
+//     value: &bodymovin::helpers::GradientColors,
+// ) -> ColorStops {
+//     use bodymovin::properties::Value::*;
+//     let count = value.count as usize;
+//     match &value.colors.value {
+//         Fixed(value) => {
+//             let mut stops = fixed::ColorStops::new();
+//             for chunk in value.chunks_exact(4) {
+//                 stops.push(
+//                     (
+//                         chunk[0] as f32,
+//                         fixed::Color::rgba(chunk[1], chunk[2], chunk[3], 1.0),
+//                     )
+//                         .into(),
+//                 )
+//             }
+//             ColorStops::Fixed(stops)
+//         }
+//         Animated(animated) => {
+//             let mut frames = vec![];
+//             let mut values = vec![];
+//             let mut last_value = None;
+//             for value in animated {
+//                 if let Some(data) =
+//                     value.start_value.as_ref().or(last_value.flatten())
+//                 {
+//                     frames.push(Time {
+//                         frame: value.start_time as f32,
+//                     });
+//                     values.push(
+//                         data.iter().map(|x| *x as f32).collect::<Vec<_>>(),
+//                     );
+//                 }
+//                 last_value = Some(value.end_value.as_ref());
+//             }
+//             ColorStops::Animated(animated::ColorStops {
+//                 frames,
+//                 values,
+//                 count,
+//             })
+//         }
+//     }
+// }
 
-fn conv_draw(value: &bodymovin::shapes::AnyShape) -> Option<Draw> {
-    use bodymovin::helpers::{LineCap, LineJoin};
-    use bodymovin::shapes::{AnyShape, GradientType};
-    use peniko::{Cap, Join};
-    match value {
-        AnyShape::Fill(value) => {
-            let color = conv_color(&value.color);
-            let brush = animated::Brush::Solid(color).to_model();
-            let opacity = conv_scalar(&value.opacity);
-            Some(Draw {
-                stroke: None,
-                brush,
-                opacity,
-            })
-        }
-        AnyShape::Stroke(value) => {
-            let stroke = animated::Stroke {
-                width: conv_scalar(&value.width),
-                join: match value.line_join {
-                    LineJoin::Bevel => Join::Bevel,
-                    LineJoin::Round => Join::Round,
-                    LineJoin::Miter => Join::Miter,
-                },
-                miter_limit: value.miter_limit.map(|x| x as f32),
-                cap: match value.line_cap {
-                    LineCap::Butt => Cap::Butt,
-                    LineCap::Round => Cap::Round,
-                    LineCap::Square => Cap::Square,
-                },
-            };
-            let color = conv_color(&value.color);
-            let brush = animated::Brush::Solid(color).to_model();
-            let opacity = conv_scalar(&value.opacity);
-            Some(Draw {
-                stroke: Some(stroke.to_model()),
-                brush,
-                opacity,
-            })
-        }
-        AnyShape::GradientFill(value) => {
-            let is_radial = matches!(value.ty, GradientType::Radial);
-            let start_point = conv_point(&value.start_point);
-            let end_point = conv_point(&value.end_point);
-            let gradient = animated::Gradient {
-                is_radial,
-                start_point,
-                end_point,
-                stops: conv_gradient_colors(&value.gradient_colors),
-            };
-            let brush = animated::Brush::Gradient(gradient).to_model();
-            Some(Draw {
-                stroke: None,
-                brush,
-                opacity: Value::Fixed(100.0),
-            })
-        }
-        AnyShape::GradientStroke(value) => {
-            let stroke = animated::Stroke {
-                width: conv_scalar(&value.stroke_width),
-                join: match value.line_join {
-                    LineJoin::Bevel => Join::Bevel,
-                    LineJoin::Round => Join::Round,
-                    LineJoin::Miter => Join::Miter,
-                },
-                miter_limit: value.miter_limit.map(|x| x as f32),
-                cap: match value.line_cap {
-                    LineCap::Butt => Cap::Butt,
-                    LineCap::Round => Cap::Round,
-                    LineCap::Square => Cap::Square,
-                },
-            };
-            let is_radial = matches!(value.ty, GradientType::Radial);
-            let start_point = conv_point(&value.start_point);
-            let end_point = conv_point(&value.end_point);
-            let gradient = animated::Gradient {
-                is_radial,
-                start_point,
-                end_point,
-                stops: conv_gradient_colors(&value.gradient_colors),
-            };
-            let brush = animated::Brush::Gradient(gradient).to_model();
-            Some(Draw {
-                stroke: Some(stroke.to_model()),
-                brush,
-                opacity: Value::Fixed(100.0),
-            })
-        }
-        _ => None,
-    }
-}
+// todo
+// fn conv_draw(value: &bodymovin::shapes::AnyShape) -> Option<Draw> {
+//     use bodymovin::helpers::{LineCap, LineJoin};
+//     use bodymovin::shapes::{AnyShape, GradientType};
+//     use peniko::{Cap, Join};
+//     match value {
+//         AnyShape::Fill(value) => {
+//             let color = conv_color(&value.color);
+//             let brush = animated::Brush::Solid(color).to_model();
+//             let opacity = conv_scalar(&value.opacity);
+//             Some(Draw {
+//                 stroke: None,
+//                 brush,
+//                 opacity,
+//             })
+//         }
+//         AnyShape::Stroke(value) => {
+//             let stroke = animated::Stroke {
+//                 width: conv_scalar(&value.width),
+//                 join: match value.line_join {
+//                     LineJoin::Bevel => Join::Bevel,
+//                     LineJoin::Round => Join::Round,
+//                     LineJoin::Miter => Join::Miter,
+//                 },
+//                 miter_limit: value.miter_limit.map(|x| x as f32),
+//                 cap: match value.line_cap {
+//                     LineCap::Butt => Cap::Butt,
+//                     LineCap::Round => Cap::Round,
+//                     LineCap::Square => Cap::Square,
+//                 },
+//             };
+//             let color = conv_color(&value.color);
+//             let brush = animated::Brush::Solid(color).to_model();
+//             let opacity = conv_scalar(&value.opacity);
+//             Some(Draw {
+//                 stroke: Some(stroke.to_model()),
+//                 brush,
+//                 opacity,
+//             })
+//         }
+// AnyShape::GradientFill(value) => {
+//     let is_radial = matches!(value.ty, GradientType::Radial);
+//     let start_point = conv_point(&value.start_point);
+//     let end_point = conv_point(&value.end_point);
+//     let gradient = animated::Gradient {
+//         is_radial,
+//         start_point,
+//         end_point,
+//         stops: conv_gradient_colors(&value.gradient_colors),
+//     };
+//     let brush = animated::Brush::Gradient(gradient).to_model();
+//     Some(Draw {
+//         stroke: None,
+//         brush,
+//         opacity: Value::Fixed(100.0),
+//     })
+// }
 
-fn conv_shape(value: &bodymovin::shapes::AnyShape) -> Option<Shape> {
-    use bodymovin::shapes::AnyShape;
-    if let Some(draw) = conv_draw(value) {
-        return Some(Shape::Draw(draw));
-    } else if let Some(geometry) = conv_geometry(value) {
-        return Some(Shape::Geometry(geometry));
+// todo
+// AnyShape::GradientStroke(value) => {
+//     let stroke = animated::Stroke {
+//         width: conv_scalar(&value.stroke_width),
+//         join: match value.line_join {
+//             LineJoin::Bevel => Join::Bevel,
+//             LineJoin::Round => Join::Round,
+//             LineJoin::Miter => Join::Miter,
+//         },
+//         miter_limit: value.miter_limit.map(|x| x as f32),
+//         cap: match value.line_cap {
+//             LineCap::Butt => Cap::Butt,
+//             LineCap::Round => Cap::Round,
+//             LineCap::Square => Cap::Square,
+//         },
+//     };
+//     let is_radial = matches!(value.ty, GradientType::Radial);
+//     let start_point = conv_point(&value.start_point);
+//     let end_point = conv_point(&value.end_point);
+//     let gradient = animated::Gradient {
+//         is_radial,
+//         start_point,
+//         end_point,
+//         stops: conv_gradient_colors(&value.gradient_colors),
+//     };
+//     let brush = animated::Brush::Gradient(gradient).to_model();
+//     Some(Draw {
+//         stroke: Some(stroke.to_model()),
+//         brush,
+//         opacity: Value::Fixed(100.0),
+//     })
+// }
+//         _ => None,
+//     }
+// }
+
+fn conv_shape(
+    value: &parser::schema::shapes::Shape,
+) -> Option<crate::runtime::model::Shape> {
+    // todo: draw shape
+    // if let Some(draw) = conv_draw(value) {
+    //     return Some(crate::runtime::model::Shape::Draw(draw));
+    // }
+    if let Some(geometry) = conv_geometry(value) {
+        return Some(crate::runtime::model::Shape::Geometry(geometry));
     }
+
     match value {
-        AnyShape::Group(value) => {
+        schema::shapes::Shape::Group(value) => {
             let mut shapes = vec![];
             let mut group_transform = None;
-            for item in &value.items {
+            for item in &value.shapes {
                 match item {
-                    AnyShape::Transform(transform) => {
+                    schema::shapes::Shape::Transform(transform) => {
                         group_transform = Some(conv_shape_transform(transform));
                     }
                     _ => {
@@ -452,111 +770,122 @@ fn conv_shape(value: &bodymovin::shapes::AnyShape) -> Option<Shape> {
                 }
             }
             if !shapes.is_empty() {
-                Some(Shape::Group(shapes, group_transform))
+                Some(crate::runtime::model::Shape::Group(
+                    shapes,
+                    group_transform,
+                ))
             } else {
                 None
             }
         }
-        AnyShape::Repeater(value) => {
-            let repeater = animated::Repeater {
-                copies: conv_scalar(&value.copies),
-                offset: conv_scalar(&value.offset),
-                anchor_point: conv_point(&value.transform.anchor_point),
-                position: conv_point(&value.transform.position),
-                rotation: conv_scalar(&value.transform.rotation),
-                scale: conv_vec2(&value.transform.scale),
-                start_opacity: conv_scalar(&value.transform.start_opacity),
-                end_opacity: conv_scalar(&value.transform.end_opacity),
-            };
-            Some(Shape::Repeater(repeater.to_model()))
-        }
+        // todo: implement repeater shape
+        // shapes::Shape::Repeater(value) => {
+        //     let repeater = animated::Repeater {
+        //         copies: conv_scalar(&value.copies),
+        //         offset: conv_scalar(&value.offset),
+        //         anchor_point: conv_point(&value.transform.anchor_point),
+        //         position: conv_point(&value.transform.position),
+        //         rotation: conv_scalar(&value.transform.rotation),
+        //         scale: conv_vec2(&value.transform.scale),
+        //         start_opacity: conv_scalar(&value.transform.start_opacity),
+        //         end_opacity: conv_scalar(&value.transform.end_opacity),
+        //     };
+        //     Some(Shape::Repeater(repeater.to_model()))
+        // }
         _ => None,
     }
 }
 
-fn conv_geometry(value: &bodymovin::shapes::AnyShape) -> Option<Geometry> {
-    use bodymovin::shapes::AnyShape;
+fn conv_geometry(
+    value: &schema::shapes::Shape,
+) -> Option<crate::runtime::model::Geometry> {
+    use schema::shapes::Shape;
     match value {
-        AnyShape::Ellipse(value) => {
+        Shape::Ellipse(value) => {
             let ellipse = animated::Ellipse {
-                is_ccw: value.direction as i32 == 3,
+                is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
                 position: conv_point(&value.position),
                 size: conv_size(&value.size),
             };
-            Some(Geometry::Ellipse(ellipse))
+            Some(crate::runtime::model::Geometry::Ellipse(ellipse))
         }
-        AnyShape::Rect(value) => {
+        Shape::Rectangle(value) => {
             let rect = animated::Rect {
-                is_ccw: value.direction as i32 == 3,
+                is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
                 position: conv_point(&value.position),
                 size: conv_size(&value.size),
-                corner_radius: conv_scalar(&value.rounded_corners),
+                corner_radius: conv_scalar(&value.rounded_corner_radius),
             };
-            Some(Geometry::Rect(rect))
+            Some(crate::runtime::model::Geometry::Rect(rect))
         }
-        AnyShape::Shape(value) => conv_shape_geometry(&value.vertices),
+        // todo: generic shape
+        // Shape::Shape(value) => conv_shape_geometry(&value.vertices),
         _ => None,
     }
 }
 
-fn conv_shape_geometry(
-    value: &bodymovin::properties::Shape,
-) -> Option<Geometry> {
-    use bodymovin::properties::Value::*;
-    let mut is_closed = false;
-    match &value.value {
-        Fixed(value) => {
-            let (points, is_closed) = conv_spline(value);
-            let mut path = vec![];
-            points.as_slice().to_path(is_closed, &mut path);
-            Some(Geometry::Fixed(path))
-        }
-        Animated(animated) => {
-            let mut frames = vec![];
-            let mut values = vec![];
-            let mut last_value = None;
-            for value in animated {
-                if let Some(data) = value.start_value.as_ref().or(last_value) {
-                    frames.push(Time {
-                        frame: value.start_time as f32,
-                    });
-                    let (points, is_frame_closed) = conv_spline(data.get(0)?);
-                    values.push(points);
-                    is_closed |= is_frame_closed;
-                }
-                last_value = value.end_value.as_ref();
-            }
-            Some(Geometry::Spline(animated::Spline {
-                is_closed,
-                times: frames,
-                values,
-            }))
-        }
-    }
-}
+// todo
+// fn conv_shape_geometry(
+//     value: &bodymovin::properties::Shape,
+// ) -> Option<Geometry> {
+//     use bodymovin::properties::Value::*;
+//     let mut is_closed = false;
+//     match &value.value {
+//         Fixed(value) => {
+//             let (points, is_closed) = conv_spline(value);
+//             let mut path = vec![];
+//             points.as_slice().to_path(is_closed, &mut path);
+//             Some(Geometry::Fixed(path))
+//         }
+//         Animated(animated) => {
+//             let mut frames = vec![];
+//             let mut values = vec![];
+//             let mut last_value = None;
+//             for value in animated {
+//                 if let Some(data) = value.start_value.as_ref().or(last_value) {
+//                     frames.push(Time {
+//                         frame: value.start_time as f32,
+//                     });
+//                     let (points, is_frame_closed) = conv_spline(data.get(0)?);
+//                     values.push(points);
+//                     is_closed |= is_frame_closed;
+//                 }
+//                 last_value = value.end_value.as_ref();
+//             }
+//             Some(Geometry::Spline(animated::Spline {
+//                 is_closed,
+//                 times: frames,
+//                 values,
+//             }))
+//         }
+//     }
+// }
 
-fn conv_spline(
-    value: &bodymovin::properties::ShapeValue,
-) -> (Vec<Point>, bool) {
-    use core::iter::repeat;
-    let mut points = Vec::with_capacity(value.vertices.len() * 3);
-    let is_closed = value.closed.unwrap_or(false);
-    for ((v, i), o) in value
-        .vertices
-        .iter()
-        .zip(value.in_point.iter().chain(repeat(&(0.0, 0.0))))
-        .zip(value.out_point.iter().chain(repeat(&(0.0, 0.0))))
-    {
-        points.push((v.0, v.1).into());
-        points.push((i.0, i.1).into());
-        points.push((o.0, o.1).into());
-    }
-    (points, is_closed)
-}
+// todo
+// fn conv_spline(
+//     value: &bodymovin::properties::ShapeValue,
+// ) -> (Vec<Point>, bool) {
+//     use core::iter::repeat;
+//     let mut points = Vec::with_capacity(value.vertices.len() * 3);
+//     let is_closed = value.closed.unwrap_or(false);
+//     for ((v, i), o) in value
+//         .vertices
+//         .iter()
+//         .zip(value.in_point.iter().chain(repeat(&(0.0, 0.0))))
+//         .zip(value.out_point.iter().chain(repeat(&(0.0, 0.0))))
+//     {
+//         points.push((v.0, v.1).into());
+//         points.push((i.0, i.1).into());
+//         points.push((o.0, o.1).into());
+//     }
+//     (points, is_closed)
+// }
 
 fn conv_blend_mode(
-    value: &parser::schema::layers::enumerations::BlendMode,
+    value: &crate::parser::schema::constants::blend_mode::BlendMode,
 ) -> Option<BlendMode> {
+    use crate::parser::schema::constants::blend_mode::BlendMode::*;
+
     Some(match value {
         Normal => return None,
         Multiply => BlendMode::from(Mix::Multiply),
@@ -574,5 +903,7 @@ fn conv_blend_mode(
         Saturation => BlendMode::from(Mix::Saturation),
         Color => BlendMode::from(Mix::Color),
         Luminosity => BlendMode::from(Mix::Luminosity),
+        Add => unimplemented!(),
+        HardMix => unimplemented!(),
     })
 }
