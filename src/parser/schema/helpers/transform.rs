@@ -35,7 +35,7 @@ pub struct Transform {
     /// axis, 90 along the Y axis)
     #[serde(rename = "sa")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skew_axis: Option<MultiDimensional>,
+    pub skew_axis: Option<FloatValue>,
     /// Opacity, 100 for fully opaque
     #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,7 +73,7 @@ impl Transform {
             .ok();
         let skew_axis = obj
             .extract_obj(breadcrumb, "sa")
-            .and_then(|obj| MultiDimensional::from_obj(breadcrumb, &obj))
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
             .ok();
         let opacity = obj
             .extract_obj(breadcrumb, "o")
