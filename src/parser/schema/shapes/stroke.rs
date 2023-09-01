@@ -1,6 +1,5 @@
-use crate::parser::schema::animated_properties::{
-    multi_dimensional::MultiDimensional, value::FloatValue,
-};
+use crate::parser::schema::animated_properties::color_value::ColorValue;
+use crate::parser::schema::animated_properties::value::FloatValue;
 use crate::parser::schema::shapes::ShapeProperties;
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
@@ -17,15 +16,19 @@ pub struct StrokeShape {
     pub properties: ShapeProperties,
     /// Line Cap
     #[serde(rename = "lc")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub line_cap: Option<LineCap>,
     /// Line Join
     #[serde(rename = "lj")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub line_join: Option<LineJoin>,
     /// Miter Limit
     #[serde(rename = "ml")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub miter_limit: Option<Number>,
     /// Animatable alternative to miter_limit
     #[serde(rename = "ml2")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub miter_limit_alt: Option<FloatValue>,
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]
@@ -35,8 +38,9 @@ pub struct StrokeShape {
     pub stroke_width: FloatValue,
     /// Dashed line definition
     #[serde(rename = "d")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub dash_array: Option<Vec<StrokeDash>>,
     /// Stroke color
     #[serde(rename = "c")]
-    pub stroke_color: MultiDimensional, // todo: stroke_color needs `Color` type, not generic multidimensional
+    pub stroke_color: ColorValue,
 }

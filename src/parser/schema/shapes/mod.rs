@@ -43,6 +43,7 @@ use serde::{Deserialize, Serialize};
 
 pub use self::common::ShapeProperties;
 
+use super::animated_properties::color_value::ColorValue;
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
 use super::animated_properties::value::FloatValue;
@@ -200,10 +201,18 @@ impl Shape {
                 miter_limit_alt: root
                     .extract_type(breadcrumb, "key", ValueType::Scalar2d)
                     .ok(),
-                opacity: todo!(),
-                stroke_width: todo!(),
-                dash_array: todo!(),
-                stroke_color: todo!(),
+                opacity: root
+                    .extract_obj(breadcrumb, "o")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
+                stroke_width: root
+                    .extract_obj(breadcrumb, "w")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
+                stroke_color: root
+                    .extract_obj(breadcrumb, "c")
+                    .and_then(|obj| ColorValue::from_obj(breadcrumb, &obj))?,
+                dash_array: root
+                    .extract_type(breadcrumb, "d", ValueType::EnumStr)
+                    .ok(),
             }),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)
