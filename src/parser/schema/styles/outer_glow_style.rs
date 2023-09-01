@@ -10,7 +10,7 @@ use serde_json::Value;
 
 ///
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct ColorOverlayStyle {
+pub struct OuterGlowStyle {
     #[serde(flatten)]
     pub layer_style: LayerStyle,
     ///
@@ -22,12 +22,28 @@ pub struct ColorOverlayStyle {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<ColorValue>,
     ///
-    #[serde(rename = "so")]
+    #[serde(rename = "o")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<FloatValue>,
+    ///
+    #[serde(rename = "r")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub range: Option<FloatValue>,
+    ///
+    #[serde(rename = "ch")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub choke_spread: Option<FloatValue>,
+    ///
+    #[serde(rename = "no")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub noise: Option<FloatValue>,
+    ///
+    #[serde(rename = "j")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jitter: Option<FloatValue>,
 }
 
-impl ColorOverlayStyle {
+impl OuterGlowStyle {
     pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
@@ -43,7 +59,27 @@ impl ColorOverlayStyle {
         } else {
             None
         };
-        let opacity = if let Ok(obj) = obj.extract_obj(breadcrumb, "so") {
+        let opacity = if let Ok(obj) = obj.extract_obj(breadcrumb, "o") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let choke_spread = if let Ok(obj) = obj.extract_obj(breadcrumb, "ch") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let range = if let Ok(obj) = obj.extract_obj(breadcrumb, "r") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let noise = if let Ok(obj) = obj.extract_obj(breadcrumb, "no") {
+            Some(FloatValue::from_obj(breadcrumb, &obj)?)
+        } else {
+            None
+        };
+        let jitter = if let Ok(obj) = obj.extract_obj(breadcrumb, "j") {
             Some(FloatValue::from_obj(breadcrumb, &obj)?)
         } else {
             None
@@ -53,6 +89,10 @@ impl ColorOverlayStyle {
             blend_mode,
             color,
             opacity,
+            choke_spread,
+            range,
+            noise,
+            jitter,
         })
     }
 }
