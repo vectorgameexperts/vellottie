@@ -139,7 +139,7 @@ lazy_static! {
                         property_index: None,
                         expression: None,
                         slot_id: None,
-                        value: AnimatedPropertyK::Static([
+                        value: AnimatedPropertyK::Static(vec![
                             Number::from(100),
                             Number::from(100)
                         ])
@@ -228,7 +228,7 @@ lazy_static! {
                         property_index: None,
                         expression: None,
                         slot_id: None,
-                        value: AnimatedPropertyK::Static([
+                        value: AnimatedPropertyK::Static(vec![
                             Number::from_f64(205.46865671641788).unwrap(),
                             Number::from_f64(204.6089552238806).unwrap()
                         ])

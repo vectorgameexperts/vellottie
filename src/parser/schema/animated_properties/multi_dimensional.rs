@@ -10,7 +10,7 @@ use serde_json::{Number, Value};
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct MultiDimensional {
     #[serde(flatten)]
-    pub animated_property: AnimatedProperty<[Number; 2]>,
+    pub animated_property: AnimatedProperty<Vec<Number>>,
 }
 
 impl MultiDimensional {
