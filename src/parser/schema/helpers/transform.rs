@@ -1,4 +1,6 @@
 //! Transform - https://lottiefiles.github.io/lottie-docs/concepts/#transform
+use crate::parser::breadcrumb::ValueType;
+use crate::parser::schema::animated_properties::split_vector::SplitVector;
 use crate::parser::schema::animated_properties::{
     multi_dimensional::MultiDimensional, position::Position, value::FloatValue,
 };
@@ -14,9 +16,8 @@ pub struct Transform {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub anchor_point: Option<Position>,
     /// Position / Translation
-    // todo: need untagged enum for split vector variant
     #[serde(rename = "p")]
-    pub position: Position,
+    pub position: AnyTransformP,
     /// Scale factor, 100 for no scaling
     #[serde(rename = "s")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -25,7 +26,7 @@ pub struct Transform {
     // todo: need untagged enum for split vector variant
     #[serde(rename = "r")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rotation: Option<FloatValue>,
+    pub rotation: Option<AnyTransformR>,
     /// Skew amount as an angle in degrees
     #[serde(rename = "sk")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,17 +51,22 @@ impl Transform {
             .extract_obj(breadcrumb, "a")
             .and_then(|obj| Position::from_obj(breadcrumb, &obj))
             .ok();
-        let position = obj
-            .extract_obj(breadcrumb, "p")
-            .and_then(|obj| Position::from_obj(breadcrumb, &obj))?;
+        let position = obj.extract_obj(breadcrumb, "p").and_then(|obj| {
+            if obj.contains_key("s") {
+                Ok(AnyTransformP::SplitVector(SplitVector::from_obj(
+                    breadcrumb, &obj,
+                )?))
+            } else {
+                Ok(AnyTransformP::Position(Position::from_obj(
+                    breadcrumb, &obj,
+                )?))
+            }
+        })?;
         let scale = obj
             .extract_obj(breadcrumb, "s")
             .and_then(|obj| MultiDimensional::from_obj(breadcrumb, &obj))
             .ok();
-        let rotation = obj
-            .extract_obj(breadcrumb, "r")
-            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
-            .ok();
+        let rotation = AnyTransformR::from_obj(breadcrumb, obj).ok();
         let skew = obj
             .extract_obj(breadcrumb, "sk")
             .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
@@ -83,5 +89,78 @@ impl Transform {
             opacity,
         };
         Ok(transform)
+    }
+}
+
+/// The possible values of "p" in a [`Transform`].
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum AnyTransformP {
+    /// Position / Translation
+    Position(Position),
+    /// Position / Translation with split components
+    SplitVector(SplitVector),
+}
+
+/// The possible values of "r" in a [`Transform`].
+#[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum AnyTransformR {
+    /// Rotation in degrees, clockwise
+    Rotation(FloatValue),
+    /// Split rotation components
+    SplitRotation {
+        /// Split rotation X component.
+        #[serde(rename = "x")]
+        x_rotation: FloatValue,
+        /// Split rotation Y component.
+        #[serde(rename = "y")]
+        y_rotation: FloatValue,
+        /// Split rotation component, equivalent to r when not split.
+        #[serde(rename = "z")]
+        z_rotation: FloatValue,
+        /// Orientation
+        #[serde(rename = "or")]
+        orientation: MultiDimensional,
+    },
+}
+
+impl AnyTransformR {
+    pub fn from_obj(
+        breadcrumb: &mut Breadcrumb,
+        obj: &serde_json::map::Map<String, Value>,
+    ) -> Result<Self, Error> {
+        breadcrumb.enter_unnamed(ValueType::Rotation);
+        let rotation = if let Some(rotation) = obj
+            .extract_obj(breadcrumb, "r")
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+            .ok()
+            .map(AnyTransformR::Rotation)
+        {
+            rotation
+        } else {
+            let x_rotation = obj
+                .extract_obj(breadcrumb, "rx")
+                .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?;
+            let y_rotation = obj
+                .extract_obj(breadcrumb, "ry")
+                .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?;
+            let z_rotation = obj
+                .extract_obj(breadcrumb, "rz")
+                .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?;
+            let orientation = obj
+                .extract_obj(breadcrumb, "or")
+                .and_then(|obj| MultiDimensional::from_obj(breadcrumb, &obj))?;
+            // Split should always have the value "1", otherwise it is not a split vector object
+            AnyTransformR::SplitRotation {
+                x_rotation,
+                y_rotation,
+                z_rotation,
+                orientation,
+            }
+        };
+
+        breadcrumb.exit();
+        Ok(rotation)
     }
 }

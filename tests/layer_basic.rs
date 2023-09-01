@@ -6,7 +6,9 @@ use vellottie::parser::schema::animated_properties::animated_property::AnimatedP
 use vellottie::parser::schema::animated_properties::position::{
     Position, PositionValueK,
 };
-use vellottie::parser::schema::helpers::transform::Transform;
+use vellottie::parser::schema::helpers::transform::{
+    AnyTransformP, AnyTransformR, Transform,
+};
 use vellottie::parser::{
     breadcrumb::Breadcrumb,
     schema::{
@@ -121,7 +123,7 @@ lazy_static! {
                         Number::from(256)
                     ],),
                 }),
-                position: Position {
+                position: AnyTransformP::Position(Position {
                     property_index: None,
                     animated: BoolInt::False,
                     expression: None,
@@ -130,7 +132,7 @@ lazy_static! {
                         Number::from(256),
                         Number::from(256)
                     ],),
-                },
+                }),
                 scale: Some(MultiDimensional {
                     animated_property: AnimatedProperty {
                         animated: BoolInt::False,
@@ -143,7 +145,7 @@ lazy_static! {
                         ])
                     }
                 }),
-                rotation: Some(FloatValue {
+                rotation: Some(AnyTransformR::Rotation(FloatValue {
                     animated_property: AnimatedProperty {
                         animated: BoolInt::False,
                         property_index: None,
@@ -151,7 +153,7 @@ lazy_static! {
                         slot_id: None,
                         value: AnimatedPropertyK::Static(Number::from(0))
                     },
-                }),
+                })),
                 opacity: Some(FloatValue {
                     animated_property: AnimatedProperty {
                         animated: BoolInt::False,

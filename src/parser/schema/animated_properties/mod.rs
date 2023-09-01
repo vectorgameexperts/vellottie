@@ -8,6 +8,6 @@ pub mod position;
 pub mod shape_keyframe;
 pub mod shape_property;
 //todo pub mod gradient_colors;
-//todo pub mod split_vector;
 pub mod position_keyframe;
+pub mod split_vector;
 pub mod value;

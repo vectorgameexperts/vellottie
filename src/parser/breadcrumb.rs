@@ -27,6 +27,8 @@ pub enum ValueType {
     ColorValue,
     MultiDimensional,
     Position,
+    Rotation,
+    SplitVector,
     ShapeProperty,
     ShapeKeyframe,
 
@@ -68,6 +70,8 @@ impl Display for ValueType {
                 ValueType::ColorValue => "Color",
                 ValueType::MultiDimensional => "Multi Dimensional",
                 ValueType::Position => "Position",
+                ValueType::Rotation => "Rotation",
+                ValueType::SplitVector => "Split Vector",
                 ValueType::ShapeProperty => "Shape Property",
                 ValueType::ShapeKeyframe => "Shape Keyframe",
                 ValueType::Bezier => "Bezier",
