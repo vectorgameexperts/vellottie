@@ -178,7 +178,7 @@ fn main() -> Result<()> {
     let window = WindowBuilder::new()
         .with_inner_size(LogicalSize::new(1044, 800))
         .with_resizable(true)
-        .with_title("Velato demo")
+        .with_title("Vellottie Demo")
         .build(&event_loop)
         .unwrap();
     pollster::block_on(run(event_loop, window, args, composition));

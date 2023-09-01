@@ -104,7 +104,6 @@ pub fn import_composition(
     target.width = source.width.unwrap_u32();
     target.height = source.height.unwrap_u32();
     let mut idmap: HashMap<usize, usize> = HashMap::default();
-    println!("got here idmap");
 
     if let Some(assets) = source.assets {
         for asset in assets {
@@ -144,14 +143,11 @@ pub fn import_composition(
             }
         }
     }
-    println!("got past assets");
 
     idmap.clear();
     let mut layers = vec![];
     let mut mask_layer = None;
     for layer in &source.layers {
-        println!("for layer");
-
         let index = layers.len();
         if let Some((mut layer, id, mask_blend)) = conv_layer(layer) {
             if let (Some(mask_blend), Some(mask_layer)) =
@@ -164,9 +160,7 @@ pub fn import_composition(
             }
             idmap.insert(id, index);
             layers.push(layer);
-            println!("got here layer");
         } else {
-            println!("DIDNT get here");
         }
     }
     for layer in &mut layers {
