@@ -33,7 +33,7 @@ pub enum ValueType {
     SplitVector,
     ShapeProperty,
     ShapeKeyframe,
-
+    Keyframe,
     // Helper types
     Bezier,
 
@@ -78,6 +78,7 @@ impl Display for ValueType {
                 ValueType::SplitVector => "Split Vector",
                 ValueType::ShapeProperty => "Shape Property",
                 ValueType::ShapeKeyframe => "Shape Keyframe",
+                ValueType::Keyframe => "Animated Property Keyframe",
                 ValueType::Bezier => "Bezier",
             }
         )

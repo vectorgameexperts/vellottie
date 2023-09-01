@@ -14,7 +14,7 @@ pub mod shape;
 pub mod shape_element;
 pub mod stroke;
 pub mod transform;
-// todo pub mod trim;
+pub mod trim;
 // todo pub mod path;
 // todo pub mod gradient_stroke;
 // todo pub mod stroke_dash;
@@ -33,7 +33,7 @@ use self::{
     pucker_bloat::PuckerBloatShape, rectangle::RectangleShape,
     repeater::RepeaterShape, repeater_transform::RepeaterTransformShape,
     shape::GenericShape, shape_element::ShapeElementShape, stroke::StrokeShape,
-    transform::TransformShape,
+    transform::TransformShape, trim::TrimShape,
 };
 use crate::parser::breadcrumb::Breadcrumb;
 use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
@@ -72,7 +72,7 @@ pub enum Shape {
     RepeaterTransform(RepeaterTransformShape),
     ShapeElement(ShapeElementShape),
     Shape(GenericShape),
-    // todo Trim(trim),
+    Trim(TrimShape),
     // todo Path(path),
     // todo GradientStroke(gradient_stroke),
     // todo StrokeDash(stroke_dash),
@@ -225,6 +225,21 @@ impl Shape {
                     .and_then(|obj| ColorValue::from_obj(breadcrumb, &obj))?,
                 fill_rule: root
                     .extract_type(breadcrumb, "r", ValueType::EnumInt)
+                    .ok(),
+            }),
+            ShapeType::Trim => Shape::Trim(TrimShape {
+                properties,
+                start: root
+                    .extract_obj(breadcrumb, "s")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
+                end: root
+                    .extract_obj(breadcrumb, "e")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
+                offset: root
+                    .extract_obj(breadcrumb, "o")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
+                multiple: root
+                    .extract_type(breadcrumb, "m", ValueType::EnumInt)
                     .ok(),
             }),
             other_shape => {

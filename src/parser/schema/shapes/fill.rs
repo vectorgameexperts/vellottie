@@ -15,11 +15,14 @@ pub struct FillShape {
 
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub opacity: Option<FloatValue>,
 
+    /// Color
     #[serde(rename = "c")]
     pub color: ColorValue,
 
+    /// Fill Rule
     #[serde(rename = "r")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fill_rule: Option<FillRule>,

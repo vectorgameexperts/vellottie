@@ -1,9 +1,7 @@
 use super::keyframe_bezier_handle::KeyframeBezierHandle;
 use crate::parser::{
-    breadcrumb::{Breadcrumb, ValueType},
-    schema::helpers::int_boolean::BoolInt,
-    util::MapExt,
-    Error,
+    breadcrumb::Breadcrumb, schema::helpers::int_boolean::BoolInt,
+    util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
@@ -16,15 +14,18 @@ pub struct KeyframeBase {
     pub time: Number,
     /// Hold
     #[serde(rename = "h")]
-    pub hold: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hold: Option<BoolInt>,
     /// In tangent of the keyframe.
     /// Easing tangent going into the next keyframe.
     #[serde(rename = "i")]
-    pub in_tangent: KeyframeBezierHandle,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub in_tangent: Option<KeyframeBezierHandle>,
     /// Out tangent of the keyframe.
     /// Easing tangent leaving the current keyframe.
     #[serde(rename = "o")]
-    pub out_tangent: KeyframeBezierHandle,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub out_tangent: Option<KeyframeBezierHandle>,
 }
 
 impl KeyframeBase {
@@ -32,17 +33,18 @@ impl KeyframeBase {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_unnamed(ValueType::ShapeProperty);
         let time = obj.extract_number(breadcrumb, "t")?;
-        let hold = obj.extract_bool_int(breadcrumb, "h")?;
+        let hold = obj.extract_bool_int(breadcrumb, "h").ok();
         let in_tangent = KeyframeBezierHandle::from_obj(
             breadcrumb,
             &obj.extract_obj(breadcrumb, "i")?,
-        )?;
+        )
+        .ok();
         let out_tangent = KeyframeBezierHandle::from_obj(
             breadcrumb,
             &obj.extract_obj(breadcrumb, "o")?,
-        )?;
+        )
+        .ok();
         Ok(Self {
             time,
             hold,

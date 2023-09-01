@@ -47,22 +47,32 @@ impl Position {
     ) -> Result<Self, Error> {
         breadcrumb.enter_unnamed(ValueType::Position);
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
-        let vector = if animated == BoolInt::True {
-            todo!();
-        } else {
-            Position {
-                property_index: obj.extract_number(breadcrumb, "ix").ok(),
-                animated: obj.extract_bool_int(breadcrumb, "a")?,
-                expression: obj.extract_string(breadcrumb, "x").ok(),
-                length: obj.extract_number(breadcrumb, "l").ok(),
-                value: PositionValueK::Static(obj.extract_type(
-                    breadcrumb,
-                    "k",
-                    ValueType::Scalar2d,
-                )?),
+
+        let value = if animated == BoolInt::True {
+            let mut keyframes = vec![];
+            breadcrumb.enter(ValueType::Array, Some("k"));
+            for v in obj.extract_arr(breadcrumb, "k")? {
+                let keyframe = PositionKeyframe::from_json(breadcrumb, &v)?;
+                keyframes.push(keyframe);
             }
+            breadcrumb.exit();
+
+            PositionValueK::Animated(keyframes)
+        } else {
+            PositionValueK::Static(obj.extract_type(
+                breadcrumb,
+                "k",
+                ValueType::Scalar2d,
+            )?)
         };
+
         breadcrumb.exit();
-        Ok(vector)
+        Ok(Position {
+            property_index: obj.extract_number(breadcrumb, "ix").ok(),
+            animated: obj.extract_bool_int(breadcrumb, "a")?,
+            expression: obj.extract_string(breadcrumb, "x").ok(),
+            length: obj.extract_number(breadcrumb, "l").ok(),
+            value,
+        })
     }
 }

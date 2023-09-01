@@ -53,21 +53,34 @@ where
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
-        let prop = if animated == BoolInt::True {
-            todo!();
-        } else {
-            AnimatedProperty {
-                property_index: obj.extract_number(breadcrumb, "ix").ok(),
-                animated,
-                expression: obj.extract_string(breadcrumb, "x").ok(),
-                slot_id: obj.extract_string(breadcrumb, "sid").ok(),
-                value: AnimatedPropertyK::Static(obj.extract_type(
-                    breadcrumb,
-                    "k",
-                    ValueType::Value,
-                )?),
+        let property_index = obj.extract_number(breadcrumb, "ix").ok();
+        let expression = obj.extract_string(breadcrumb, "x").ok();
+        let slot_id = obj.extract_string(breadcrumb, "sid").ok();
+
+        let value = if animated == BoolInt::True {
+            let mut keyframes = vec![];
+            breadcrumb.enter(ValueType::Array, Some("k"));
+            for v in obj.extract_arr(breadcrumb, "k")? {
+                let keyframe = Keyframe::from_json(breadcrumb, &v)?;
+                keyframes.push(keyframe);
             }
+            breadcrumb.exit();
+
+            AnimatedPropertyK::AnimatedValue(keyframes)
+        } else {
+            AnimatedPropertyK::Static(obj.extract_type(
+                breadcrumb,
+                "k",
+                ValueType::Value,
+            )?)
         };
-        Ok(prop)
+
+        Ok(AnimatedProperty {
+            property_index,
+            animated,
+            expression,
+            slot_id,
+            value,
+        })
     }
 }
