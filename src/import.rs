@@ -104,6 +104,8 @@ pub fn import_composition(
     target.width = source.width.unwrap_u32();
     target.height = source.height.unwrap_u32();
     let mut idmap: HashMap<usize, usize> = HashMap::default();
+    println!("got here idmap");
+
     if let Some(assets) = source.assets {
         for asset in assets {
             match asset {
@@ -141,31 +143,38 @@ pub fn import_composition(
                 }
             }
         }
-        idmap.clear();
-        let mut layers = vec![];
-        let mut mask_layer = None;
-        for layer in &source.layers {
-            let index = layers.len();
-            if let Some((mut layer, id, mask_blend)) = conv_layer(layer) {
-                if let (Some(mask_blend), Some(mask_layer)) =
-                    (mask_blend, mask_layer.take())
-                {
-                    layer.mask_layer = Some((mask_blend, mask_layer));
-                }
-                if layer.is_mask {
-                    mask_layer = Some(index);
-                }
-                idmap.insert(id, index);
-                layers.push(layer);
-            }
-        }
-        for layer in &mut layers {
-            if let Some(parent) = layer.parent {
-                layer.parent = idmap.get(&parent).copied();
-            }
-        }
-        target.layers = layers;
     }
+    println!("got past assets");
+
+    idmap.clear();
+    let mut layers = vec![];
+    let mut mask_layer = None;
+    for layer in &source.layers {
+        println!("for layer");
+
+        let index = layers.len();
+        if let Some((mut layer, id, mask_blend)) = conv_layer(layer) {
+            if let (Some(mask_blend), Some(mask_layer)) =
+                (mask_blend, mask_layer.take())
+            {
+                layer.mask_layer = Some((mask_blend, mask_layer));
+            }
+            if layer.is_mask {
+                mask_layer = Some(index);
+            }
+            idmap.insert(id, index);
+            layers.push(layer);
+            println!("got here layer");
+        } else {
+            println!("DIDNT get here");
+        }
+    }
+    for layer in &mut layers {
+        if let Some(parent) = layer.parent {
+            layer.parent = idmap.get(&parent).copied();
+        }
+    }
+    target.layers = layers;
 
     Ok(target)
 }
@@ -525,6 +534,43 @@ fn conv_multi<T: Lerp>(
     }
 }
 
+fn conv_multi_color<T: Lerp>(
+    color: &parser::schema::animated_properties::color_value::ColorValue,
+    f: impl Fn(&Vec<f64>) -> T,
+) -> Value<T> {
+    use crate::parser::schema::animated_properties::animated_property::AnimatedPropertyK::*;
+
+    match &color.animated_property.value {
+        Static(components) => {
+            let value: Vec<f64> = components
+                .iter()
+                .map(|number| number.as_f64().unwrap())
+                .collect();
+            Value::Fixed(f(&value))
+        }
+        AnimatedValue(keyframes) => {
+            let mut frames = vec![];
+            let mut values = vec![];
+            for keyframe in keyframes {
+                let data: Vec<f64> = keyframe
+                    .value
+                    .iter()
+                    .map(|number| number.as_f64().unwrap())
+                    .collect();
+                frames.push(Time {
+                    frame: keyframe.base.time.unwrap_f32(),
+                });
+                values.push(f(&data));
+                // todo: end_value deprecated but should we still append it if it exists?
+            }
+            Value::Animated(model::Animated {
+                times: frames,
+                values,
+            })
+        }
+    }
+}
+
 fn conv_pos<T: Lerp>(
     position: &parser::schema::animated_properties::position::Position,
     f: impl Fn(&Vec<f64>) -> T,
@@ -574,8 +620,10 @@ fn conv_point(
     })
 }
 
-fn _conv_color(value: &MultiDimensional) -> Value<Color> {
-    conv_multi(value, |x| {
+fn conv_color(
+    value: &schema::animated_properties::color_value::ColorValue,
+) -> Value<Color> {
+    conv_multi_color(value, |x| {
         Color::rgb(
             x.get(0).copied().unwrap_or(0.0),
             x.get(1).copied().unwrap_or(0.0),
@@ -648,108 +696,112 @@ fn conv_size(value: &MultiDimensional) -> Value<Size> {
 //     }
 // }
 
-// todo
-// fn conv_draw(value: &bodymovin::shapes::AnyShape) -> Option<Draw> {
-//     use bodymovin::helpers::{LineCap, LineJoin};
-//     use bodymovin::shapes::{AnyShape, GradientType};
-//     use peniko::{Cap, Join};
-//     match value {
-//         AnyShape::Fill(value) => {
-//             let color = conv_color(&value.color);
-//             let brush = animated::Brush::Solid(color).to_model();
-//             let opacity = conv_scalar(&value.opacity);
-//             Some(Draw {
-//                 stroke: None,
-//                 brush,
-//                 opacity,
-//             })
-//         }
-//         AnyShape::Stroke(value) => {
-//             let stroke = animated::Stroke {
-//                 width: conv_scalar(&value.width),
-//                 join: match value.line_join {
-//                     LineJoin::Bevel => Join::Bevel,
-//                     LineJoin::Round => Join::Round,
-//                     LineJoin::Miter => Join::Miter,
-//                 },
-//                 miter_limit: value.miter_limit.map(|x| x as f32),
-//                 cap: match value.line_cap {
-//                     LineCap::Butt => Cap::Butt,
-//                     LineCap::Round => Cap::Round,
-//                     LineCap::Square => Cap::Square,
-//                 },
-//             };
-//             let color = conv_color(&value.color);
-//             let brush = animated::Brush::Solid(color).to_model();
-//             let opacity = conv_scalar(&value.opacity);
-//             Some(Draw {
-//                 stroke: Some(stroke.to_model()),
-//                 brush,
-//                 opacity,
-//             })
-//         }
-// AnyShape::GradientFill(value) => {
-//     let is_radial = matches!(value.ty, GradientType::Radial);
-//     let start_point = conv_point(&value.start_point);
-//     let end_point = conv_point(&value.end_point);
-//     let gradient = animated::Gradient {
-//         is_radial,
-//         start_point,
-//         end_point,
-//         stops: conv_gradient_colors(&value.gradient_colors),
-//     };
-//     let brush = animated::Brush::Gradient(gradient).to_model();
-//     Some(Draw {
-//         stroke: None,
-//         brush,
-//         opacity: Value::Fixed(100.0),
-//     })
-// }
+fn conv_draw(value: &schema::shapes::Shape) -> Option<runtime::model::Draw> {
+    use peniko::{Cap, Join};
+    use schema::constants::line_cap::LineCap;
+    use schema::constants::line_join::LineJoin;
+    use schema::shapes::Shape;
 
-// todo
-// AnyShape::GradientStroke(value) => {
-//     let stroke = animated::Stroke {
-//         width: conv_scalar(&value.stroke_width),
-//         join: match value.line_join {
-//             LineJoin::Bevel => Join::Bevel,
-//             LineJoin::Round => Join::Round,
-//             LineJoin::Miter => Join::Miter,
-//         },
-//         miter_limit: value.miter_limit.map(|x| x as f32),
-//         cap: match value.line_cap {
-//             LineCap::Butt => Cap::Butt,
-//             LineCap::Round => Cap::Round,
-//             LineCap::Square => Cap::Square,
-//         },
-//     };
-//     let is_radial = matches!(value.ty, GradientType::Radial);
-//     let start_point = conv_point(&value.start_point);
-//     let end_point = conv_point(&value.end_point);
-//     let gradient = animated::Gradient {
-//         is_radial,
-//         start_point,
-//         end_point,
-//         stops: conv_gradient_colors(&value.gradient_colors),
-//     };
-//     let brush = animated::Brush::Gradient(gradient).to_model();
-//     Some(Draw {
-//         stroke: Some(stroke.to_model()),
-//         brush,
-//         opacity: Value::Fixed(100.0),
-//     })
-// }
-//         _ => None,
-//     }
-// }
+    match value {
+        Shape::Fill(value) => {
+            let color = conv_color(&value.color);
+            let brush = animated::Brush::Solid(color).to_model();
+            let opacity = conv_scalar(
+                value.opacity.as_ref().unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
+            );
+            Some(runtime::model::Draw {
+                stroke: None,
+                brush,
+                opacity,
+            })
+        }
+        Shape::Stroke(value) => {
+            let stroke = animated::Stroke {
+                width: conv_scalar(&value.stroke_width),
+                join: match value.line_join.as_ref().unwrap_or(&LineJoin::Bevel)
+                {
+                    LineJoin::Bevel => Join::Bevel,
+                    LineJoin::Round => Join::Round,
+                    LineJoin::Miter => Join::Miter,
+                },
+                miter_limit: value
+                    .miter_limit
+                    .as_ref()
+                    .map(|number| number.unwrap_f32()),
+                cap: match value.line_cap.as_ref().unwrap_or(&LineCap::Butt) {
+                    LineCap::Butt => Cap::Butt,
+                    LineCap::Round => Cap::Round,
+                    LineCap::Square => Cap::Square,
+                },
+            };
+            let color = conv_color(&value.stroke_color);
+            let brush = animated::Brush::Solid(color).to_model();
+            let opacity = conv_scalar(&value.opacity);
+            Some(runtime::model::Draw {
+                stroke: Some(stroke.to_model()),
+                brush,
+                opacity,
+            })
+        }
+        // todo: gradients
+        // Shape::GradientFill(value) => {
+        //     let is_radial = matches!(value.ty, GradientType::Radial);
+        //     let start_point = conv_point(&value.start_point);
+        //     let end_point = conv_point(&value.end_point);
+        //     let gradient = animated::Gradient {
+        //         is_radial,
+        //         start_point,
+        //         end_point,
+        //         stops: conv_gradient_colors(&value.gradient_colors),
+        //     };
+        //     let brush = animated::Brush::Gradient(gradient).to_model();
+        //     Some(Draw {
+        //         stroke: None,
+        //         brush,
+        //         opacity: Value::Fixed(100.0),
+        //     })
+        // }
+        // Shape::GradientStroke(value) => {
+        //     let stroke = animated::Stroke {
+        //         width: conv_scalar(&value.stroke_width),
+        //         join: match value.line_join {
+        //             LineJoin::Bevel => Join::Bevel,
+        //             LineJoin::Round => Join::Round,
+        //             LineJoin::Miter => Join::Miter,
+        //         },
+        //         miter_limit: value.miter_limit.map(|x| x as f32),
+        //         cap: match value.line_cap {
+        //             LineCap::Butt => Cap::Butt,
+        //             LineCap::Round => Cap::Round,
+        //             LineCap::Square => Cap::Square,
+        //         },
+        //     };
+        //     let is_radial = matches!(value.ty, GradientType::Radial);
+        //     let start_point = conv_point(&value.start_point);
+        //     let end_point = conv_point(&value.end_point);
+        //     let gradient = animated::Gradient {
+        //         is_radial,
+        //         start_point,
+        //         end_point,
+        //         stops: conv_gradient_colors(&value.gradient_colors),
+        //     };
+        //     let brush = animated::Brush::Gradient(gradient).to_model();
+        //     Some(Draw {
+        //         stroke: Some(stroke.to_model()),
+        //         brush,
+        //         opacity: Value::Fixed(100.0),
+        //     })
+        // }
+        _ => None,
+    }
+}
 
 fn conv_shape(
     value: &parser::schema::shapes::Shape,
 ) -> Option<crate::runtime::model::Shape> {
-    // todo: draw shape
-    // if let Some(draw) = conv_draw(value) {
-    //     return Some(crate::runtime::model::Shape::Draw(draw));
-    // }
-    if let Some(geometry) = conv_geometry(value) {
+    if let Some(draw) = conv_draw(value) {
+        return Some(crate::runtime::model::Shape::Draw(draw));
+    } else if let Some(geometry) = conv_geometry(value) {
         return Some(crate::runtime::model::Shape::Geometry(geometry));
     }
 
