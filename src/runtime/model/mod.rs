@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use vello::kurbo::{self, Affine, PathEl, Point, Shape as _, Size, Vec2};
 use vello::peniko::{self, BlendMode, Color};
 
@@ -31,7 +28,9 @@ macro_rules! simple_value {
             pub fn evaluate(&self, frame: f32) -> ValueRef<fixed::$name> {
                 match self {
                     Self::Fixed(value) => ValueRef::Borrowed(value),
-                    Self::Animated(value) => ValueRef::Owned(value.evaluate(frame)),
+                    Self::Animated(value) => {
+                        ValueRef::Owned(value.evaluate(frame))
+                    }
                 }
             }
         }
@@ -63,7 +62,9 @@ impl Brush {
                     ValueRef::Owned(fixed::brush_with_alpha(value, alpha))
                 }
             }
-            Self::Animated(value) => ValueRef::Owned(value.evaluate(alpha, frame)),
+            Self::Animated(value) => {
+                ValueRef::Owned(value.evaluate(alpha, frame))
+            }
         }
     }
 }

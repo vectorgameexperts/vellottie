@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use super::{model::*, Composition};
 
 use vello::{
@@ -147,8 +144,10 @@ impl Renderer {
             );
         }
         let parent_transform = transform;
-        let transform = self.compute_transform(layer_set, layer, parent_transform, frame);
-        let full_rect = Rect::new(0.0, 0.0, animation.width as _, animation.height as _);
+        let transform =
+            self.compute_transform(layer_set, layer, parent_transform, frame);
+        let full_rect =
+            Rect::new(0.0, 0.0, animation.width as _, animation.height as _);
         if let Some((mode, mask_index)) = layer.mask_layer {
             // Extra layer to isolate blending for the mask
             sink.push_layer(Mix::Normal, 1.0, parent_transform, &full_rect);
@@ -169,7 +168,12 @@ impl Renderer {
         for mask in &layer.masks {
             let alpha = mask.opacity.evaluate(frame) / 100.0;
             mask.geometry.evaluate(frame, &mut self.mask_elements);
-            sink.push_layer(Mix::Clip, alpha, transform, &self.mask_elements.as_slice());
+            sink.push_layer(
+                Mix::Clip,
+                alpha,
+                transform,
+                &self.mask_elements.as_slice(),
+            );
             self.mask_elements.clear();
         }
         match &layer.content {
@@ -202,12 +206,21 @@ impl Renderer {
                 self.batch.clear();
             }
         }
-        for _ in 0..layer.masks.len() + clip as usize + (layer.mask_layer.is_some() as usize * 2) {
+        for _ in 0..layer.masks.len()
+            + clip as usize
+            + (layer.mask_layer.is_some() as usize * 2)
+        {
             sink.pop_layer();
         }
     }
 
-    fn render_shapes(&mut self, shapes: &[Shape], transform: Affine, alpha: f32, frame: f32) {
+    fn render_shapes(
+        &mut self,
+        shapes: &[Shape],
+        transform: Affine,
+        alpha: f32,
+        frame: f32,
+    ) {
         // Keep track of our local top of the geometry stack. Any subsequent draws
         // are bounded by this.
         let geometry_start = self.batch.geometries.len();
@@ -218,7 +231,9 @@ impl Renderer {
             match shape {
                 Shape::Group(shapes, group_transform) => {
                     let (group_transform, group_alpha) =
-                        if let Some(GroupTransform { transform, opacity }) = group_transform {
+                        if let Some(GroupTransform { transform, opacity }) =
+                            group_transform
+                        {
                             (
                                 transform.evaluate(frame).to_owned(),
                                 opacity.evaluate(frame) / 100.0,
@@ -241,8 +256,11 @@ impl Renderer {
                 }
                 Shape::Repeater(repeater) => {
                     let repeater = repeater.evaluate(frame);
-                    self.batch
-                        .repeat(repeater.as_ref(), geometry_start, draw_start);
+                    self.batch.repeat(
+                        repeater.as_ref(),
+                        geometry_start,
+                        draw_start,
+                    );
                 }
             }
         }
@@ -269,7 +287,8 @@ impl Renderer {
             }
             if let Some(parent) = layer_set.get(index) {
                 parent_index = parent.parent;
-                transform = parent.transform.evaluate(frame).to_owned() * transform;
+                transform =
+                    parent.transform.evaluate(frame).to_owned() * transform;
                 count += 1;
             } else {
                 break;
@@ -289,7 +308,12 @@ struct DrawData {
 }
 
 impl DrawData {
-    fn new(draw: &Draw, alpha: f32, geometry: Range<usize>, frame: f32) -> Self {
+    fn new(
+        draw: &Draw,
+        alpha: f32,
+        geometry: Range<usize>,
+        frame: f32,
+    ) -> Self {
         Self {
             stroke: draw
                 .stroke
@@ -322,15 +346,22 @@ struct Batch {
 }
 
 impl Batch {
-    fn push_geometry(&mut self, geometry: &Geometry, transform: Affine, frame: f32) {
+    fn push_geometry(
+        &mut self,
+        geometry: &Geometry,
+        transform: Affine,
+        frame: f32,
+    ) {
         // Merge with the previous geometry if possible. There are two conditions:
         // 1. The previous geometry has not yet been referenced by a draw
         // 2. The geometries have the same transform
         if self.drawn_geometry < self.geometries.len()
-            && self.geometries.last().map(|last| last.transform) == Some(transform)
+            && self.geometries.last().map(|last| last.transform)
+                == Some(transform)
         {
             geometry.evaluate(frame, &mut self.elements);
-            self.geometries.last_mut().unwrap().elements.end = self.elements.len();
+            self.geometries.last_mut().unwrap().elements.end =
+                self.elements.len();
         } else {
             let start = self.elements.len();
             geometry.evaluate(frame, &mut self.elements);
@@ -342,7 +373,13 @@ impl Batch {
         }
     }
 
-    fn push_draw(&mut self, draw: &Draw, alpha: f32, geometry_start: usize, frame: f32) {
+    fn push_draw(
+        &mut self,
+        draw: &Draw,
+        alpha: f32,
+        geometry_start: usize,
+        frame: f32,
+    ) {
         self.draws.push(DrawData::new(
             draw,
             alpha,
@@ -352,7 +389,12 @@ impl Batch {
         self.drawn_geometry = self.geometries.len();
     }
 
-    fn repeat(&mut self, repeater: &fixed::Repeater, geometry_start: usize, draw_start: usize) {
+    fn repeat(
+        &mut self,
+        repeater: &fixed::Repeater,
+        geometry_start: usize,
+        draw_start: usize,
+    ) {
         // First move the relevant ranges of geometries and draws into side buffers
         self.repeat_geometries
             .extend(self.geometries.drain(geometry_start..));
@@ -385,8 +427,10 @@ impl Batch {
                 draw.alpha *= alpha;
                 let count = draw.geometry.end - draw.geometry.start;
                 draw.geometry.start = geometry_start
-                    + (draw.geometry.start - geometry_start) * repeater.copies as usize;
-                draw.geometry.end = draw.geometry.start + count * repeater.copies as usize;
+                    + (draw.geometry.start - geometry_start)
+                        * repeater.copies as usize;
+                draw.geometry.end =
+                    draw.geometry.start + count * repeater.copies as usize;
                 self.draws.push(draw);
             }
         }

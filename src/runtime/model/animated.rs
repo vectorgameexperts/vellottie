@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 /*!
 Representations of animated values.
 */
@@ -130,7 +127,9 @@ pub struct Rect {
 impl Rect {
     /// Returns true if the rectangle is fixed.
     pub fn is_fixed(&self) -> bool {
-        self.position.is_fixed() && self.size.is_fixed() && self.corner_radius.is_fixed()
+        self.position.is_fixed()
+            && self.size.is_fixed()
+            && self.corner_radius.is_fixed()
     }
 
     /// Evaluates the rectangle at the specified frame.
@@ -200,7 +199,8 @@ impl Spline {
         let (Some(from), Some(to)) = (self.values.get(ix0), self.values.get(ix1)) else {
             return false;
         };
-        (from.as_slice(), to.as_slice(), t as f64).to_path(self.is_closed, path);
+        (from.as_slice(), to.as_slice(), t as f64)
+            .to_path(self.is_closed, path);
         true
     }
 }
@@ -328,7 +328,9 @@ pub struct Gradient {
 impl Gradient {
     /// Returns true if the value contains no animated properties.
     pub fn is_fixed(&self) -> bool {
-        self.start_point.is_fixed() && self.end_point.is_fixed() && self.stops.is_fixed()
+        self.start_point.is_fixed()
+            && self.end_point.is_fixed()
+            && self.stops.is_fixed()
     }
 
     /// Evaluates the animated value at the given frame.
@@ -410,7 +412,9 @@ impl Brush {
     /// Evaluates the animation at the specified time.
     pub fn evaluate(&self, alpha: f32, frame: f32) -> fixed::Brush {
         match self {
-            Self::Solid(value) => value.evaluate(frame).with_alpha_factor(alpha).into(),
+            Self::Solid(value) => {
+                value.evaluate(frame).with_alpha_factor(alpha).into()
+            }
             Self::Gradient(value) => value.evaluate(frame),
         }
     }

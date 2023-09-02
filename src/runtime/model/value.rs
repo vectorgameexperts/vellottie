@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use vello::kurbo;
 use vello::peniko;
 
@@ -68,7 +65,10 @@ pub struct Time {
 
 impl Time {
     /// Returns the frame indices and interpolation weight for the given frame.
-    pub(crate) fn frames_and_weight(times: &[Time], frame: f32) -> Option<([usize; 2], f32)> {
+    pub(crate) fn frames_and_weight(
+        times: &[Time],
+        frame: f32,
+    ) -> Option<([usize; 2], f32)> {
         if times.is_empty() {
             return None;
         }

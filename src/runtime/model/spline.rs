@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use vello::kurbo::{PathEl, Point};
 
 /// Helper trait for converting cubic splines to paths.

@@ -1,6 +1,3 @@
-// Copyright 2023 Google LLC
-// SPDX-License-Identifier: Apache-2.0 OR MIT
-
 use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
 use crate::parser::schema::animated_properties::value::FloatValue;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
@@ -98,13 +95,17 @@ pub fn import_composition(
     source: impl AsRef<[u8]>,
 ) -> Result<Composition, Box<dyn std::error::Error>> {
     let source = Lottie::from_slice(source.as_ref())?;
-    let mut target = Composition::default();
-    target.frame_rate = source.frame_rate.unwrap_f32();
-    target.frames = source.in_point.unwrap_f32()..source.out_point.unwrap_f32();
-    target.width = source.width.unwrap_u32();
-    target.height = source.height.unwrap_u32();
-    let mut idmap: HashMap<usize, usize> = HashMap::default();
+    let mut target = Composition {
+        frames: source.in_point.unwrap_f32()..source.out_point.unwrap_f32(),
+        frame_rate: source.frame_rate.unwrap_f32(),
+        width: source.width.unwrap_u32(),
+        height: source.height.unwrap_u32(),
+        assets: Default::default(),
+        layers: Default::default(),
+    };
 
+    // Collect assets and layers
+    let mut idmap: HashMap<usize, usize> = HashMap::default();
     if let Some(assets) = source.assets {
         for asset in assets {
             match asset {
