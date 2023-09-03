@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+vellottie = { path = "../" }
 include_dir = "0.7"
 stylist = { version = "0.12.0", features = ["yew_integration"] }
 yew = { version = "0.20.0", features = ["csr"] }
@@ -15,3 +16,6 @@ console_error_panic_hook = "0.1"
 console_log = "1.0"
 log = "0.4"
 wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+reqwest = "0.11"
+lazy_static = "1.4"

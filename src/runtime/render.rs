@@ -1,11 +1,9 @@
 use super::{model::*, Composition};
-
+use std::ops::Range;
 use vello::{
     kurbo::{self, Affine, PathEl, Rect},
     peniko::{self, Fill, Mix},
 };
-
-use std::ops::Range;
 
 pub trait RenderSink {
     fn push_layer(

@@ -14,6 +14,11 @@ pub struct PlayerProps {
 
 #[styled_component]
 pub fn LottiefilesPlayer(props: &PlayerProps) -> Html {
+    let ctr_css = css! {
+        display: inline-grid;
+        margin: 10px;
+    };
+
     use_effect({
         let path = props.file.to_string();
         move || {
@@ -21,14 +26,17 @@ pub fn LottiefilesPlayer(props: &PlayerProps) -> Html {
         }
     });
     html! {
-        <lottie-player
-            src={&props.file}
-            autoplay=true
-            controls=true
-            loop=true
-            mode="normal"
-            style="width: 320px"
-        >
-        </lottie-player>
+        <div class={ctr_css}>
+            <h1>{"Lottiefiles"}</h1>
+            <lottie-player
+                src={&props.file}
+                autoplay=true
+                controls=true
+                loop=true
+                mode="normal"
+                style="width: 400px;height: 400px;"
+            >
+            </lottie-player>
+        </div>
     }
 }

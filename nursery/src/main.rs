@@ -4,6 +4,7 @@ use stylist::yew::{styled_component, Global};
 use yew::prelude::*;
 mod nav;
 mod player;
+mod vellottie_player;
 
 #[styled_component]
 pub fn Root() -> Html {
@@ -30,6 +31,7 @@ pub fn App() -> Html {
     let wrap_css = css! {
         display: flex;
     };
+
 
     html! {
         <div id="app" class={app_css}>

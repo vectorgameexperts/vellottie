@@ -1,4 +1,5 @@
 use crate::player;
+use crate::vellottie_player;
 use include_dir::{include_dir, Dir, DirEntry};
 use stylist::yew::styled_component;
 use yew::prelude::*;
@@ -25,7 +26,12 @@ pub fn Navigation(props: &NavigationProps) -> Html {
         log::info!("file: {}", path.to_string_lossy());
         items.push((
             name,
-            html!(<player::LottiefilesPlayer file={format!("/files/{}", path.display())} />),
+            html!{
+                <>
+                    <player::LottiefilesPlayer file={format!("/files/{}", path.display())} />
+                    <vellottie_player::VellottiePlayer file={format!("/files/{}", path.display())} />
+                </>
+            },
         ));
     }
     items.sort_by(|i1, i2| i1.0.cmp(&i2.0));
