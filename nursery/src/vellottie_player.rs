@@ -3,8 +3,8 @@ use log::{error, info};
 use std::sync::{Arc, Mutex};
 use stylist::yew::styled_component;
 use vello::{
-    block_on_wgpu, kurbo::Affine, peniko::Color, util::RenderContext,
-    RenderParams, Scene, SceneBuilder,
+    kurbo::Affine, peniko::Color, util::RenderContext, RenderParams, Scene,
+    SceneBuilder,
 };
 use vellottie::runtime::{
     vello::{self, util::RenderSurface, RendererOptions},
@@ -52,25 +52,25 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                 init_state().await;
             });
             info!("loading {path}");
-            //wasm_bindgen_futures::spawn_local(async move {
-            //    let body = reqwest::get(format!("http://127.0.0.1:8080{path}"))
-            //        .await
-            //        .unwrap()
-            //        .text()
-            //        .await
-            //        .unwrap();
-            //    let lottie =
-            //        vellottie::import::import_composition(body.as_bytes());
-            //    match lottie {
-            //        Ok(ref composition) => {
-            //            info!("Successful read");
-            //            info!("rendering t=0...");
-            //            render(composition, 0.0);
-            //            info!("rendered!");
-            //        }
-            //        Err(e) => error!("Bad lottie: {e}"),
-            //    }
-            //});
+            wasm_bindgen_futures::spawn_local(async move {
+                let body = reqwest::get(format!("http://127.0.0.1:8080{path}"))
+                    .await
+                    .unwrap()
+                    .text()
+                    .await
+                    .unwrap();
+                let lottie =
+                    vellottie::import::import_composition(body.as_bytes());
+                match lottie {
+                    Ok(ref composition) => {
+                        info!("Successful read");
+                        info!("rendering t=0...");
+                        render(composition, 0.0);
+                        info!("rendered!");
+                    }
+                    Err(e) => error!("Bad lottie: {e}"),
+                }
+            });
         }
     });
     html! {
@@ -151,9 +151,9 @@ fn render(composition: &Composition, time: f32) {
         .get_current_texture()
         .expect("failed to get surface texture");
     info!("starting block...");
-    block_on_wgpu(
-        &device_handle.device,
-        state.vello_renderer.render_to_surface_async(
+    state
+        .vello_renderer
+        .render_to_surface(
             &device_handle.device,
             &device_handle.queue,
             &scene,
@@ -163,9 +163,8 @@ fn render(composition: &Composition, time: f32) {
                 width,
                 height,
             },
-        ),
-    )
-    .expect("failed to render to surface");
+        )
+        .expect("failed to render to surface");
     error!("finished block");
     surface_texture.present();
     device_handle.device.poll(wgpu::Maintain::Poll);
