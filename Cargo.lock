@@ -1604,6 +1604,7 @@ dependencies = [
  "cssugar",
  "gloo-dialogs 0.2.0",
  "include_dir",
+ "instant",
  "lazy_static",
  "log",
  "reqwest",
@@ -1611,6 +1612,9 @@ dependencies = [
  "vellottie",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+ "web-sys",
+ "wgpu",
+ "winit",
  "yew",
  "yew-router",
 ]

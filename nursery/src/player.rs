@@ -17,6 +17,10 @@ pub fn LottiefilesPlayer(props: &PlayerProps) -> Html {
     let ctr_css = css! {
         display: inline-grid;
         margin: 10px;
+
+        lottie-player {
+            border: 1px solid black;
+        }
     };
 
     use_effect({
