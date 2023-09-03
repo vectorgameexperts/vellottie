@@ -249,7 +249,7 @@ fn test_serde_deserialize() {
     }
 }
 
-#[test_log::test]
+#[test]
 fn test_deserialize() {
     let actual = Layer::from_json(&mut Breadcrumb::new(), &JSON);
 
