@@ -1,4 +1,3 @@
-use log::Level;
 use nav::Navigation;
 use stylist::yew::{styled_component, Global};
 use yew::prelude::*;
@@ -32,7 +31,6 @@ pub fn App() -> Html {
         display: flex;
     };
 
-
     html! {
         <div id="app" class={app_css}>
             <div id="wrap" class={wrap_css}>
@@ -49,6 +47,6 @@ pub fn App() -> Html {
 
 pub fn main() {
     console_error_panic_hook::set_once();
-    console_log::init_with_level(Level::Debug).unwrap();
+    console_log::init().unwrap();
     yew::Renderer::<Root>::new().render();
 }
