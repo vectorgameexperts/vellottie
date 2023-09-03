@@ -147,20 +147,21 @@ impl Renderer {
         let full_rect =
             Rect::new(0.0, 0.0, animation.width as _, animation.height as _);
         if let Some((mode, mask_index)) = layer.mask_layer {
+            // todo: re-enable masking when it is more understood (and/or if it's currently supported in vello?)
             // Extra layer to isolate blending for the mask
-            sink.push_layer(Mix::Normal, 1.0, parent_transform, &full_rect);
-            if let Some(mask) = layer_set.get(mask_index) {
-                self.render_layer(
-                    animation,
-                    layer_set,
-                    mask,
-                    parent_transform,
-                    alpha,
-                    frame,
-                    sink,
-                );
-            }
-            sink.push_layer(mode, 1.0, parent_transform, &full_rect);
+            // sink.push_layer(Mix::Normal, 1.0, parent_transform, &full_rect);
+            // if let Some(mask) = layer_set.get(mask_index) {
+            //     self.render_layer(
+            //         animation,
+            //         layer_set,
+            //         mask,
+            //         parent_transform,
+            //         alpha,
+            //         frame,
+            //         sink,
+            //     );
+            // }
+            // sink.push_layer(mode, 1.0, parent_transform, &full_rect);
         }
         let alpha = alpha * layer.opacity.evaluate(frame) / 100.0;
         for mask in &layer.masks {

@@ -167,7 +167,6 @@ pub fn import_composition(
             }
             idmap.insert(id, index);
             layers.push(layer);
-        } else {
         }
     }
     for layer in &mut layers {
