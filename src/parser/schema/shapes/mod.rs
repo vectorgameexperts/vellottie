@@ -53,7 +53,7 @@ use super::helpers::transform::Transform;
 /// share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum Shape {
+pub enum AnyShape {
     /// A group is a shape that can contain other shapes (including other
     /// groups)
     Group(GroupShape),
@@ -129,11 +129,11 @@ pub enum ShapeType {
     ZigZag,
 }
 
-impl Shape {
+impl AnyShape {
     pub fn from_json(
         breadcrumb: &mut Breadcrumb,
         v: &serde_json::Value,
-    ) -> Result<Shape, Error> {
+    ) -> Result<AnyShape, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Shape,
@@ -144,7 +144,7 @@ impl Shape {
         // Extract
         let properties = ShapeProperties::from_obj(breadcrumb, root)?;
         let shape = match &properties.shape_type {
-            ShapeType::Ellipse => Shape::Ellipse(EllipseShape {
+            ShapeType::Ellipse => AnyShape::Ellipse(EllipseShape {
                 properties,
                 position: Position::from_obj(
                     breadcrumb,
@@ -155,7 +155,7 @@ impl Shape {
                     &root.extract_obj(breadcrumb, "s")?,
                 )?,
             }),
-            ShapeType::Rectangle => Shape::Rectangle(RectangleShape {
+            ShapeType::Rectangle => AnyShape::Rectangle(RectangleShape {
                 properties,
                 position: Position::from_obj(
                     breadcrumb,
@@ -170,7 +170,7 @@ impl Shape {
                     &root.extract_obj(breadcrumb, "r")?,
                 )?,
             }),
-            ShapeType::Group => Shape::Group(GroupShape {
+            ShapeType::Group => AnyShape::Group(GroupShape {
                 properties,
                 num_properties: root.extract_number(breadcrumb, "np").ok(),
                 shapes: {
@@ -178,18 +178,18 @@ impl Shape {
                     let json_shapes = root.extract_arr(breadcrumb, "it")?;
                     breadcrumb.enter(ValueType::Array, Some("it"));
                     for v in json_shapes {
-                        let shape = Shape::from_json(breadcrumb, &v)?;
+                        let shape = AnyShape::from_json(breadcrumb, &v)?;
                         shapes.push(shape);
                     }
                     breadcrumb.exit();
                     shapes
                 },
             }),
-            ShapeType::Transform => Shape::Transform(TransformShape {
+            ShapeType::Transform => AnyShape::Transform(TransformShape {
                 properties,
                 transform: Transform::from_obj(breadcrumb, root)?,
             }),
-            ShapeType::Stroke => Shape::Stroke(StrokeShape {
+            ShapeType::Stroke => AnyShape::Stroke(StrokeShape {
                 properties,
                 line_cap: root
                     .extract_type(breadcrumb, "lc", ValueType::EnumInt)
@@ -214,7 +214,7 @@ impl Shape {
                     .extract_type(breadcrumb, "d", ValueType::EnumStr)
                     .ok(),
             }),
-            ShapeType::Fill => Shape::Fill(FillShape {
+            ShapeType::Fill => AnyShape::Fill(FillShape {
                 properties,
                 opacity: root
                     .extract_obj(breadcrumb, "o")
@@ -227,7 +227,7 @@ impl Shape {
                     .extract_type(breadcrumb, "r", ValueType::EnumInt)
                     .ok(),
             }),
-            ShapeType::Trim => Shape::Trim(TrimShape {
+            ShapeType::Trim => AnyShape::Trim(TrimShape {
                 properties,
                 start: root
                     .extract_obj(breadcrumb, "s")

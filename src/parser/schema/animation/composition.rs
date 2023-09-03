@@ -1,5 +1,5 @@
 use crate::parser::{
-    breadcrumb::Breadcrumb, breadcrumb::ValueType, schema::layers::Layer,
+    breadcrumb::Breadcrumb, breadcrumb::ValueType, schema::layers::AnyLayer,
     util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
@@ -10,7 +10,7 @@ use serde_json::Value;
 pub struct Composition {
     /// An array of Layers
     #[serde(rename = "layers")]
-    pub layers: Vec<Layer>,
+    pub layers: Vec<AnyLayer>,
 }
 
 impl Composition {
@@ -22,7 +22,7 @@ impl Composition {
         let json_layers = obj.extract_arr(breadcrumb, "layers")?;
         breadcrumb.enter(ValueType::Array, Some("layers"));
         for v in json_layers {
-            let layer = Layer::from_json(breadcrumb, &v)?;
+            let layer = AnyLayer::from_json(breadcrumb, &v)?;
             layers.push(layer);
         }
         breadcrumb.exit();

@@ -175,7 +175,7 @@ pub fn import_composition(
 }
 
 fn conv_layer(
-    source: &parser::schema::layers::Layer,
+    source: &parser::schema::layers::AnyLayer,
 ) -> Option<(Layer, usize, Option<BlendMode>)> {
     let mut layer = Layer::default();
     let params;
@@ -184,13 +184,13 @@ fn conv_layer(
         // parser::schema::layers::Layer::Null(value) => {
         //     params = setup_layer(value, &mut layer);
         // }
-        parser::schema::layers::Layer::Precomposition(precomp_layer) => {
+        parser::schema::layers::AnyLayer::Precomposition(precomp_layer) => {
             params = setup_precomp_layer(precomp_layer, &mut layer);
             let name = precomp_layer.precomp_id.clone();
             let time_remap = conv_scalar(&precomp_layer.time_remap);
             layer.content = Content::Instance { name, time_remap };
         }
-        parser::schema::layers::Layer::Shape(shape_layer) => {
+        parser::schema::layers::AnyLayer::Shape(shape_layer) => {
             params = setup_shape_layer(shape_layer, &mut layer);
             let mut shapes = vec![];
             for shape in &shape_layer.shapes {
@@ -385,7 +385,7 @@ fn conv_transform(
         schema::helpers::transform::AnyTransformP::Position(position) => {
             position
         }
-        schema::helpers::transform::AnyTransformP::SplitVector(_) => {
+        schema::helpers::transform::AnyTransformP::SplitPosition(_) => {
             // todo: split vectors
             todo!("split vector");
         }
@@ -415,7 +415,7 @@ fn conv_shape_transform(
         Some(any_trans) => match any_trans {
             parser::schema::helpers::transform::AnyTransformR::Rotation(float_value) => float_value,
             // todo: need to actually handle split rotations
-            parser::schema::helpers::transform::AnyTransformR::SplitRotation { .. } => &FLOAT_VALUE_ZERO,
+            parser::schema::helpers::transform::AnyTransformR::SplitRotation { .. } => todo!("split rotation"),
         },
         None => &FLOAT_VALUE_ZERO,
     };
@@ -423,9 +423,9 @@ fn conv_shape_transform(
         schema::helpers::transform::AnyTransformP::Position(position) => {
             position
         }
-        schema::helpers::transform::AnyTransformP::SplitVector(_) => {
+        schema::helpers::transform::AnyTransformP::SplitPosition(_) => {
             // todo: split vectors
-            todo!("split vector");
+            todo!("split position");
         }
     };
 
@@ -691,14 +691,14 @@ fn conv_size(value: &MultiDimensional) -> Value<Size> {
 //     }
 // }
 
-fn conv_draw(value: &schema::shapes::Shape) -> Option<runtime::model::Draw> {
+fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
     use peniko::{Cap, Join};
     use schema::constants::line_cap::LineCap;
     use schema::constants::line_join::LineJoin;
-    use schema::shapes::Shape;
+    use schema::shapes::AnyShape;
 
     match value {
-        Shape::Fill(value) => {
+        AnyShape::Fill(value) => {
             let color = conv_color(&value.color);
             let brush = animated::Brush::Solid(color).to_model();
             let opacity = conv_scalar(
@@ -710,7 +710,7 @@ fn conv_draw(value: &schema::shapes::Shape) -> Option<runtime::model::Draw> {
                 opacity,
             })
         }
-        Shape::Stroke(value) => {
+        AnyShape::Stroke(value) => {
             let stroke = animated::Stroke {
                 width: conv_scalar(&value.stroke_width),
                 join: match value.line_join.as_ref().unwrap_or(&LineJoin::Bevel)
@@ -792,7 +792,7 @@ fn conv_draw(value: &schema::shapes::Shape) -> Option<runtime::model::Draw> {
 }
 
 fn conv_shape(
-    value: &parser::schema::shapes::Shape,
+    value: &parser::schema::shapes::AnyShape,
 ) -> Option<crate::runtime::model::Shape> {
     if let Some(draw) = conv_draw(value) {
         return Some(crate::runtime::model::Shape::Draw(draw));
@@ -801,12 +801,12 @@ fn conv_shape(
     }
 
     match value {
-        schema::shapes::Shape::Group(value) => {
+        schema::shapes::AnyShape::Group(value) => {
             let mut shapes = vec![];
             let mut group_transform = None;
             for item in &value.shapes {
                 match item {
-                    schema::shapes::Shape::Transform(transform) => {
+                    schema::shapes::AnyShape::Transform(transform) => {
                         group_transform = Some(conv_shape_transform(transform));
                     }
                     _ => {
@@ -844,11 +844,11 @@ fn conv_shape(
 }
 
 fn conv_geometry(
-    value: &schema::shapes::Shape,
+    value: &schema::shapes::AnyShape,
 ) -> Option<crate::runtime::model::Geometry> {
-    use schema::shapes::Shape;
+    use schema::shapes::AnyShape;
     match value {
-        Shape::Ellipse(value) => {
+        AnyShape::Ellipse(value) => {
             let ellipse = animated::Ellipse {
                 is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
                 position: conv_point(&value.position),
@@ -856,7 +856,7 @@ fn conv_geometry(
             };
             Some(crate::runtime::model::Geometry::Ellipse(ellipse))
         }
-        Shape::Rectangle(value) => {
+        AnyShape::Rectangle(value) => {
             let rect = animated::Rect {
                 is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
                 position: conv_point(&value.position),

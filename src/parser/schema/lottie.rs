@@ -1,4 +1,4 @@
-use super::{assets::AnyAsset, layers::Layer};
+use super::{assets::AnyAsset, layers::AnyLayer};
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
@@ -43,7 +43,7 @@ pub struct Lottie {
     pub assets: Option<Vec<AnyAsset>>,
     /// List of layers
     #[serde(default)]
-    pub layers: Vec<Layer>,
+    pub layers: Vec<AnyLayer>,
 }
 
 impl Lottie {
@@ -113,7 +113,7 @@ impl Lottie {
         let json_layers = root.extract_arr(&breadcrumb, "layers")?;
         breadcrumb.enter(ValueType::Array, Some("layers"));
         for v in json_layers {
-            let layer = Layer::from_json(&mut breadcrumb, &v)?;
+            let layer = AnyLayer::from_json(&mut breadcrumb, &v)?;
             layers.push(layer);
         }
         breadcrumb.exit();

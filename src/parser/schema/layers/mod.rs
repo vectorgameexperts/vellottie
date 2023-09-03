@@ -4,7 +4,7 @@ pub mod precomposition;
 pub mod shape;
 
 use self::{common::LayerProperties, enumerations::LayerType};
-use super::{animated_properties::value::FloatValue, shapes::Shape};
+use super::{animated_properties::value::FloatValue, shapes::AnyShape};
 use crate::parser::{
     breadcrumb::Breadcrumb,
     breadcrumb::ValueType,
@@ -20,7 +20,7 @@ use util::MapExt;
 /// layers share the properties in `layers::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
-pub enum Layer {
+pub enum AnyLayer {
     /// Renders a Precomposition
     Precomposition(PrecompositionLayer),
 
@@ -49,11 +49,11 @@ pub enum Layer {
     // unimplemented - Data(DataLayer)
 }
 
-impl Layer {
+impl AnyLayer {
     pub fn from_json(
         breadcrumb: &mut Breadcrumb,
         v: &serde_json::Value,
-    ) -> Result<Layer, Error> {
+    ) -> Result<AnyLayer, Error> {
         let root = v.as_object().ok_or(Error::UnexpectedChild {
             breadcrumb: breadcrumb.to_owned(),
             expected: ValueType::Layer,
@@ -65,7 +65,7 @@ impl Layer {
         let properties = LayerProperties::from_obj(breadcrumb, root)?;
         let layer = match properties.layer_type {
             LayerType::Precomposition => {
-                Layer::Precomposition(PrecompositionLayer {
+                AnyLayer::Precomposition(PrecompositionLayer {
                     properties,
                     precomp_id: root.extract_string(breadcrumb, "refID")?,
                     width: root.extract_number(breadcrumb, "w")?,
@@ -76,14 +76,14 @@ impl Layer {
                     )?,
                 })
             }
-            LayerType::Shape => Layer::Shape(ShapeLayer {
+            LayerType::Shape => AnyLayer::Shape(ShapeLayer {
                 properties,
                 shapes: {
                     let mut shapes = vec![];
                     let json_shapes = root.extract_arr(breadcrumb, "shapes")?;
                     breadcrumb.enter(ValueType::Array, Some("shapes"));
                     for v in json_shapes {
-                        let shape = Shape::from_json(breadcrumb, &v)?;
+                        let shape = AnyShape::from_json(breadcrumb, &v)?;
                         shapes.push(shape);
                     }
                     breadcrumb.exit();

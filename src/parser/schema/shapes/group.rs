@@ -1,4 +1,4 @@
-use super::{common, Shape};
+use super::{common, AnyShape};
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 
@@ -12,5 +12,5 @@ pub struct GroupShape {
     pub num_properties: Option<Number>,
     /// Array of shapes
     #[serde(rename = "it")]
-    pub shapes: Vec<Shape>,
+    pub shapes: Vec<AnyShape>,
 }

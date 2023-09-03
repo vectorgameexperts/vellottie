@@ -53,7 +53,7 @@ impl Transform {
             .ok();
         let position = obj.extract_obj(breadcrumb, "p").and_then(|obj| {
             if obj.contains_key("s") {
-                Ok(AnyTransformP::SplitVector(SplitVector::from_obj(
+                Ok(AnyTransformP::SplitPosition(SplitVector::from_obj(
                     breadcrumb, &obj,
                 )?))
             } else {
@@ -99,7 +99,7 @@ pub enum AnyTransformP {
     /// Position / Translation
     Position(Position),
     /// Position / Translation with split components
-    SplitVector(SplitVector),
+    SplitPosition(SplitVector),
 }
 
 /// The possible values of "r" in a [`Transform`].

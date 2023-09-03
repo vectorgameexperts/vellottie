@@ -19,11 +19,11 @@ use vellottie::parser::{
         helpers::int_boolean::BoolInt,
         layers::{
             common::LayerProperties, enumerations::LayerType,
-            shape::ShapeLayer, Layer,
+            shape::ShapeLayer, AnyLayer,
         },
         shapes::{
-            ellipse::EllipseShape, group::GroupShape, Shape, ShapeProperties,
-            ShapeType,
+            ellipse::EllipseShape, group::GroupShape, AnyShape,
+            ShapeProperties, ShapeType,
         },
     },
 };
@@ -100,7 +100,7 @@ lazy_static! {
             ]
         }
     );
-    static ref LAYER: Layer = Layer::Shape(ShapeLayer {
+    static ref LAYER: AnyLayer = AnyLayer::Shape(ShapeLayer {
         properties: LayerProperties {
             name: Some("Ellipse".to_string()),
             match_name: Some(
@@ -185,7 +185,7 @@ lazy_static! {
             tranform_before_mask_deprecated: None,
             transform_before_mask: None
         },
-        shapes: vec![Shape::Group(GroupShape {
+        shapes: vec![AnyShape::Group(GroupShape {
             properties: ShapeProperties {
                 name: Some("Group".to_string()),
                 match_name: Some(
@@ -199,7 +199,7 @@ lazy_static! {
                 id: None
             },
             num_properties: None,
-            shapes: vec![Shape::Ellipse(EllipseShape {
+            shapes: vec![AnyShape::Ellipse(EllipseShape {
                 properties: ShapeProperties {
                     name: Some("Ellipse".to_string()),
                     match_name: Some(
@@ -251,7 +251,7 @@ fn test_serde_deserialize() {
 
 #[test]
 fn test_deserialize() {
-    let actual = Layer::from_json(&mut Breadcrumb::new(), &JSON);
+    let actual = AnyLayer::from_json(&mut Breadcrumb::new(), &JSON);
 
     match actual {
         Ok(actual) => assert_eq!(*LAYER, actual),
