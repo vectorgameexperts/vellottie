@@ -43,7 +43,7 @@ pub fn Navigation(props: &NavigationProps) -> Html {
         display: flex;
         flex-direction: column;
         min-height: 100vh;
-        min-width: 200px;
+        width: 200px;
         overflow-y: auto;
     };
 
@@ -52,6 +52,7 @@ pub fn Navigation(props: &NavigationProps) -> Html {
             {
                 items.into_iter().map(|(name, item)| {
                     let change_selected = change_selected.clone();
+
                     html!{
                         <div>
                             <input

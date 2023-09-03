@@ -4,6 +4,13 @@
 <head>
   <title>Velottie Test Viewer</title>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script>
+    function load(p) {
+      const player = document.querySelector("lottie-player");
+      console.log(p);
+      player.load(p);
+    }
+  </script>
 
   <link rel=copy-dir data-trunk href="files/" />
   <link rel=rust data-trunk />

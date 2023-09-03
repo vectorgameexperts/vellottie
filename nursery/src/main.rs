@@ -1,9 +1,7 @@
-use component_container::ComponentContainer;
 use log::Level;
 use nav::Navigation;
 use stylist::yew::{styled_component, Global};
 use yew::prelude::*;
-mod component_container;
 mod nav;
 mod player;
 
@@ -24,8 +22,9 @@ pub fn App() -> Html {
 
     let app_css = css! {
         margin: auto;
-        max-width: 1100px;
+
         min-height: 100vh;
+        width: 100vw;
     };
 
     let wrap_css = css! {
@@ -36,7 +35,11 @@ pub fn App() -> Html {
         <div id="app" class={app_css}>
             <div id="wrap" class={wrap_css}>
                 <Navigation selected={selected.clone()} />
-                <ComponentContainer {selected} />
+                <div style="width: calc(100% - 200px)">
+                    <div align="center">
+                        {(*selected).clone()}
+                    </div>
+                </div>
             </div>
         </div>
     }

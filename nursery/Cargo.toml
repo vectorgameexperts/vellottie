@@ -12,5 +12,6 @@ gloo-dialogs = "0.2.0"
 # TODO: Remove when stable
 cssugar = { git = "https://github.com/simbleau/cssugar", rev = "e0c185a961eb3d1873efbb20c3375fda2e7d9a40" }
 console_error_panic_hook = "0.1"
-console_log = "*"
-log = "*"
+console_log = "1.0"
+log = "0.4"
+wasm-bindgen = "0.2"
