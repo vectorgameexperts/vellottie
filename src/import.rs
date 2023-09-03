@@ -4,23 +4,29 @@ use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    self, animated, Content, GroupTransform, Layer, Lerp, Time, Value,
+    self, animated, Content, GroupTransform, Layer, Lerp, SplineToPath, Time,
+    Value,
 };
 use crate::runtime::{self, Composition};
 use lazy_static::lazy_static;
 use parser::schema;
 use std::collections::HashMap;
 use vello::kurbo::{Point, Size, Vec2};
-use vello::peniko::{self, BlendMode, Color, Mix};
+use vello::peniko::{self, BlendMode, Color, Compose, Mix};
 
 pub trait NumberExt {
     fn unwrap_f32(&self) -> f32;
+    fn unwrap_f64(&self) -> f64;
     fn unwrap_u32(&self) -> u32;
 }
 
 impl NumberExt for serde_json::Number {
     fn unwrap_f32(&self) -> f32 {
         self.as_f64().expect("Could not get float from JSON Number") as f32
+    }
+
+    fn unwrap_f64(&self) -> f64 {
+        self.as_f64().expect("Could not get float from JSON Number")
     }
 
     fn unwrap_u32(&self) -> u32 {
@@ -230,14 +236,24 @@ fn setup_precomp_layer(
         .as_ref()
         .map_or(false, |td| *td == BoolInt::True);
 
-    // todo: Matte mode
-    //let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
-    //    MatteMode::Normal => Mix::Normal.into(),
-    //    MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
-    //    MatteMode::InvertAlpha | MatteMode::InvertLuma => {
-    //        Compose::SrcOut.into()
-    //    }
-    //});
+    let matte_mode =
+        source
+            .properties
+            .matte_mode
+            .as_ref()
+            .map(|mode| match mode {
+                schema::constants::matte_mode::MatteMode::Normal => {
+                    Mix::Normal.into()
+                }
+                schema::constants::matte_mode::MatteMode::Alpha
+                | schema::constants::matte_mode::MatteMode::Luma => {
+                    Compose::SrcIn.into()
+                }
+                schema::constants::matte_mode::MatteMode::InvertedAlpha
+                | schema::constants::matte_mode::MatteMode::InvertedLuma => {
+                    Compose::SrcOut.into()
+                }
+            });
 
     target.blend_mode =
         conv_blend_mode(source.properties.blend_mode.as_ref().unwrap_or(
@@ -287,8 +303,7 @@ fn setup_precomp_layer(
             .index
             .as_ref()
             .map_or(0, |ind| ind.unwrap_u32()) as usize,
-        // todo: matte mode
-        Some(Mix::Normal.into()),
+        matte_mode,
     )
 }
 
@@ -311,14 +326,24 @@ fn setup_shape_layer(
         .as_ref()
         .map_or(false, |td| *td == BoolInt::True);
 
-    // todo: Matte mode
-    //let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
-    //    MatteMode::Normal => Mix::Normal.into(),
-    //    MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
-    //    MatteMode::InvertAlpha | MatteMode::InvertLuma => {
-    //        Compose::SrcOut.into()
-    //    }
-    //});
+    let matte_mode =
+        source
+            .properties
+            .matte_mode
+            .as_ref()
+            .map(|mode| match mode {
+                schema::constants::matte_mode::MatteMode::Normal => {
+                    Mix::Normal.into()
+                }
+                schema::constants::matte_mode::MatteMode::Alpha
+                | schema::constants::matte_mode::MatteMode::Luma => {
+                    Compose::SrcIn.into()
+                }
+                schema::constants::matte_mode::MatteMode::InvertedAlpha
+                | schema::constants::matte_mode::MatteMode::InvertedLuma => {
+                    Compose::SrcOut.into()
+                }
+            });
 
     target.blend_mode =
         conv_blend_mode(source.properties.blend_mode.as_ref().unwrap_or(
@@ -368,8 +393,7 @@ fn setup_shape_layer(
             .index
             .as_ref()
             .map_or(0, |ind| ind.unwrap_u32()) as usize,
-        // todo: matte mode
-        Some(Mix::Normal.into()),
+        matte_mode,
     )
 }
 
@@ -869,68 +893,71 @@ fn conv_geometry(
             };
             Some(crate::runtime::model::Geometry::Rect(rect))
         }
+        AnyShape::Path(value) => conv_shape_geometry(&value.shape),
         // todo: generic shape
-        // Shape::Shape(value) => conv_shape_geometry(&value.vertices),
         _ => None,
     }
 }
 
-// todo
-// fn conv_shape_geometry(
-//     value: &bodymovin::properties::Shape,
-// ) -> Option<Geometry> {
-//     use bodymovin::properties::Value::*;
-//     let mut is_closed = false;
-//     match &value.value {
-//         Fixed(value) => {
-//             let (points, is_closed) = conv_spline(value);
-//             let mut path = vec![];
-//             points.as_slice().to_path(is_closed, &mut path);
-//             Some(Geometry::Fixed(path))
-//         }
-//         Animated(animated) => {
-//             let mut frames = vec![];
-//             let mut values = vec![];
-//             let mut last_value = None;
-//             for value in animated {
-//                 if let Some(data) = value.start_value.as_ref().or(last_value) {
-//                     frames.push(Time {
-//                         frame: value.start_time as f32,
-//                     });
-//                     let (points, is_frame_closed) = conv_spline(data.get(0)?);
-//                     values.push(points);
-//                     is_closed |= is_frame_closed;
-//                 }
-//                 last_value = value.end_value.as_ref();
-//             }
-//             Some(Geometry::Spline(animated::Spline {
-//                 is_closed,
-//                 times: frames,
-//                 values,
-//             }))
-//         }
-//     }
-// }
+fn conv_shape_geometry(
+    value: &schema::animated_properties::shape_property::ShapeProperty,
+) -> Option<runtime::model::Geometry> {
+    use schema::animated_properties::shape_property::ShapePropertyK::*;
+    let mut is_closed = false;
+    match &value.value {
+        Static(value) => {
+            let (points, is_closed) = conv_spline(value);
+            let mut path = vec![];
+            points.as_slice().to_path(is_closed, &mut path);
+            Some(runtime::model::Geometry::Fixed(path))
+        }
+        Animated(animated) => {
+            let mut frames = vec![];
+            let mut values = vec![];
+            for value in animated {
+                frames.push(Time {
+                    frame: value.base.time.unwrap_f32(),
+                });
+                let (points, is_frame_closed) =
+                    conv_spline(value.start.get(0)?);
+                values.push(points);
+                is_closed |= is_frame_closed;
+            }
+            Some(runtime::model::Geometry::Spline(animated::Spline {
+                is_closed,
+                times: frames,
+                values,
+            }))
+        }
+    }
+}
 
-// todo
-// fn conv_spline(
-//     value: &bodymovin::properties::ShapeValue,
-// ) -> (Vec<Point>, bool) {
-//     use core::iter::repeat;
-//     let mut points = Vec::with_capacity(value.vertices.len() * 3);
-//     let is_closed = value.closed.unwrap_or(false);
-//     for ((v, i), o) in value
-//         .vertices
-//         .iter()
-//         .zip(value.in_point.iter().chain(repeat(&(0.0, 0.0))))
-//         .zip(value.out_point.iter().chain(repeat(&(0.0, 0.0))))
-//     {
-//         points.push((v.0, v.1).into());
-//         points.push((i.0, i.1).into());
-//         points.push((o.0, o.1).into());
-//     }
-//     (points, is_closed)
-// }
+fn conv_spline(value: &schema::helpers::bezier::Bezier) -> (Vec<Point>, bool) {
+    use core::iter::repeat;
+    let mut points = Vec::with_capacity(value.vertices.len() * 3);
+    let is_closed = value
+        .closed
+        .as_ref()
+        .unwrap_or(&BoolInt::False)
+        .eq(&BoolInt::True);
+    for ((v, i), o) in value
+        .vertices
+        .iter()
+        .zip(value.in_tangents.iter().chain(repeat(&[
+            serde_json::Number::from(0),
+            serde_json::Number::from(0),
+        ])))
+        .zip(value.out_tangents.iter().chain(repeat(&[
+            serde_json::Number::from(0),
+            serde_json::Number::from(0),
+        ])))
+    {
+        points.push((v[0].unwrap_f64(), v[1].unwrap_f64()).into());
+        points.push((i[0].unwrap_f64(), i[1].unwrap_f64()).into());
+        points.push((o[0].unwrap_f64(), o[1].unwrap_f64()).into());
+    }
+    (points, is_closed)
+}
 
 fn conv_blend_mode(
     value: &crate::parser::schema::constants::blend_mode::BlendMode,

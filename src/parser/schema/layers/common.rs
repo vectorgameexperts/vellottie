@@ -2,7 +2,9 @@
 
 use super::enumerations::LayerType;
 use crate::parser::schema::constants::blend_mode::BlendMode;
+use crate::parser::schema::constants::matte_mode::MatteMode;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
+use crate::parser::schema::helpers::mask::Mask;
 use crate::parser::schema::helpers::transform::Transform;
 use crate::parser::{
     breadcrumb::Breadcrumb, breadcrumb::ValueType, util::MapExt, Error,
@@ -56,15 +58,15 @@ pub struct LayerProperties {
     /// Matte mode
     #[serde(rename = "tt")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub matte_mode: Option<()>, // TODO: Matte Mode
+    pub matte_mode: Option<MatteMode>,
     /// Matte target
     #[serde(rename = "td", default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub matte_target: Option<BoolInt>,
     /// Masks for the layer
-    #[serde(rename = "maskProperties")]
+    #[serde(rename = "masksProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mask_properties: Option<()>, //  TODO: array of Mask
+    pub mask_properties: Option<Mask>,
     /// Effects for the layer
     #[serde(rename = "ef")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -147,7 +149,13 @@ impl LayerProperties {
         let in_point = obj.extract_number(breadcrumb, "ip")?;
         let out_point = obj.extract_number(breadcrumb, "op")?;
         let start_time = obj.extract_number(breadcrumb, "st")?;
+        let matte_mode =
+            obj.extract_type(breadcrumb, "tt", ValueType::EnumInt).ok();
         let matte_target = obj.extract_bool_int(breadcrumb, "td").ok();
+        let mask_properties = obj
+            .extract_obj(breadcrumb, "masksProperties")
+            .and_then(|obj| Mask::from_obj(breadcrumb, &obj))
+            .ok();
         let rotate_to_match_anim_pos_path =
             obj.extract_bool_int(breadcrumb, "ao").ok();
         let matte_layer_index = obj.extract_number(breadcrumb, "tp").ok();
@@ -180,11 +188,11 @@ impl LayerProperties {
             in_point,
             out_point,
             start_time,
-            matte_mode: None, // TODO
+            matte_mode,
             matte_target,
-            mask_properties: None, // TODO
-            effects: None,         // TODO
-            styles: None,          // TODO
+            mask_properties,
+            effects: None, // TODO
+            styles: None,  // TODO
             transform,
             rotate_to_match_anim_pos_path,
             matte_layer_index,

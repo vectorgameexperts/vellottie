@@ -1,7 +1,16 @@
-use crate::parser::schema::{
-    animated_properties::value::FloatValue, constants::mask_mode::MaskMode,
+use crate::parser::{
+    breadcrumb::Breadcrumb,
+    schema::{
+        animated_properties::{
+            shape_property::ShapeProperty, value::FloatValue,
+        },
+        constants::mask_mode::MaskMode,
+    },
+    util::MapExt,
+    Error,
 };
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 
 /// A layer can have an array of masks that clip the contents of the layer to a shape.
 
@@ -29,7 +38,7 @@ pub struct Mask {
     /// Shape
     #[serde(rename = "pt")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub shape: Option<()>, // todo 	Animated Bezier
+    pub shape: Option<ShapeProperty>,
 
     /// Opacity
     #[serde(rename = "o")]
@@ -45,4 +54,44 @@ pub struct Mask {
     #[serde(rename = "x")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expand: Option<FloatValue>,
+}
+
+impl Mask {
+    pub fn from_obj(
+        breadcrumb: &mut Breadcrumb,
+        obj: &serde_json::map::Map<String, Value>,
+    ) -> Result<Self, Error> {
+        let name = obj.extract_string(breadcrumb, "nm").ok();
+        let match_name = obj.extract_string(breadcrumb, "mn").ok();
+        let inverted = obj.extract_bool(breadcrumb, "inv").ok();
+        let shape = obj
+            .extract_obj(breadcrumb, "pt")
+            .and_then(|obj| ShapeProperty::from_obj(breadcrumb, &obj))
+            .ok();
+        let opacity = obj
+            .extract_obj(breadcrumb, "o")
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+            .ok();
+        let mode: Option<MaskMode> = obj
+            .extract_type(
+                breadcrumb,
+                "mode",
+                crate::parser::breadcrumb::ValueType::EnumStr,
+            )
+            .ok();
+        let expand = obj
+            .extract_obj(breadcrumb, "x")
+            .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+            .ok();
+
+        Ok(Mask {
+            name,
+            match_name,
+            inverted,
+            shape,
+            opacity,
+            mode,
+            expand,
+        })
+    }
 }

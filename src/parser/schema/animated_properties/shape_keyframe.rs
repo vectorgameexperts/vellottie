@@ -12,7 +12,7 @@ use serde_json::Value;
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeKeyframe {
     #[serde(flatten)]
-    base: KeyframeBase,
+    pub base: KeyframeBase,
     #[serde(rename = "s")]
     pub start: Vec<Bezier>,
 }
