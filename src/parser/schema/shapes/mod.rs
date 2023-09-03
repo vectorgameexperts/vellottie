@@ -5,6 +5,7 @@ pub mod fill;
 pub mod group;
 pub mod merge;
 pub mod offset_path;
+pub mod path;
 pub mod polystar;
 pub mod pucker_bloat;
 pub mod rectangle;
@@ -15,7 +16,6 @@ pub mod shape_element;
 pub mod stroke;
 pub mod transform;
 pub mod trim;
-// todo pub mod path;
 // todo pub mod gradient_stroke;
 // todo pub mod stroke_dash;
 // todo pub mod shape_list;
@@ -28,6 +28,7 @@ pub mod trim;
 // todo pub mod gradient;
 // todo pub mod modifier;
 
+use self::path::PathShape;
 use self::{
     fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
     pucker_bloat::PuckerBloatShape, rectangle::RectangleShape,
@@ -46,6 +47,7 @@ pub use self::common::ShapeProperties;
 use super::animated_properties::color_value::ColorValue;
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
+use super::animated_properties::shape_property::ShapeProperty;
 use super::animated_properties::value::FloatValue;
 use super::helpers::transform::Transform;
 
@@ -73,7 +75,7 @@ pub enum AnyShape {
     ShapeElement(ShapeElementShape),
     Shape(GenericShape),
     Trim(TrimShape),
-    // todo Path(path),
+    Path(PathShape),
     // todo GradientStroke(gradient_stroke),
     // todo StrokeDash(stroke_dash),
     // todo ShapeList(shape_list),
@@ -241,6 +243,12 @@ impl AnyShape {
                 multiple: root
                     .extract_type(breadcrumb, "m", ValueType::EnumInt)
                     .ok(),
+            }),
+            ShapeType::Path => AnyShape::Path(PathShape {
+                properties,
+                shape: root.extract_obj(breadcrumb, "ks").and_then(|obj| {
+                    ShapeProperty::from_obj(breadcrumb, &obj)
+                })?,
             }),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)

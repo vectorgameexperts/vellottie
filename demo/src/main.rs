@@ -156,8 +156,8 @@ fn main() -> Result<()> {
     let event_loop = EventLoop::new();
     let contents = fs::read(&args.file)?;
     // TODO: Implement proper error handling in velato so that anyhow can be properly used here
-    let composition =
-        vellottie::runtime::Composition::from_bytes(&contents).unwrap();
+    let composition = vellottie::runtime::Composition::from_bytes(&contents)
+        .unwrap_or_else(|e| panic!("{e}"));
     let window = WindowBuilder::new()
         .with_inner_size(LogicalSize::new(1044, 800))
         .with_resizable(true)

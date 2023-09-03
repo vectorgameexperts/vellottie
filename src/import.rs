@@ -187,7 +187,11 @@ fn conv_layer(
         parser::schema::layers::AnyLayer::Precomposition(precomp_layer) => {
             params = setup_precomp_layer(precomp_layer, &mut layer);
             let name = precomp_layer.precomp_id.clone();
-            let time_remap = conv_scalar(&precomp_layer.time_remap);
+            let time_remap_in = precomp_layer
+                .time_remap
+                .as_ref()
+                .unwrap_or(&FLOAT_VALUE_ZERO); // todo: verify that time remap should be 0 when none was parsed
+            let time_remap = conv_scalar(time_remap_in);
             layer.content = Content::Instance { name, time_remap };
         }
         parser::schema::layers::AnyLayer::Shape(shape_layer) => {

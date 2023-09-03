@@ -67,13 +67,13 @@ impl AnyLayer {
             LayerType::Precomposition => {
                 AnyLayer::Precomposition(PrecompositionLayer {
                     properties,
-                    precomp_id: root.extract_string(breadcrumb, "refID")?,
+                    precomp_id: root.extract_string(breadcrumb, "refId")?,
                     width: root.extract_number(breadcrumb, "w")?,
                     height: root.extract_number(breadcrumb, "h")?,
-                    time_remap: FloatValue::from_obj(
-                        breadcrumb,
-                        &root.extract_obj(breadcrumb, "tm")?,
-                    )?,
+                    time_remap: root
+                        .extract_obj(breadcrumb, "tm")
+                        .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+                        .ok(),
                 })
             }
             LayerType::Shape => AnyLayer::Shape(ShapeLayer {

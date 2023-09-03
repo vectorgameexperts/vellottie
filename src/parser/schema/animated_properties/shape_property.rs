@@ -42,7 +42,6 @@ impl ShapeProperty {
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         breadcrumb.enter_unnamed(ValueType::ShapeProperty);
-        let animated = obj.extract_bool_int(breadcrumb, "a")?;
         let property_index = obj.extract_number(breadcrumb, "ix").ok();
         let animated = obj.extract_bool_int(breadcrumb, "a")?;
         let expression = obj.extract_string(breadcrumb, "x").ok();

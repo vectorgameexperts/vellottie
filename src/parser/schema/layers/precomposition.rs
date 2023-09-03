@@ -11,7 +11,7 @@ pub struct PrecompositionLayer {
     #[serde(flatten)]
     pub properties: LayerProperties,
     /// ID of the precomp as specified in the assets
-    #[serde(rename = "refID")]
+    #[serde(rename = "refId")]
     pub precomp_id: String,
     /// Width of the clipping rect
     #[serde(rename = "w")]
@@ -21,5 +21,6 @@ pub struct PrecompositionLayer {
     pub height: Number,
     /// Time Remapping
     #[serde(rename = "tm")]
-    pub time_remap: FloatValue,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time_remap: Option<FloatValue>,
 }
