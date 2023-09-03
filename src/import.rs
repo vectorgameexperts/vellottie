@@ -700,6 +700,7 @@ fn conv_draw(value: &schema::shapes::Shape) -> Option<runtime::model::Draw> {
     match value {
         Shape::Fill(value) => {
             let color = conv_color(&value.color);
+            println!("color={:?}", color);
             let brush = animated::Brush::Solid(color).to_model();
             let opacity = conv_scalar(
                 value.opacity.as_ref().unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),

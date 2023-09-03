@@ -314,12 +314,24 @@ impl DrawData {
         geometry: Range<usize>,
         frame: f32,
     ) -> Self {
+        let mut b = draw.brush.evaluate(1.0, frame).to_owned();
+        if let peniko::Brush::Solid(ref mut color) = b {
+            // color.r = 255;
+            // color.g = 0;
+            // color.b = 0;
+            // color.a = 255;
+
+            if draw.stroke.is_none() && color.r == 50 {
+                println!("color={:?}, geo={:?}", b, geometry);
+            }
+        }
+
         Self {
             stroke: draw
                 .stroke
                 .as_ref()
                 .map(|stroke| stroke.evaluate(frame).to_owned()),
-            brush: draw.brush.evaluate(1.0, frame).to_owned(),
+            brush: b,
             alpha: alpha * draw.opacity.evaluate(frame) / 100.0,
             geometry,
         }
