@@ -118,7 +118,7 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValueK::Static([
+                    value: PositionValueK::Static(vec![
                         Number::from(256),
                         Number::from(256)
                     ],),
@@ -128,7 +128,7 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValueK::Static([
+                    value: PositionValueK::Static(vec![
                         Number::from(256),
                         Number::from(256)
                     ],),
@@ -171,7 +171,7 @@ lazy_static! {
             time_stretch: None,
             matte_mode: None,
             matte_target: None,
-            mask_properties: None,
+            masks_properties: None,
             effects: None,
             styles: None,
             rotate_to_match_anim_pos_path: None,
@@ -217,7 +217,7 @@ lazy_static! {
                     animated: BoolInt::False,
                     expression: None,
                     length: None,
-                    value: PositionValueK::Static([
+                    value: PositionValueK::Static(vec![
                         Number::from_f64(303.9044776119403).unwrap(),
                         Number::from_f64(324.9671641791045).unwrap()
                     ],),
@@ -257,6 +257,16 @@ fn test_deserialize() {
         Ok(actual) => assert_eq!(*LAYER, actual),
         Err(e) => panic!("{e}"),
     }
+}
+
+#[test]
+fn test_xor_deserialize() {
+    // Ensure our (slow) parsing method returns the same result as serde's.
+    let vellottie_parse =
+        AnyLayer::from_json(&mut Breadcrumb::new(), &JSON).unwrap();
+    let serde_parse = serde_json::from_value(JSON.to_owned()).unwrap();
+
+    assert_eq!(vellottie_parse, serde_parse);
 }
 
 #[test]

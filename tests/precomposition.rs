@@ -54,6 +54,19 @@ fn test_deserialize() {
 }
 
 #[test]
+fn test_xor_deserialize() {
+    // Ensure our (slow) parsing method returns the same result as serde's.
+    let vellottie_parse = Precomposition::from_obj(
+        &mut Breadcrumb::new(),
+        JSON.as_object().unwrap(),
+    )
+    .unwrap();
+    let serde_parse = serde_json::from_value(JSON.to_owned()).unwrap();
+
+    assert_eq!(vellottie_parse, serde_parse);
+}
+
+#[test]
 fn test_serialize() {
     let actual = serde_json::to_value(&*PRECOMP).unwrap();
 
