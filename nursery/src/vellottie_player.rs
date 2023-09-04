@@ -52,12 +52,11 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
         let path = props.file.to_string();
         move || {
             // Initialize render loop
-            let interval = Interval::new(200, move || {
+            let interval = Interval::new(2, move || {
                 if let Some(composition) =
                     (*COMPOSITION).lock().unwrap().as_ref()
                 {
                     let time = (*ANIM_START).elapsed().as_secs_f32();
-                    info!("go");
                     render(composition, time);
                 }
             });
