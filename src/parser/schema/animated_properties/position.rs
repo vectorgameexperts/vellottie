@@ -17,7 +17,7 @@ pub struct Position {
     pub property_index: Option<Number>,
     /// Whether the property is animated
     #[serde(rename = "a")]
-    pub animated: BoolInt,
+    pub animated: Option<BoolInt>,
     /// The expression for the property.
     #[serde(rename = "x")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +69,7 @@ impl Position {
         breadcrumb.exit();
         Ok(Position {
             property_index: obj.extract_number(breadcrumb, "ix").ok(),
-            animated: obj.extract_bool_int(breadcrumb, "a")?,
+            animated: obj.extract_bool_int(breadcrumb, "a").ok(),
             expression: obj.extract_string(breadcrumb, "x").ok(),
             length: obj.extract_number(breadcrumb, "l").ok(),
             value,

@@ -8,8 +8,8 @@ use kurbo::PathEl;
 
 #[derive(Clone, Debug)]
 pub enum Position {
-    Point(Value<Point>),
-    SplitComponents((Value<f32>, Value<f32>)),
+    Value(Value<Point>),
+    SplitValues((Value<f32>, Value<f32>)),
 }
 
 /// Animated affine transformation.
@@ -34,8 +34,8 @@ impl Transform {
     pub fn is_fixed(&self) -> bool {
         self.anchor.is_fixed()
             && match &self.position {
-                Position::Point(value) => value.is_fixed(),
-                Position::SplitComponents((x_value, y_value)) => {
+                Position::Value(value) => value.is_fixed(),
+                Position::SplitValues((x_value, y_value)) => {
                     x_value.is_fixed() && y_value.is_fixed()
                 }
             }
@@ -49,8 +49,8 @@ impl Transform {
     pub fn evaluate(&self, frame: f32) -> Affine {
         let anchor = self.anchor.evaluate(frame);
         let position = match &self.position {
-            Position::Point(value) => value.evaluate(frame),
-            Position::SplitComponents((x_value, y_value)) => kurbo::Point {
+            Position::Value(value) => value.evaluate(frame),
+            Position::SplitValues((x_value, y_value)) => kurbo::Point {
                 x: x_value.evaluate(frame) as f64,
                 y: y_value.evaluate(frame) as f64,
             },

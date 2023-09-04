@@ -26,6 +26,7 @@ pub struct SplitVector {
 
     /// Z component.
     #[serde(rename = "z")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub z: Option<FloatValue>,
 }
 
@@ -34,23 +35,35 @@ impl SplitVector {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_unnamed(ValueType::SplitVector);
-        let vector = obj.extract_bool(breadcrumb, "s").and_then(|split| {
-            if split {
-                Ok(SplitVector {
-                    split,
-                    x: FloatValue::from_obj(breadcrumb, obj)?,
-                    y: FloatValue::from_obj(breadcrumb, obj)?,
-                    z: FloatValue::from_obj(breadcrumb, obj).ok(),
-                })
+        obj.extract_bool(breadcrumb, "s").and_then(|split| {
+            breadcrumb.enter_unnamed(ValueType::SplitVector);
+            let result = if split {
+                breadcrumb.enter(ValueType::SplitVector, Some("x"));
+                let x = obj
+                    .extract_obj(breadcrumb, "x")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?;
+                breadcrumb.exit();
+                breadcrumb.enter(ValueType::SplitVector, Some("y"));
+                let y = obj
+                    .extract_obj(breadcrumb, "y")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?;
+                breadcrumb.exit();
+                breadcrumb.enter(ValueType::SplitVector, Some("z"));
+                let z = obj
+                    .extract_obj(breadcrumb, "z")
+                    .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
+                    .ok();
+                breadcrumb.exit();
+
+                Ok(SplitVector { split, x, y, z })
             } else {
                 Err(UnexpectedChild {
                     expected: ValueType::SplitVector,
                     breadcrumb: breadcrumb.clone(),
                 })
-            }
-        });
-        breadcrumb.exit();
-        vector
+            };
+            breadcrumb.exit();
+            result
+        })
     }
 }

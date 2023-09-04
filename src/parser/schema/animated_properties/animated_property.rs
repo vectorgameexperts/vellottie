@@ -20,7 +20,8 @@ pub struct AnimatedProperty<StaticType> {
     pub property_index: Option<Number>,
     /// Whether the property is animated.
     #[serde(rename = "a")]
-    pub animated: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub animated: Option<BoolInt>,
     /// Expression for the property.
     #[serde(rename = "x")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,12 +53,16 @@ where
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        let animated = obj.extract_bool_int(breadcrumb, "a")?;
+        let animated = obj.extract_bool_int(breadcrumb, "a").ok();
         let property_index = obj.extract_number(breadcrumb, "ix").ok();
         let expression = obj.extract_string(breadcrumb, "x").ok();
         let slot_id = obj.extract_string(breadcrumb, "sid").ok();
 
-        let value = if animated == BoolInt::True {
+        let value = if animated
+            .as_ref()
+            .unwrap_or(&BoolInt::False)
+            .eq(&BoolInt::True)
+        {
             let mut keyframes = vec![];
             breadcrumb.enter(ValueType::Array, Some("k"));
             for v in obj.extract_arr(breadcrumb, "k")? {

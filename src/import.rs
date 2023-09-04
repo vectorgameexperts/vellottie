@@ -1,4 +1,5 @@
 use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
+use crate::parser::schema::animated_properties::split_vector::SplitVector;
 use crate::parser::schema::animated_properties::value::FloatValue;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{self, Lottie};
@@ -41,7 +42,7 @@ lazy_static! {
         animated_property:
             schema::animated_properties::animated_property::AnimatedProperty {
                 property_index: None,
-                animated: BoolInt::False,
+                animated: Some(BoolInt::False),
                 expression: None,
                 slot_id: None,
                 value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
@@ -53,7 +54,7 @@ lazy_static! {
         animated_property:
             schema::animated_properties::animated_property::AnimatedProperty {
                 property_index: None,
-                animated: BoolInt::False,
+                animated: Some(BoolInt::False),
                 expression: None,
                 slot_id: None,
                 value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
@@ -66,7 +67,7 @@ lazy_static! {
         MultiDimensional {
             animated_property: schema::animated_properties::animated_property::AnimatedProperty {
                 property_index: None,
-                animated: BoolInt::False,
+                animated: Some(BoolInt::False),
                 expression: None,
                 slot_id: None,
                 value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
@@ -78,7 +79,7 @@ lazy_static! {
         MultiDimensional {
             animated_property: schema::animated_properties::animated_property::AnimatedProperty {
                 property_index: None,
-                animated: BoolInt::False,
+                animated: Some(BoolInt::False),
                 expression: None,
                 slot_id: None,
                 value: schema::animated_properties::animated_property::AnimatedPropertyK::Static(
@@ -89,7 +90,7 @@ lazy_static! {
 
     static ref POSITION_ZERO: schema::animated_properties::position::Position = schema::animated_properties::position::Position {
         property_index: None,
-        animated: BoolInt::False,
+        animated: Some(BoolInt::False),
         expression: None,
         length: None,
         value: schema::animated_properties::position::PositionValueK::Static(vec![serde_json::Number::from(0), serde_json::Number::from(0)]),
@@ -487,21 +488,20 @@ fn conv_transform(
         None => todo!("split rotation"),
     };
 
-    let position_in = match &value.position {
+    let position = match &value.position {
         schema::helpers::transform::AnyTransformP::Position(position) => {
-            position
+            Position::Value(conv_point(position))
         }
-        schema::helpers::transform::AnyTransformP::SplitPosition(_) => {
-            // todo: split vectors
-            todo!("split vector");
-        }
+        schema::helpers::transform::AnyTransformP::SplitPosition(
+            SplitVector { x, y, .. },
+        ) => Position::SplitValues((conv_scalar(x), conv_scalar(y))),
     };
 
     let transform = animated::Transform {
         anchor: conv_point(
             value.anchor_point.as_ref().unwrap_or(&POSITION_ZERO),
         ),
-        position: Position::Point(conv_point(position_in)), // todo
+        position,
         scale: conv_vec2(value.scale.as_ref().unwrap_or(&MULTIDIM_ONE)),
         rotation: conv_scalar(rotation_in),
         skew: conv_scalar(value.skew.as_ref().unwrap_or(&FLOAT_VALUE_ZERO)),
@@ -543,7 +543,7 @@ fn conv_shape_transform(
                 .as_ref()
                 .unwrap_or(&POSITION_ZERO),
         ),
-        position: Position::Point(conv_point(position_in)),
+        position: Position::Value(conv_point(position_in)),
         scale: conv_vec2(
             value.transform.scale.as_ref().unwrap_or(&MULTIDIM_ONE),
         ),
@@ -1016,7 +1016,7 @@ fn conv_spline(value: &schema::helpers::bezier::Bezier) -> (Vec<Point>, bool) {
     let is_closed = value
         .closed
         .as_ref()
-        .unwrap_or(&BoolInt::False)
+        .unwrap_or(&BoolInt::True)
         .eq(&BoolInt::True);
     for ((v, i), o) in value
         .vertices

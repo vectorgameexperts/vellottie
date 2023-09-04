@@ -115,7 +115,7 @@ lazy_static! {
             transform: Transform {
                 anchor_point: Some(Position {
                     property_index: None,
-                    animated: BoolInt::False,
+                    animated: Some(BoolInt::False),
                     expression: None,
                     length: None,
                     value: PositionValueK::Static(vec![
@@ -125,7 +125,7 @@ lazy_static! {
                 }),
                 position: AnyTransformP::Position(Position {
                     property_index: None,
-                    animated: BoolInt::False,
+                    animated: Some(BoolInt::False),
                     expression: None,
                     length: None,
                     value: PositionValueK::Static(vec![
@@ -135,7 +135,7 @@ lazy_static! {
                 }),
                 scale: Some(MultiDimensional {
                     animated_property: AnimatedProperty {
-                        animated: BoolInt::False,
+                        animated: Some(BoolInt::False),
                         property_index: None,
                         expression: None,
                         slot_id: None,
@@ -147,7 +147,7 @@ lazy_static! {
                 }),
                 rotation: Some(AnyTransformR::Rotation(FloatValue {
                     animated_property: AnimatedProperty {
-                        animated: BoolInt::False,
+                        animated: Some(BoolInt::False),
                         property_index: None,
                         expression: None,
                         slot_id: None,
@@ -156,7 +156,7 @@ lazy_static! {
                 })),
                 opacity: Some(FloatValue {
                     animated_property: AnimatedProperty {
-                        animated: BoolInt::False,
+                        animated: Some(BoolInt::False),
                         property_index: None,
                         expression: None,
                         slot_id: None,
@@ -214,7 +214,7 @@ lazy_static! {
                 },
                 position: Position {
                     property_index: None,
-                    animated: BoolInt::False,
+                    animated: Some(BoolInt::False),
                     expression: None,
                     length: None,
                     value: PositionValueK::Static(vec![
@@ -224,7 +224,7 @@ lazy_static! {
                 },
                 size: MultiDimensional {
                     animated_property: AnimatedProperty {
-                        animated: BoolInt::False,
+                        animated: Some(BoolInt::False),
                         property_index: None,
                         expression: None,
                         slot_id: None,

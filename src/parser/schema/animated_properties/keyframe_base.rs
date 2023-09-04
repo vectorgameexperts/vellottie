@@ -1,9 +1,7 @@
 use super::keyframe_bezier_handle::KeyframeBezierHandle;
 use crate::parser::{
-    breadcrumb::{Breadcrumb, ValueType},
-    schema::helpers::int_boolean::BoolInt,
-    util::MapExt,
-    Error,
+    breadcrumb::Breadcrumb, schema::helpers::int_boolean::BoolInt,
+    util::MapExt, Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
