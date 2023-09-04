@@ -66,7 +66,7 @@ pub struct LayerProperties {
     /// Masks for the layer
     #[serde(rename = "masksProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mask_properties: Option<Mask>,
+    pub masks_properties: Option<Vec<Mask>>,
     /// Effects for the layer
     #[serde(rename = "ef")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -152,10 +152,17 @@ impl LayerProperties {
         let matte_mode =
             obj.extract_type(breadcrumb, "tt", ValueType::EnumInt).ok();
         let matte_target = obj.extract_bool_int(breadcrumb, "td").ok();
-        let mask_properties = obj
-            .extract_obj(breadcrumb, "masksProperties")
-            .and_then(|obj| Mask::from_obj(breadcrumb, &obj))
-            .ok();
+
+        let mut masks_properties: Option<Vec<Mask>> = None;
+        if let Ok(values) = obj.extract_arr(breadcrumb, "masksProperties") {
+            let mut masks: Vec<Mask> = Vec::default();
+            for v in values {
+                let mask = Mask::from_json(breadcrumb, &v)?;
+                masks.push(mask);
+            }
+            masks_properties = Some(masks);
+        }
+
         let rotate_to_match_anim_pos_path =
             obj.extract_bool_int(breadcrumb, "ao").ok();
         let matte_layer_index = obj.extract_number(breadcrumb, "tp").ok();
@@ -190,7 +197,7 @@ impl LayerProperties {
             start_time,
             matte_mode,
             matte_target,
-            mask_properties,
+            masks_properties,
             effects: None, // TODO
             styles: None,  // TODO
             transform,

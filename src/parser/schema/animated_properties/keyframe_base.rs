@@ -1,7 +1,9 @@
 use super::keyframe_bezier_handle::KeyframeBezierHandle;
 use crate::parser::{
-    breadcrumb::Breadcrumb, schema::helpers::int_boolean::BoolInt,
-    util::MapExt, Error,
+    breadcrumb::{Breadcrumb, ValueType},
+    schema::helpers::int_boolean::BoolInt,
+    util::MapExt,
+    Error,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
@@ -35,16 +37,17 @@ impl KeyframeBase {
     ) -> Result<Self, Error> {
         let time = obj.extract_number(breadcrumb, "t")?;
         let hold = obj.extract_bool_int(breadcrumb, "h").ok();
-        let in_tangent = KeyframeBezierHandle::from_obj(
-            breadcrumb,
-            &obj.extract_obj(breadcrumb, "i")?,
-        )
-        .ok();
-        let out_tangent = KeyframeBezierHandle::from_obj(
-            breadcrumb,
-            &obj.extract_obj(breadcrumb, "o")?,
-        )
-        .ok();
+
+        let in_tangent = obj
+            .extract_obj(breadcrumb, "i")
+            .and_then(|obj| KeyframeBezierHandle::from_obj(breadcrumb, &obj))
+            .ok();
+
+        let out_tangent = obj
+            .extract_obj(breadcrumb, "o")
+            .and_then(|obj| KeyframeBezierHandle::from_obj(breadcrumb, &obj))
+            .ok();
+
         Ok(Self {
             time,
             hold,

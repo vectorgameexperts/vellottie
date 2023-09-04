@@ -51,17 +51,16 @@ impl Transform {
             .extract_obj(breadcrumb, "a")
             .and_then(|obj| Position::from_obj(breadcrumb, &obj))
             .ok();
-        let position = obj.extract_obj(breadcrumb, "p").and_then(|obj| {
-            if obj.contains_key("s") {
-                Ok(AnyTransformP::SplitPosition(SplitVector::from_obj(
-                    breadcrumb, &obj,
-                )?))
-            } else {
-                Ok(AnyTransformP::Position(Position::from_obj(
-                    breadcrumb, &obj,
-                )?))
-            }
-        })?;
+        let position = obj.extract_obj(breadcrumb, "p")?;
+        breadcrumb.enter(ValueType::Position, Some("p"));
+        let position = if position.contains_key("s") {
+            AnyTransformP::SplitPosition(SplitVector::from_obj(
+                breadcrumb, &position,
+            )?)
+        } else {
+            AnyTransformP::Position(Position::from_obj(breadcrumb, &position)?)
+        };
+        breadcrumb.exit();
         let scale = obj
             .extract_obj(breadcrumb, "s")
             .and_then(|obj| MultiDimensional::from_obj(breadcrumb, &obj))

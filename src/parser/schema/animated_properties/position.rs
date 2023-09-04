@@ -37,7 +37,7 @@ pub struct Position {
 #[serde(untagged)]
 pub enum PositionValueK {
     Animated(Vec<PositionKeyframe>),
-    Static([Number; 2]),
+    Static(Vec<Number>),
 }
 
 impl Position {

@@ -36,6 +36,7 @@ pub enum ValueType {
     Keyframe,
     // Helper types
     Bezier,
+    Mask,
 
     // I don't think these are necessary anymore?
     AnimatedVector,
@@ -80,6 +81,7 @@ impl Display for ValueType {
                 ValueType::ShapeKeyframe => "Shape Keyframe",
                 ValueType::Keyframe => "Animated Property Keyframe",
                 ValueType::Bezier => "Bezier",
+                ValueType::Mask => "Mask",
             }
         )
     }

@@ -31,13 +31,12 @@ pub enum AnyLayer {
     // todo Image
 
     /// No contents, only used for parenting
-    // todo Null (empty)
 
     /// Has an array of shapes
     Shape(ShapeLayer),
     // Renders Text
     // todo Text
-
+    Null(LayerProperties),
     // unimplemented - Audio(AudioLayer),
     // unimplemented - VideoPlaceholder(VideoPlaceholderLayer)
     // unimplemented - Video(VideoLayer)
@@ -90,7 +89,10 @@ impl AnyLayer {
                     shapes
                 },
             }),
-            _ => todo!(),
+            LayerType::Null => AnyLayer::Null(properties),
+            layer_type => {
+                todo!("layer type {:?} not implemented yet", layer_type)
+            }
         };
 
         breadcrumb.exit();

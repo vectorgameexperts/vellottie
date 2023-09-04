@@ -36,11 +36,11 @@ impl KeyframeBezierHandle {
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
-        breadcrumb.enter_unnamed(ValueType::ShapeProperty);
         let x_coordinate =
             obj.extract_type(breadcrumb, "x", ValueType::Number)?;
         let y_coordinate =
             obj.extract_type(breadcrumb, "y", ValueType::Number)?;
+
         Ok(Self {
             x_coordinate,
             y_coordinate,

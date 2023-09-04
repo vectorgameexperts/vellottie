@@ -1,5 +1,5 @@
 use crate::parser::{
-    breadcrumb::Breadcrumb,
+    breadcrumb::{Breadcrumb, ValueType},
     schema::{
         animated_properties::{
             shape_property::ShapeProperty, value::FloatValue,
@@ -10,7 +10,6 @@ use crate::parser::{
     Error,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 /// A layer can have an array of masks that clip the contents of the layer to a shape.
 
@@ -57,10 +56,15 @@ pub struct Mask {
 }
 
 impl Mask {
-    pub fn from_obj(
+    pub fn from_json(
         breadcrumb: &mut Breadcrumb,
-        obj: &serde_json::map::Map<String, Value>,
+        v: &serde_json::Value,
     ) -> Result<Self, Error> {
+        let obj = v.as_object().ok_or(Error::UnexpectedChild {
+            breadcrumb: breadcrumb.to_owned(),
+            expected: ValueType::Mask,
+        })?;
+
         let name = obj.extract_string(breadcrumb, "nm").ok();
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
         let inverted = obj.extract_bool(breadcrumb, "inv").ok();

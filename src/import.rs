@@ -92,7 +92,7 @@ lazy_static! {
         animated: BoolInt::False,
         expression: None,
         length: None,
-        value: schema::animated_properties::position::PositionValueK::Static([serde_json::Number::from(0), serde_json::Number::from(0)]),
+        value: schema::animated_properties::position::PositionValueK::Static(vec![serde_json::Number::from(0), serde_json::Number::from(0)]),
     };
 
 }
@@ -186,9 +186,9 @@ fn conv_layer(
     let params;
     match source {
         // TODO
-        // parser::schema::layers::Layer::Null(value) => {
-        //     params = setup_layer(value, &mut layer);
-        // }
+        parser::schema::layers::AnyLayer::Null(properties) => {
+            params = setup_layer_base(properties, &mut layer);
+        }
         parser::schema::layers::AnyLayer::Precomposition(precomp_layer) => {
             params = setup_precomp_layer(precomp_layer, &mut layer);
             let name = precomp_layer.precomp_id.clone();
@@ -274,27 +274,30 @@ fn setup_precomp_layer(
         .time_stretch
         .as_ref()
         .map_or(0.0, |sr| sr.unwrap_f32());
-    // todo: masks
-    // for mask_source in &source.masks {
-    //     if let Some(geometry) = conv_shape_geometry(&mask_source.points) {
-    //         let mode = peniko::BlendMode::default();
-    //         let opacity = conv_scalar(&mask_source.opacity);
-    //         target.masks.push(Mask {
-    //             mode,
-    //             geometry,
-    //             opacity,
-    //         })
-    //     }
-    // }
 
-    // todo: matte mode
-    // let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
-    //     MatteMode::Normal => Mix::Normal.into(),
-    //     MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
-    //     MatteMode::InvertAlpha | MatteMode::InvertLuma => {
-    //         Compose::SrcOut.into()
-    //     }
-    // });
+    for mask_source in source
+        .properties
+        .masks_properties
+        .as_ref()
+        .unwrap_or(&Vec::default())
+    {
+        if let Some(shape) = &mask_source.shape {
+            if let Some(geometry) = conv_shape_geometry(&shape) {
+                let mode = peniko::BlendMode::default();
+                let opacity = conv_scalar(
+                    &mask_source
+                        .opacity
+                        .as_ref()
+                        .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
+                );
+                target.masks.push(runtime::model::Mask {
+                    mode,
+                    geometry,
+                    opacity,
+                })
+            }
+        }
+    }
 
     (
         source
@@ -364,27 +367,30 @@ fn setup_shape_layer(
         .time_stretch
         .as_ref()
         .map_or(0.0, |sr| sr.unwrap_f32());
-    // todo: masks
-    // for mask_source in &source.masks {
-    //     if let Some(geometry) = conv_shape_geometry(&mask_source.points) {
-    //         let mode = peniko::BlendMode::default();
-    //         let opacity = conv_scalar(&mask_source.opacity);
-    //         target.masks.push(Mask {
-    //             mode,
-    //             geometry,
-    //             opacity,
-    //         })
-    //     }
-    // }
 
-    // todo: matte mode
-    // let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
-    //     MatteMode::Normal => Mix::Normal.into(),
-    //     MatteMode::Alpha | MatteMode::Luma => Compose::SrcIn.into(),
-    //     MatteMode::InvertAlpha | MatteMode::InvertLuma => {
-    //         Compose::SrcOut.into()
-    //     }
-    // });
+    for mask_source in source
+        .properties
+        .masks_properties
+        .as_ref()
+        .unwrap_or(&Vec::default())
+    {
+        if let Some(shape) = &mask_source.shape {
+            if let Some(geometry) = conv_shape_geometry(&shape) {
+                let mode = peniko::BlendMode::default();
+                let opacity = conv_scalar(
+                    &mask_source
+                        .opacity
+                        .as_ref()
+                        .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
+                );
+                target.masks.push(runtime::model::Mask {
+                    mode,
+                    geometry,
+                    opacity,
+                })
+            }
+        }
+    }
 
     (
         source
@@ -392,6 +398,79 @@ fn setup_shape_layer(
             .index
             .as_ref()
             .map_or(0, |ind| ind.unwrap_u32()) as usize,
+        matte_mode,
+    )
+}
+
+fn setup_layer_base(
+    source: &parser::schema::layers::common::LayerProperties,
+    target: &mut Layer,
+) -> (usize, Option<BlendMode>) {
+    target.name = source.name.clone().unwrap_or_default();
+    target.parent = source
+        .parent_index
+        .as_ref()
+        .map(|i| i.unwrap_u32() as usize);
+    let (transform, opacity) = conv_transform(&source.transform);
+    target.transform = transform;
+    target.opacity = opacity;
+    target.is_mask = source
+        .matte_target
+        .as_ref()
+        .map_or(false, |td| *td == BoolInt::True);
+
+    let matte_mode = source.matte_mode.as_ref().map(|mode| match mode {
+        schema::constants::matte_mode::MatteMode::Normal => Mix::Normal.into(),
+        schema::constants::matte_mode::MatteMode::Alpha
+        | schema::constants::matte_mode::MatteMode::Luma => {
+            Compose::SrcIn.into()
+        }
+        schema::constants::matte_mode::MatteMode::InvertedAlpha
+        | schema::constants::matte_mode::MatteMode::InvertedLuma => {
+            Compose::SrcOut.into()
+        }
+    });
+
+    target.blend_mode = conv_blend_mode(source.blend_mode.as_ref().unwrap_or(
+        &crate::parser::schema::constants::blend_mode::BlendMode::Normal,
+    ));
+    if target.blend_mode == Some(peniko::Mix::Normal.into()) {
+        target.blend_mode = None;
+    }
+    target.frames = source.in_point.unwrap_f32()..source.out_point.unwrap_f32();
+    target.stretch = source
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+    target.start_frame = source.start_time.unwrap_f32();
+    target.stretch = source
+        .time_stretch
+        .as_ref()
+        .map_or(0.0, |sr| sr.unwrap_f32());
+
+    for mask_source in
+        source.masks_properties.as_ref().unwrap_or(&Vec::default())
+    {
+        if let Some(shape) = &mask_source.shape {
+            if let Some(geometry) = conv_shape_geometry(&shape) {
+                let mode = peniko::BlendMode::default();
+                let opacity = conv_scalar(
+                    &mask_source
+                        .opacity
+                        .as_ref()
+                        .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
+                );
+                target.masks.push(runtime::model::Mask {
+                    mode,
+                    geometry,
+                    opacity,
+                })
+            }
+        }
+    }
+
+    (
+        source.index.as_ref().map_or(0, |ind| ind.unwrap_u32()) as usize,
         matte_mode,
     )
 }
