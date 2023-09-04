@@ -48,23 +48,26 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
         }
     };
 
-    let interval = Interval::new(2, move || {
-        if let Some(composition) = (*COMPOSITION).lock().unwrap().as_ref() {
-            let time = (*ANIM_START).elapsed().as_secs_f32();
-            render(composition, time);
-        }
-    });
-    interval.forget();
-
     use_effect({
         let path = props.file.to_string();
         move || {
-            // Init GPU canvas
-            wasm_bindgen_futures::spawn_local(async move {
-                init_state().await;
+            // Initialize render loop
+            let interval = Interval::new(200, move || {
+                if let Some(composition) =
+                    (*COMPOSITION).lock().unwrap().as_ref()
+                {
+                    let time = (*ANIM_START).elapsed().as_secs_f32();
+                    info!("go");
+                    render(composition, time);
+                }
             });
-            info!("loading {path}...");
+
             wasm_bindgen_futures::spawn_local(async move {
+                // Init GPU Canvas, if not initialized.
+                init_state().await;
+
+                // Load file
+                info!("loading {path}...");
                 let body = reqwest::get(format!("http://127.0.0.1:8080{path}"))
                     .await
                     .unwrap()
@@ -85,6 +88,10 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                     Err(e) => error!("Bad lottie: {e}"),
                 }
             });
+
+            || {
+                interval.cancel(); // cleanup
+            }
         }
     });
     html! {
