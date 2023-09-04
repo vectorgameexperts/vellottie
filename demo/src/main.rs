@@ -36,7 +36,7 @@ async fn run(
         .create_surface(&window, size.width, size.height)
         .await;
     let device_handle = &render_cx.devices[surface.dev_id];
-    let mut velato_renderer = vellottie::runtime::Renderer::new();
+    let mut vellottie_renderer = vellottie::runtime::Renderer::new();
     let mut renderer = Renderer::new(
         &device_handle.device,
         &RendererOptions {
@@ -119,7 +119,7 @@ async fn run(
             let time = start.elapsed().as_secs_f32();
 
             let mut builder = SceneBuilder::for_scene(&mut scene);
-            velato_renderer.render(&composition, time, transform, 1.0, &mut builder);
+            vellottie_renderer.render(&composition, time, transform, 1.0, &mut builder);
 
             let surface_texture = surface
                 .surface

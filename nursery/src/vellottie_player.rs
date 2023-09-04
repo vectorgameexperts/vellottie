@@ -39,6 +39,8 @@ pub struct PlayerProps {
 
 #[styled_component]
 pub fn VellottiePlayer(props: &PlayerProps) -> Html {
+    let baseurl = web_sys::window().unwrap().origin();
+
     let ctr_css = css! {
         display: inline-grid;
         margin: 10px;
@@ -64,10 +66,9 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
             wasm_bindgen_futures::spawn_local(async move {
                 // Init GPU Canvas, if not initialized.
                 init_state().await;
-
                 // Load file
                 info!("loading {path}...");
-                let body = reqwest::get(format!("http://127.0.0.1:8080{path}"))
+                let body = reqwest::get(format!("{baseurl}{path}"))
                     .await
                     .unwrap()
                     .text()
@@ -78,7 +79,7 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                     vellottie::import::import_composition(body.as_bytes());
                 match lottie {
                     Ok(ref composition) => {
-                        info!("Successful read");
+                        info!("read file successfully");
                         (*COMPOSITION)
                             .lock()
                             .unwrap()
