@@ -39,6 +39,8 @@ pub struct PlayerProps {
 
 #[styled_component]
 pub fn VellottiePlayer(props: &PlayerProps) -> Html {
+    let baseurl = web_sys::window().unwrap().origin();
+
     let ctr_css = css! {
         display: inline-grid;
         margin: 10px;
@@ -48,24 +50,25 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
         }
     };
 
-    let interval = Interval::new(2, move || {
-        if let Some(composition) = (*COMPOSITION).lock().unwrap().as_ref() {
-            let time = (*ANIM_START).elapsed().as_secs_f32();
-            render(composition, time);
-        }
-    });
-    interval.forget();
-
     use_effect({
         let path = props.file.to_string();
         move || {
-            // Init GPU canvas
-            wasm_bindgen_futures::spawn_local(async move {
-                init_state().await;
+            // Initialize render loop
+            let interval = Interval::new(2, move || {
+                if let Some(composition) =
+                    (*COMPOSITION).lock().unwrap().as_ref()
+                {
+                    let time = (*ANIM_START).elapsed().as_secs_f32();
+                    render(composition, time);
+                }
             });
-            info!("loading {path}...");
+
             wasm_bindgen_futures::spawn_local(async move {
-                let body = reqwest::get(format!("http://127.0.0.1:8080{path}"))
+                // Init GPU Canvas, if not initialized.
+                init_state().await;
+                // Load file
+                info!("loading {path}...");
+                let body = reqwest::get(format!("{baseurl}{path}"))
                     .await
                     .unwrap()
                     .text()
@@ -76,7 +79,7 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                     vellottie::import::import_composition(body.as_bytes());
                 match lottie {
                     Ok(ref composition) => {
-                        info!("Successful read");
+                        info!("read file successfully");
                         (*COMPOSITION)
                             .lock()
                             .unwrap()
@@ -85,6 +88,10 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                     Err(e) => error!("Bad lottie: {e}"),
                 }
             });
+
+            || {
+                interval.cancel(); // cleanup
+            }
         }
     });
     html! {
@@ -148,7 +155,9 @@ fn render(composition: &Composition, time: f32) {
 
     let width = state.surface.config.width;
     let height = state.surface.config.height;
-    let transform = Affine::scale(1.0);
+    let scale = (state.surface.config.width as f64 / composition.width as f64)
+        .min(state.surface.config.height as f64 / composition.height as f64);
+    let transform = Affine::scale(scale);
 
     let mut builder = SceneBuilder::for_scene(&mut scene);
     state.vellottie_renderer.render(
@@ -172,7 +181,7 @@ fn render(composition: &Composition, time: f32) {
             &scene,
             &surface_texture,
             &RenderParams {
-                base_color: Color::BLACK,
+                base_color: Color::WHITE,
                 width,
                 height,
             },

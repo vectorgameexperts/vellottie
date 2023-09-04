@@ -35,7 +35,7 @@ pub fn LottiefilesPlayer(props: &PlayerProps) -> Html {
             <lottie-player
                 src={&props.file}
                 autoplay=true
-                controls=true
+                controls=false
                 loop=true
                 mode="normal"
                 style="width: 400px;height: 400px;"
