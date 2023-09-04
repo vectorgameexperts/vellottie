@@ -155,7 +155,9 @@ fn render(composition: &Composition, time: f32) {
 
     let width = state.surface.config.width;
     let height = state.surface.config.height;
-    let transform = Affine::scale(1.0);
+    let scale = (state.surface.config.width as f64 / composition.width as f64)
+        .min(state.surface.config.height as f64 / composition.height as f64);
+    let transform = Affine::scale(scale);
 
     let mut builder = SceneBuilder::for_scene(&mut scene);
     state.vellottie_renderer.render(
@@ -179,7 +181,7 @@ fn render(composition: &Composition, time: f32) {
             &scene,
             &surface_texture,
             &RenderParams {
-                base_color: Color::BLACK,
+                base_color: Color::WHITE,
                 width,
                 height,
             },
