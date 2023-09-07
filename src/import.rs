@@ -1,12 +1,14 @@
+use crate::parser::schema::animated_properties::gradient_colors::GradientColors;
 use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
 use crate::parser::schema::animated_properties::split_vector::SplitVector;
 use crate::parser::schema::animated_properties::value::FloatValue;
+use crate::parser::schema::constants::gradient_type::GradientType;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    self, animated, Content, GroupTransform, Layer, Lerp, SplineToPath, Time,
-    Value,
+    self, animated, Content, Draw, GroupTransform, Layer, Lerp, SplineToPath,
+    Time, Value,
 };
 use crate::runtime::{self, Composition};
 use lazy_static::lazy_static;
@@ -506,7 +508,7 @@ fn conv_transform(
 
     let position = match &value.position {
         schema::helpers::transform::AnyTransformP::Position(position) => {
-            Position::Value(conv_point(position))
+            Position::Value(conv_pos_point(position))
         }
         schema::helpers::transform::AnyTransformP::SplitPosition(
             SplitVector { x, y, .. },
@@ -514,7 +516,7 @@ fn conv_transform(
     };
 
     let transform = animated::Transform {
-        anchor: conv_point(
+        anchor: conv_pos_point(
             value.anchor_point.as_ref().unwrap_or(&POSITION_ZERO),
         ),
         position,
@@ -552,14 +554,14 @@ fn conv_shape_transform(
     };
 
     let transform = animated::Transform {
-        anchor: conv_point(
+        anchor: conv_pos_point(
             value
                 .transform
                 .anchor_point
                 .as_ref()
                 .unwrap_or(&POSITION_ZERO),
         ),
-        position: Position::Value(conv_point(position_in)),
+        position: Position::Value(conv_pos_point(position_in)),
         scale: conv_vec2(
             value.transform.scale.as_ref().unwrap_or(&MULTIDIM_ONE),
         ),
@@ -726,10 +728,21 @@ fn conv_pos<T: Lerp>(
     }
 }
 
-fn conv_point(
+fn conv_pos_point(
     value: &schema::animated_properties::position::Position,
 ) -> Value<Point> {
     conv_pos(value, |x| {
+        Point::new(
+            x.get(0).copied().unwrap_or(0.0),
+            x.get(1).copied().unwrap_or(0.0),
+        )
+    })
+}
+
+fn conv_multi_point(
+    value: &schema::animated_properties::multi_dimensional::MultiDimensional,
+) -> Value<Point> {
+    conv_multi(value, |x| {
         Point::new(
             x.get(0).copied().unwrap_or(0.0),
             x.get(1).copied().unwrap_or(0.0),
@@ -767,51 +780,52 @@ fn conv_size(value: &MultiDimensional) -> Value<Size> {
     })
 }
 
-// todo
-// fn conv_gradient_colors(
-//     value: &bodymovin::helpers::GradientColors,
-// ) -> ColorStops {
-//     use bodymovin::properties::Value::*;
-//     let count = value.count as usize;
-//     match &value.colors.value {
-//         Fixed(value) => {
-//             let mut stops = fixed::ColorStops::new();
-//             for chunk in value.chunks_exact(4) {
-//                 stops.push(
-//                     (
-//                         chunk[0] as f32,
-//                         fixed::Color::rgba(chunk[1], chunk[2], chunk[3], 1.0),
-//                     )
-//                         .into(),
-//                 )
-//             }
-//             ColorStops::Fixed(stops)
-//         }
-//         Animated(animated) => {
-//             let mut frames = vec![];
-//             let mut values = vec![];
-//             let mut last_value = None;
-//             for value in animated {
-//                 if let Some(data) =
-//                     value.start_value.as_ref().or(last_value.flatten())
-//                 {
-//                     frames.push(Time {
-//                         frame: value.start_time as f32,
-//                     });
-//                     values.push(
-//                         data.iter().map(|x| *x as f32).collect::<Vec<_>>(),
-//                     );
-//                 }
-//                 last_value = Some(value.end_value.as_ref());
-//             }
-//             ColorStops::Animated(animated::ColorStops {
-//                 frames,
-//                 values,
-//                 count,
-//             })
-//         }
-//     }
-// }
+fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
+    use schema::animated_properties::animated_property::AnimatedPropertyK::*;
+
+    let count = value.count.unwrap_u32() as usize;
+    match &value.colors.animated_property.value {
+        Static(value) => {
+            let mut stops = runtime::model::fixed::ColorStops::new();
+            for chunk in value.chunks_exact(4) {
+                stops.push(
+                    (
+                        chunk[0].unwrap_f32(),
+                        runtime::model::fixed::Color::rgba(
+                            chunk[1].unwrap_f64(),
+                            chunk[2].unwrap_f64(),
+                            chunk[3].unwrap_f64(),
+                            1.0,
+                        ),
+                    )
+                        .into(),
+                )
+            }
+            runtime::model::ColorStops::Fixed(stops)
+        }
+        AnimatedValue(animated) => {
+            let mut frames = vec![];
+            let mut values = vec![];
+            for value in animated {
+                frames.push(Time {
+                    frame: value.base.time.unwrap_f32(),
+                });
+                values.push(
+                    value
+                        .value
+                        .iter()
+                        .map(|x| x.unwrap_f32())
+                        .collect::<Vec<_>>(),
+                );
+            }
+            runtime::model::ColorStops::Animated(animated::ColorStops {
+                frames,
+                values,
+                count,
+            })
+        }
+    }
+}
 
 fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
     use peniko::{Cap, Join};
@@ -860,24 +874,27 @@ fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
                 opacity,
             })
         }
-        // todo: gradients
-        // Shape::GradientFill(value) => {
-        //     let is_radial = matches!(value.ty, GradientType::Radial);
-        //     let start_point = conv_point(&value.start_point);
-        //     let end_point = conv_point(&value.end_point);
-        //     let gradient = animated::Gradient {
-        //         is_radial,
-        //         start_point,
-        //         end_point,
-        //         stops: conv_gradient_colors(&value.gradient_colors),
-        //     };
-        //     let brush = animated::Brush::Gradient(gradient).to_model();
-        //     Some(Draw {
-        //         stroke: None,
-        //         brush,
-        //         opacity: Value::Fixed(100.0),
-        //     })
-        // }
+        AnyShape::GradientFill(value) => {
+            let is_radial = matches!(
+                value.gradient.gradient_type,
+                Some(GradientType::Radial)
+            );
+            let start_point = conv_multi_point(&value.gradient.start_point);
+            let end_point = conv_multi_point(&value.gradient.end_point);
+            let gradient = animated::Gradient {
+                is_radial,
+                start_point,
+                end_point,
+                stops: conv_gradient_colors(&value.gradient.colors),
+            };
+            let brush = animated::Brush::Gradient(gradient).to_model();
+            Some(Draw {
+                stroke: None,
+                brush,
+                opacity: Value::Fixed(100.0),
+            })
+        }
+        // todo:
         // Shape::GradientStroke(value) => {
         //     let stroke = animated::Stroke {
         //         width: conv_scalar(&value.stroke_width),
@@ -973,7 +990,7 @@ fn conv_geometry(
         AnyShape::Ellipse(value) => {
             let ellipse = animated::Ellipse {
                 is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
-                position: conv_point(&value.position),
+                position: conv_pos_point(&value.position),
                 size: conv_size(&value.size),
             };
             Some(crate::runtime::model::Geometry::Ellipse(ellipse))
@@ -981,7 +998,7 @@ fn conv_geometry(
         AnyShape::Rectangle(value) => {
             let rect = animated::Rect {
                 is_ccw: false, // todo: lottie schema does not have a field for this (anymore?)
-                position: conv_point(&value.position),
+                position: conv_pos_point(&value.position),
                 size: conv_size(&value.size),
                 corner_radius: conv_scalar(&value.rounded_corner_radius),
             };

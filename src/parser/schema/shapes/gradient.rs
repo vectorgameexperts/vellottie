@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 /// Represents a gradient.
-pub struct GradientShape {
+pub struct Gradient {
     /// Describes the starting point for the gradient.
     #[serde(rename = "s")]
     pub start_point: MultiDimensional,

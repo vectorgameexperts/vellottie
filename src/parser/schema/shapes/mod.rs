@@ -28,7 +28,7 @@ pub mod gradient;
 pub mod gradient_fill;
 // todo pub mod modifier;
 
-use self::gradient::GradientShape;
+use self::gradient::Gradient;
 use self::gradient_fill::GradientFillShape;
 use self::path::PathShape;
 use self::{
@@ -88,7 +88,7 @@ pub enum AnyShape {
     // todo Twist(twist),
     // todo RoundedCorners(rounded_corners),
     GradientFill(GradientFillShape),
-    Gradient(GradientShape),
+    Gradient(Gradient),
     // todo modifier(modifier),
 }
 
@@ -256,7 +256,7 @@ impl AnyShape {
             ShapeType::GradientFill => {
                 AnyShape::GradientFill(GradientFillShape {
                     properties,
-                    shape: GradientShape {
+                    gradient: Gradient {
                         start_point: root
                             .extract_obj(breadcrumb, "s")
                             .and_then(|obj| {

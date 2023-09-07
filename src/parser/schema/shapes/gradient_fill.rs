@@ -2,7 +2,7 @@ use crate::parser::schema::{
     animated_properties::value::FloatValue, constants::fill_rule::FillRule,
 };
 
-use super::{gradient::GradientShape, ShapeProperties};
+use super::{gradient::Gradient, ShapeProperties};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -13,7 +13,7 @@ pub struct GradientFillShape {
 
     /// Gradient data
     #[serde(flatten)]
-    pub shape: GradientShape,
+    pub gradient: Gradient,
 
     /// Opacity
     #[serde(rename = "o")]

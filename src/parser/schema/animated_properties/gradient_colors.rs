@@ -17,10 +17,10 @@ use serde_json::{Number, Value};
 pub struct GradientColors {
     /// Colors in the gradient.
     #[serde(rename = "k")]
-    colors: MultiDimensional,
+    pub colors: MultiDimensional,
     /// Number of colors in k.
     #[serde(rename = "p")]
-    count: Number,
+    pub count: Number,
 }
 
 impl GradientColors {
