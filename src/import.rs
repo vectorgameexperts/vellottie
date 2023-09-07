@@ -301,10 +301,10 @@ fn setup_precomp_layer(
         .unwrap_or(&Vec::default())
     {
         if let Some(shape) = &mask_source.shape {
-            if let Some(geometry) = conv_shape_geometry(&shape) {
+            if let Some(geometry) = conv_shape_geometry(shape) {
                 let mode = peniko::BlendMode::default();
                 let opacity = conv_scalar(
-                    &mask_source
+                    mask_source
                         .opacity
                         .as_ref()
                         .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
@@ -394,10 +394,10 @@ fn setup_shape_layer(
         .unwrap_or(&Vec::default())
     {
         if let Some(shape) = &mask_source.shape {
-            if let Some(geometry) = conv_shape_geometry(&shape) {
+            if let Some(geometry) = conv_shape_geometry(shape) {
                 let mode = peniko::BlendMode::default();
                 let opacity = conv_scalar(
-                    &mask_source
+                    mask_source
                         .opacity
                         .as_ref()
                         .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
@@ -471,10 +471,10 @@ fn setup_layer_base(
         source.masks_properties.as_ref().unwrap_or(&Vec::default())
     {
         if let Some(shape) = &mask_source.shape {
-            if let Some(geometry) = conv_shape_geometry(&shape) {
+            if let Some(geometry) = conv_shape_geometry(shape) {
                 let mode = peniko::BlendMode::default();
                 let opacity = conv_scalar(
-                    &mask_source
+                    mask_source
                         .opacity
                         .as_ref()
                         .unwrap_or(&FLOAT_VALUE_ONE_HUNDRED),
@@ -728,6 +728,7 @@ fn conv_pos<T: Lerp>(
     }
 }
 
+#[allow(clippy::get_first)]
 fn conv_pos_point(
     value: &schema::animated_properties::position::Position,
 ) -> Value<Point> {
@@ -739,6 +740,7 @@ fn conv_pos_point(
     })
 }
 
+#[allow(clippy::get_first)]
 fn conv_multi_point(
     value: &schema::animated_properties::multi_dimensional::MultiDimensional,
 ) -> Value<Point> {
@@ -750,6 +752,7 @@ fn conv_multi_point(
     })
 }
 
+#[allow(clippy::get_first)]
 fn conv_color(
     value: &schema::animated_properties::color_value::ColorValue,
 ) -> Value<Color> {
@@ -762,6 +765,7 @@ fn conv_color(
     })
 }
 
+#[allow(clippy::get_first)]
 fn conv_vec2(value: &MultiDimensional) -> Value<Vec2> {
     conv_multi(value, |x| {
         Vec2::new(
@@ -771,6 +775,7 @@ fn conv_vec2(value: &MultiDimensional) -> Value<Vec2> {
     })
 }
 
+#[allow(clippy::get_first)]
 fn conv_size(value: &MultiDimensional) -> Value<Size> {
     conv_multi(value, |x| {
         Size::new(
