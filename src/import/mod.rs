@@ -1,17 +1,16 @@
 use crate::import::properties::{conv_color, conv_multi_point, conv_size};
 use crate::parser::schema::animated_properties::gradient_colors::GradientColors;
-use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
 use crate::parser::schema::constants::gradient_type::GradientType;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    self, animated, Draw, GroupTransform, Lerp, SplineToPath, Time, Value,
+    animated, Draw, GroupTransform, SplineToPath, Time, Value,
 };
 use crate::runtime::{self, Composition};
 use parser::schema;
 use std::collections::HashMap;
-use vello::kurbo::{Point, Size, Vec2};
-use vello::peniko::{self, BlendMode, Color, Mix};
+use vello::kurbo::Point;
+use vello::peniko::{self, BlendMode, Mix};
 
 use self::defaults::{
     FLOAT_VALUE_ONE_HUNDRED, FLOAT_VALUE_ZERO, MULTIDIM_ONE, POSITION_ZERO,
