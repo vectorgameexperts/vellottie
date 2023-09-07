@@ -158,7 +158,6 @@ fn main() -> Result<()> {
     // TODO: Implement proper error handling in velato so that anyhow can be properly used here
     let composition = vellottie::runtime::Composition::from_bytes(&contents)
         .unwrap_or_else(|e| panic!("{e}"));
-    println!("{:?}", composition);
     let window = WindowBuilder::new()
         .with_inner_size(LogicalSize::new(1044, 800))
         .with_resizable(true)
