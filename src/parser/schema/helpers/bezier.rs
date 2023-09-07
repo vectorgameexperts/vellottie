@@ -1,4 +1,3 @@
-use super::int_boolean::BoolInt;
 use crate::parser::{
     breadcrumb::{Breadcrumb, ValueType},
     util::{MapExt, ValueExt},

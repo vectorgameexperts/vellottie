@@ -45,24 +45,6 @@ impl Transform {
             && self.skew_angle.is_fixed()
     }
 
-    fn skew_amount_direction(skew_amount: f64, skew_angle: f64) -> Affine {
-        // Convert skew angle from degrees to radians
-        let skew_angle_rad = skew_angle.to_radians();
-
-        // Calculate skew factors for horizontal and vertical directions
-        let abs_skew_angle = skew_angle_rad.abs();
-
-        // Ensure that the skew angle is in the range [0, 180] degrees
-        let normalized_angle = abs_skew_angle % 180.0;
-
-        // Calculate skew factors based on the normalized angle
-        let skew_x = normalized_angle.cos() * skew_amount.to_radians().tan();
-        let skew_y = -normalized_angle.sin() * skew_amount.to_radians().tan();
-
-        // Create and return the Affine transformation
-        Affine::skew(skew_x, skew_y)
-    }
-
     /// Evaluates the transform at the specified frame.
     pub fn evaluate(&self, frame: f32) -> Affine {
         let anchor = self.anchor.evaluate(frame);
