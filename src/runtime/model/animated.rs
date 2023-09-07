@@ -65,7 +65,6 @@ impl Transform {
 
     /// Evaluates the transform at the specified frame.
     pub fn evaluate(&self, frame: f32) -> Affine {
-        println!("here");
         let anchor = self.anchor.evaluate(frame);
         let position = match &self.position {
             Position::Value(value) => value.evaluate(frame),

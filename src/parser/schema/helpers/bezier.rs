@@ -14,7 +14,7 @@ pub struct Bezier {
     /// Whether the bezier forms a closed loop
     #[serde(rename = "c")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub closed: Option<BoolInt>,
+    pub closed: Option<bool>,
 
     /// Points along the curve
     #[serde(rename = "v")]
@@ -35,7 +35,7 @@ impl Bezier {
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         breadcrumb.enter_unnamed(ValueType::Bezier);
-        let closed = obj.extract_bool_int(breadcrumb, "c").ok();
+        let closed = obj.extract_bool(breadcrumb, "c").ok();
 
         let vertices = obj.extract_arr(breadcrumb, "v")?;
         breadcrumb.enter(ValueType::Array, Some("v"));

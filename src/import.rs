@@ -184,14 +184,21 @@ fn conv_layer(
     source: &parser::schema::layers::AnyLayer,
 ) -> Option<(Layer, usize, Option<BlendMode>)> {
     let mut layer = Layer::default();
-    let params;
-    match source {
-        // TODO
+
+    let params = match source {
         parser::schema::layers::AnyLayer::Null(properties) => {
-            params = setup_layer_base(properties, &mut layer);
+            if let Some(true) = properties.hidden {
+                return None;
+            }
+
+            setup_layer_base(properties, &mut layer)
         }
         parser::schema::layers::AnyLayer::Precomposition(precomp_layer) => {
-            params = setup_precomp_layer(precomp_layer, &mut layer);
+            if let Some(true) = precomp_layer.properties.hidden {
+                return None;
+            }
+
+            let params = setup_precomp_layer(precomp_layer, &mut layer);
             let name = precomp_layer.precomp_id.clone();
             let time_remap_in = precomp_layer
                 .time_remap
@@ -199,9 +206,15 @@ fn conv_layer(
                 .unwrap_or(&FLOAT_VALUE_ZERO); // todo: verify that time remap should be 0 when none was parsed
             let time_remap = conv_scalar(time_remap_in);
             layer.content = Content::Instance { name, time_remap };
+
+            params
         }
         parser::schema::layers::AnyLayer::Shape(shape_layer) => {
-            params = setup_shape_layer(shape_layer, &mut layer);
+            if let Some(true) = shape_layer.properties.hidden {
+                return None;
+            }
+
+            let params = setup_shape_layer(shape_layer, &mut layer);
             let mut shapes = vec![];
             for shape in &shape_layer.shapes {
                 if let Some(shape) = conv_shape(shape) {
@@ -209,8 +222,11 @@ fn conv_layer(
                 }
             }
             layer.content = Content::Shape(shapes);
+
+            params
         } //_ => {}, // todo: handle other todo shapes here
-    }
+    };
+
     let (id, matte_mode) = params;
     Some((layer, id, matte_mode))
 }
@@ -1013,11 +1029,8 @@ fn conv_shape_geometry(
 fn conv_spline(value: &schema::helpers::bezier::Bezier) -> (Vec<Point>, bool) {
     use core::iter::repeat;
     let mut points = Vec::with_capacity(value.vertices.len() * 3);
-    let is_closed = value
-        .closed
-        .as_ref()
-        .unwrap_or(&BoolInt::True)
-        .eq(&BoolInt::True);
+    let is_closed = value.closed.unwrap_or(false);
+
     for ((v, i), o) in value
         .vertices
         .iter()
