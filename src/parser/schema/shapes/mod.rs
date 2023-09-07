@@ -24,10 +24,12 @@ pub mod trim;
 // todo pub mod base_stroke;
 // todo pub mod twist;
 // todo pub mod rounded_corners;
-// todo pub mod gradient_fill;
-// todo pub mod gradient;
+pub mod gradient;
+pub mod gradient_fill;
 // todo pub mod modifier;
 
+use self::gradient::GradientShape;
+use self::gradient_fill::GradientFillShape;
 use self::path::PathShape;
 use self::{
     fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
@@ -45,6 +47,7 @@ use serde::{Deserialize, Serialize};
 pub use self::common::ShapeProperties;
 
 use super::animated_properties::color_value::ColorValue;
+use super::animated_properties::gradient_colors::GradientColors;
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
 use super::animated_properties::shape_property::ShapeProperty;
@@ -84,8 +87,8 @@ pub enum AnyShape {
     // todo BaseStroke(base_stroke),
     // todo Twist(twist),
     // todo RoundedCorners(rounded_corners),
-    // todo GradientFill(gradient_fill),
-    // todo gradient(gradient),
+    GradientFill(GradientFillShape),
+    Gradient(GradientShape),
     // todo modifier(modifier),
 }
 
@@ -250,6 +253,45 @@ impl AnyShape {
                     ShapeProperty::from_obj(breadcrumb, &obj)
                 })?,
             }),
+            ShapeType::GradientFill => {
+                AnyShape::GradientFill(GradientFillShape {
+                    properties,
+                    shape: GradientShape {
+                        start_point: root
+                            .extract_obj(breadcrumb, "s")
+                            .and_then(|obj| {
+                                MultiDimensional::from_obj(breadcrumb, &obj)
+                            })?,
+                        end_point: root.extract_obj(breadcrumb, "e").and_then(
+                            |obj| MultiDimensional::from_obj(breadcrumb, &obj),
+                        )?,
+                        gradient_type: root
+                            .extract_type(breadcrumb, "t", ValueType::EnumInt)
+                            .ok(),
+                        highlight_length: root
+                            .extract_obj(breadcrumb, "h")
+                            .and_then(|obj| {
+                                FloatValue::from_obj(breadcrumb, &obj)
+                            })
+                            .ok(),
+                        highlight_angle: root
+                            .extract_obj(breadcrumb, "a")
+                            .and_then(|obj| {
+                                FloatValue::from_obj(breadcrumb, &obj)
+                            })
+                            .ok(),
+                        colors: root.extract_obj(breadcrumb, "g").and_then(
+                            |obj| GradientColors::from_obj(breadcrumb, &obj),
+                        )?,
+                    },
+                    opacity: root.extract_obj(breadcrumb, "o").and_then(
+                        |obj| FloatValue::from_obj(breadcrumb, &obj),
+                    )?,
+                    fill_rule: root
+                        .extract_type(breadcrumb, "r", ValueType::EnumInt)
+                        .ok(),
+                })
+            }
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)
             }
