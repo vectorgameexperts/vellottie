@@ -1,15 +1,13 @@
-use crate::parser::schema::{
-    animated_properties::{
-        multi_dimensional::MultiDimensional, position::Position,
-    },
-    shapes::ShapeProperties,
+use super::shape_element::ShapeElement;
+use crate::parser::schema::animated_properties::{
+    multi_dimensional::MultiDimensional, position::Position,
 };
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct EllipseShape {
     #[serde(flatten)]
-    pub properties: ShapeProperties,
+    pub shape_element: ShapeElement,
     /// Position
     #[serde(rename = "p")]
     pub position: Position,

@@ -1,6 +1,4 @@
-pub(crate) mod common;
 pub mod ellipse;
-pub mod enumerations;
 pub mod fill;
 pub mod group;
 pub mod merge;
@@ -14,6 +12,7 @@ pub mod repeater_transform;
 pub mod shape;
 pub mod shape_element;
 pub mod stroke;
+pub mod stroke_dash;
 pub mod transform;
 pub mod trim;
 // todo pub mod gradient_stroke;
@@ -31,20 +30,18 @@ pub mod gradient_fill;
 use self::gradient::Gradient;
 use self::gradient_fill::GradientFillShape;
 use self::path::PathShape;
+use self::shape_element::ShapeElement;
 use self::{
     fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
     pucker_bloat::PuckerBloatShape, rectangle::RectangleShape,
-    repeater::RepeaterShape, repeater_transform::RepeaterTransformShape,
-    shape::GenericShape, shape_element::ShapeElementShape, stroke::StrokeShape,
-    transform::TransformShape, trim::TrimShape,
+    repeater::RepeaterShape, stroke::StrokeShape, transform::TransformShape,
+    trim::TrimShape,
 };
 use crate::parser::breadcrumb::Breadcrumb;
 use crate::parser::{breadcrumb::ValueType, util::MapExt, Error};
 use ellipse::EllipseShape;
 use group::GroupShape;
 use serde::{Deserialize, Serialize};
-
-pub use self::common::ShapeProperties;
 
 use super::animated_properties::color_value::ColorValue;
 use super::animated_properties::gradient_colors::GradientColors;
@@ -152,12 +149,12 @@ impl AnyShape {
         breadcrumb.enter(ValueType::Shape, name);
 
         // Extract
-        let properties = ShapeProperties::from_obj(breadcrumb, root)?;
+        let shape_element = ShapeElement::from_obj(breadcrumb, root)?;
         let shape_type =
             root.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let shape = match shape_type {
             ShapeType::Ellipse => AnyShape::Ellipse(EllipseShape {
-                properties,
+                shape_element,
                 position: Position::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
@@ -168,7 +165,7 @@ impl AnyShape {
                 )?,
             }),
             ShapeType::Rectangle => AnyShape::Rectangle(RectangleShape {
-                properties,
+                shape_element,
                 position: Position::from_obj(
                     breadcrumb,
                     &root.extract_obj(breadcrumb, "p")?,
@@ -183,7 +180,7 @@ impl AnyShape {
                 )?,
             }),
             ShapeType::Group => AnyShape::Group(GroupShape {
-                properties,
+                shape_element,
                 num_properties: root.extract_number(breadcrumb, "np").ok(),
                 shapes: {
                     let mut shapes = vec![];
@@ -198,11 +195,11 @@ impl AnyShape {
                 },
             }),
             ShapeType::Transform => AnyShape::Transform(TransformShape {
-                properties,
+                shape_element,
                 transform: Transform::from_obj(breadcrumb, root)?,
             }),
             ShapeType::Stroke => AnyShape::Stroke(StrokeShape {
-                properties,
+                shape_element,
                 line_cap: root
                     .extract_type(breadcrumb, "lc", ValueType::EnumInt)
                     .ok(),
@@ -227,7 +224,7 @@ impl AnyShape {
                     .ok(),
             }),
             ShapeType::Fill => AnyShape::Fill(FillShape {
-                properties,
+                shape_element,
                 opacity: root
                     .extract_obj(breadcrumb, "o")
                     .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))
@@ -240,7 +237,7 @@ impl AnyShape {
                     .ok(),
             }),
             ShapeType::Trim => AnyShape::Trim(TrimShape {
-                properties,
+                shape_element,
                 start: root
                     .extract_obj(breadcrumb, "s")
                     .and_then(|obj| FloatValue::from_obj(breadcrumb, &obj))?,
@@ -255,14 +252,14 @@ impl AnyShape {
                     .ok(),
             }),
             ShapeType::Path => AnyShape::Path(PathShape {
-                properties,
+                shape_element,
                 shape: root.extract_obj(breadcrumb, "ks").and_then(|obj| {
                     ShapeProperty::from_obj(breadcrumb, &obj)
                 })?,
             }),
             ShapeType::GradientFill => {
                 AnyShape::GradientFill(GradientFillShape {
-                    properties,
+                    shape_element,
                     gradient: Gradient {
                         start_point: root
                             .extract_obj(breadcrumb, "s")

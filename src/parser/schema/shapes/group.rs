@@ -1,11 +1,11 @@
-use super::{common, AnyShape};
+use super::{shape_element::ShapeElement, AnyShape};
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct GroupShape {
     #[serde(flatten)]
-    pub properties: common::ShapeProperties,
+    pub shape_element: ShapeElement,
     /// Number of properties
     #[serde(rename = "np")]
     #[serde(skip_serializing_if = "Option::is_none")]

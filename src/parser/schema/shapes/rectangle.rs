@@ -3,15 +3,17 @@ use crate::parser::schema::{
         multi_dimensional::MultiDimensional, position::Position,
         value::FloatValue,
     },
-    shapes::ShapeProperties,
+    helpers::visual_object::VisualObject,
 };
 use serde::{Deserialize, Serialize};
+
+use super::shape_element::ShapeElement;
 
 /// A rectangle, defined by its center point and size.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct RectangleShape {
     #[serde(flatten)]
-    pub properties: ShapeProperties,
+    pub shape_element: ShapeElement,
     /// Center of the rectangle
     #[serde(rename = "p")]
     pub position: Position,

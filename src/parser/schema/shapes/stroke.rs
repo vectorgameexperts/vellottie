@@ -1,20 +1,18 @@
+use super::shape_element::ShapeElement;
+use super::stroke_dash::StrokeDash;
 use crate::parser::schema::animated_properties::value::FloatValue;
 use crate::parser::schema::constants::line_join::LineJoin;
-use crate::parser::schema::shapes::ShapeProperties;
 use crate::parser::schema::{
     animated_properties::color_value::ColorValue, constants::line_cap::LineCap,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Number;
 
-use crate::parser::schema::shapes::enumerations::StrokeDash;
-
 /// Defines a stroke.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct StrokeShape {
-    /// Shape Type
     #[serde(flatten)]
-    pub properties: ShapeProperties,
+    pub shape_element: ShapeElement,
     /// Line Cap
     #[serde(rename = "lc")]
     #[serde(skip_serializing_if = "Option::is_none")]

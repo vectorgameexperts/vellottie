@@ -1,17 +1,15 @@
+use super::shape_element::ShapeElement;
 use crate::parser::schema::{
     animated_properties::color_value::ColorValue,
     constants::fill_rule::FillRule, shapes::FloatValue,
 };
 use serde::{Deserialize, Serialize};
 
-use super::ShapeProperties;
-
 /// Solid fill color
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct FillShape {
-    /// Shape Type
     #[serde(flatten)]
-    pub properties: ShapeProperties,
+    pub shape_element: ShapeElement,
 
     /// Opacity, 100 means fully opaque
     #[serde(rename = "o")]

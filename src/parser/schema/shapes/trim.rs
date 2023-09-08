@@ -2,16 +2,15 @@ use crate::parser::schema::{
     animated_properties::value::FloatValue,
     constants::trim_multiple_shapes::TrimMultipleShapes,
 };
-
-use super::ShapeProperties;
 use serde::{Deserialize, Serialize};
+
+use super::shape_element::ShapeElement;
 
 /// Trims shapes into a segment.
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct TrimShape {
-    /// Shape Type
     #[serde(flatten)]
-    pub properties: ShapeProperties,
+    pub shape_element: ShapeElement,
 
     /// Segment start.
     #[serde(rename = "s")]
