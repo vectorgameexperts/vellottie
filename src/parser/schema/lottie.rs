@@ -92,19 +92,19 @@ impl Lottie {
         let three_dimensional = root.extract_bool_int(&breadcrumb, "ddd").ok();
 
         // Assets
-        let mut assets = vec![];
-        let json_assets =
-            root.extract_arr(&breadcrumb, "assets").unwrap_or_default();
-        breadcrumb.enter(ValueType::Array, Some("assets"));
-        for v in json_assets {
-            let asset = AnyAsset::from_json(&mut breadcrumb, &v)?;
-            assets.push(asset);
-        }
-        breadcrumb.exit();
-        let assets = if assets.is_empty() {
-            None
-        } else {
-            Some(assets)
+        let assets = {
+            if let Ok(json_assets) = root.extract_arr(&breadcrumb, "assets") {
+                let mut assets = vec![];
+                breadcrumb.enter(ValueType::Array, Some("assets"));
+                for v in json_assets {
+                    let asset = AnyAsset::from_json(&mut breadcrumb, &v)?;
+                    assets.push(asset);
+                }
+                breadcrumb.exit();
+                Some(assets)
+            } else {
+                None
+            }
         };
 
         // Layers
