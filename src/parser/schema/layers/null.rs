@@ -1,4 +1,4 @@
-use super::LayerProperties;
+use super::VisualLayer;
 use serde::{Deserialize, Serialize};
 
 #[derive(
@@ -16,7 +16,7 @@ pub enum LayerId {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct NullLayer {
     #[serde(flatten)]
-    pub properties: LayerProperties,
+    pub properties: VisualLayer,
 
     /// Layer type, must be 3
     #[serde(rename = "ty")]

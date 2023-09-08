@@ -57,7 +57,14 @@ pub fn conv_layer(
             layer.content = Content::Shape(shapes);
 
             params
-        } //_ => {}, // todo: handle other todo shapes here
+        }
+        schema::layers::AnyLayer::SolidColor(solid_color_layer) => {
+            if let Some(true) = solid_color_layer.properties.hidden {
+                return None;
+            }
+
+            setup_layer_base(&solid_color_layer.properties, &mut layer)
+        }
     };
 
     let (id, matte_mode) = params;
@@ -253,7 +260,7 @@ fn setup_shape_layer(
 }
 
 fn setup_layer_base(
-    source: &parser::schema::layers::common::LayerProperties,
+    source: &parser::schema::layers::visual::VisualLayer,
     target: &mut Layer,
 ) -> (usize, Option<BlendMode>) {
     target.name = source.name.clone().unwrap_or_default();

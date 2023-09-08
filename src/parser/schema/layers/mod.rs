@@ -1,10 +1,13 @@
-pub mod common;
 pub mod enumerations;
 pub mod null;
 pub mod precomposition;
 pub mod shape;
+pub mod solid_color;
+pub mod visual;
 
-use self::{common::LayerProperties, enumerations::LayerType};
+use self::{
+    enumerations::LayerType, solid_color::SolidColorLayer, visual::VisualLayer,
+};
 use super::{animated_properties::value::FloatValue, shapes::AnyShape};
 use crate::parser::{
     breadcrumb::Breadcrumb,
@@ -27,7 +30,7 @@ pub enum AnyLayer {
     Precomposition(PrecompositionLayer),
 
     /// Static rectangle filling the canvas with a single color
-    // todo SolidColor
+    SolidColor(SolidColorLayer),
 
     /// Renders an Image
     // todo Image
@@ -63,7 +66,7 @@ impl AnyLayer {
         breadcrumb.enter(ValueType::Layer, name);
 
         //Extract
-        let properties = LayerProperties::from_obj(breadcrumb, root)?;
+        let properties = VisualLayer::from_obj(breadcrumb, root)?;
         let layer_type =
             root.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let layer = match layer_type {
@@ -98,6 +101,13 @@ impl AnyLayer {
             LayerType::Null => AnyLayer::Null(NullLayer {
                 properties,
                 layer_type: null::LayerId::Null,
+            }),
+            LayerType::SolidColor => AnyLayer::SolidColor(SolidColorLayer {
+                properties,
+                layer_type: solid_color::LayerId::SolidColor,
+                color: root.extract_string(breadcrumb, "sc")?,
+                height: root.extract_number(breadcrumb, "sh")?,
+                width: root.extract_number(breadcrumb, "sw")?,
             }),
             layer_type => {
                 todo!("layer type {:?} not implemented yet", layer_type)

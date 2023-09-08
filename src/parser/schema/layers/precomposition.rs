@@ -3,7 +3,7 @@ use serde_json::Number;
 
 use crate::parser::schema::animated_properties::value::FloatValue;
 
-use super::common::LayerProperties;
+use super::visual::VisualLayer;
 
 #[derive(
     serde_repr::Deserialize_repr,
@@ -21,7 +21,7 @@ pub enum LayerId {
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct PrecompositionLayer {
     #[serde(flatten)]
-    pub properties: LayerProperties,
+    pub properties: VisualLayer,
     /// Layer type, must be 0
     #[serde(rename = "ty")]
     pub layer_type: LayerId,

@@ -19,7 +19,7 @@ use vellottie::parser::{
             multi_dimensional::MultiDimensional, value::FloatValue,
         },
         helpers::int_boolean::BoolInt,
-        layers::{common::LayerProperties, shape::ShapeLayer, AnyLayer},
+        layers::{shape::ShapeLayer, visual::VisualLayer, AnyLayer},
         shapes::{ellipse::EllipseShape, group::GroupShape, AnyShape},
     },
 };
@@ -97,7 +97,7 @@ lazy_static! {
         }
     );
     static ref LAYER: AnyLayer = AnyLayer::Shape(ShapeLayer {
-        properties: LayerProperties {
+        properties: VisualLayer {
             name: Some("Ellipse".to_string()),
             match_name: Some(
                 "{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}".to_string()

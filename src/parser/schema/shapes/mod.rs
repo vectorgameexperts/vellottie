@@ -295,6 +295,12 @@ impl AnyShape {
                         .ok(),
                 })
             }
+            ShapeType::Merge => AnyShape::Merge(MergeShape {
+                shape_element,
+                merge_mode: root
+                    .extract_type(breadcrumb, "mm", ValueType::EnumInt)
+                    .ok(),
+            }),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)
             }

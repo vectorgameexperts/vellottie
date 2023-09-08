@@ -13,7 +13,7 @@ use serde_json::{Number, Value};
 
 /// Common properties between layers
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-pub struct LayerProperties {
+pub struct VisualLayer {
     /// Name, as seen from editors and the like
     #[serde(rename = "nm")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -129,7 +129,7 @@ pub struct LayerProperties {
     pub transform_before_mask: Option<BoolInt>,
 }
 
-impl LayerProperties {
+impl VisualLayer {
     pub fn from_obj(
         breadcrumb: &mut Breadcrumb,
         obj: &serde_json::map::Map<String, Value>,
@@ -178,7 +178,7 @@ impl LayerProperties {
         };
         let blend_mode: Option<BlendMode> =
             obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();
-        Ok(LayerProperties {
+        Ok(VisualLayer {
             name,
             match_name,
             three_dimensional,
