@@ -15,8 +15,6 @@ pub struct ShapeProperties {
     #[serde(rename = "mn")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub match_name: Option<String>,
-    #[serde(rename = "ty")]
-    pub shape_type: ShapeType,
     #[serde(rename = "hd")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hidden: Option<bool>,
@@ -52,7 +50,6 @@ impl ShapeProperties {
         Ok(ShapeProperties {
             name,
             match_name,
-            shape_type,
             hidden,
             blend_mode,
             index_in_expression,

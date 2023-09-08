@@ -5,11 +5,26 @@ use crate::parser::schema::animated_properties::value::FloatValue;
 
 use super::common::LayerProperties;
 
+#[derive(
+    serde_repr::Deserialize_repr,
+    serde_repr::Serialize_repr,
+    Debug,
+    Clone,
+    PartialEq,
+)]
+#[repr(u8)]
+pub enum LayerId {
+    Precomposition = 0,
+}
+
 /// Renders a Precomposition
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct PrecompositionLayer {
     #[serde(flatten)]
     pub properties: LayerProperties,
+    /// Layer type, must be 0
+    #[serde(rename = "ty")]
+    pub layer_type: LayerId,
     /// ID of the precomp as specified in the assets
     #[serde(rename = "refId")]
     pub precomp_id: String,

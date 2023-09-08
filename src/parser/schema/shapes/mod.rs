@@ -57,39 +57,44 @@ use super::helpers::transform::Transform;
 /// Lottie considers everything related to vector data as a "shape". All shapes
 /// share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
-#[serde(untagged)]
+#[serde(tag = "ty")]
 pub enum AnyShape {
     /// A group is a shape that can contain other shapes (including other
     /// groups)
+    #[serde(rename = "gr")]
     Group(GroupShape),
     /// A rectangle, defined by its center point and size.
+    #[serde(rename = "rc")]
     Rectangle(RectangleShape),
     /// An ellipse, defined by its center point and width and height.
+    #[serde(rename = "el")]
     Ellipse(EllipseShape),
+    #[serde(rename = "tr")]
     Transform(TransformShape),
+    #[serde(rename = "st")]
     Stroke(StrokeShape),
-    // TODO: model other shapes
+    #[serde(rename = "pb")]
     PuckerBloat(PuckerBloatShape),
+    #[serde(rename = "mm")]
     Merge(MergeShape),
+    #[serde(rename = "rp")]
     Repeater(RepeaterShape),
+    #[serde(rename = "op")]
     OffsetPath(OffsetPathShape),
+    #[serde(rename = "fl")]
     Fill(FillShape),
-    RepeaterTransform(RepeaterTransformShape),
-    ShapeElement(ShapeElementShape),
-    Shape(GenericShape),
+    #[serde(rename = "tm")]
     Trim(TrimShape),
+    #[serde(rename = "sh")]
     Path(PathShape),
+    #[serde(rename = "gf")]
+    GradientFill(GradientFillShape),
+    // TODO: model other shapes
     // todo GradientStroke(gradient_stroke),
-    // todo StrokeDash(stroke_dash),
-    // todo ShapeList(shape_list),
     // todo ZigZag(zig_zag),
     // todo no_style(no_style),
-    // todo BaseStroke(base_stroke),
     // todo Twist(twist),
     // todo RoundedCorners(rounded_corners),
-    GradientFill(GradientFillShape),
-    Gradient(Gradient),
-    // todo modifier(modifier),
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
@@ -148,7 +153,9 @@ impl AnyShape {
 
         // Extract
         let properties = ShapeProperties::from_obj(breadcrumb, root)?;
-        let shape = match &properties.shape_type {
+        let shape_type =
+            root.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
+        let shape = match shape_type {
             ShapeType::Ellipse => AnyShape::Ellipse(EllipseShape {
                 properties,
                 position: Position::from_obj(

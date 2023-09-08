@@ -17,13 +17,9 @@ use vellottie::parser::{
             multi_dimensional::MultiDimensional, value::FloatValue,
         },
         helpers::int_boolean::BoolInt,
-        layers::{
-            common::LayerProperties, enumerations::LayerType,
-            shape::ShapeLayer, AnyLayer,
-        },
+        layers::{common::LayerProperties, shape::ShapeLayer, AnyLayer},
         shapes::{
-            ellipse::EllipseShape, group::GroupShape, AnyShape,
-            ShapeProperties, ShapeType,
+            ellipse::EllipseShape, group::GroupShape, AnyShape, ShapeProperties,
         },
     },
 };
@@ -107,7 +103,6 @@ lazy_static! {
                 "{0a36d01c-18e1-48d3-8e8f-cc093b3f24ba}".to_string()
             ),
             three_dimensional: Some(BoolInt::False),
-            layer_type: LayerType::Shape,
             index: Some(Number::from(1)),
             start_time: Number::from(0),
             in_point: Number::from(0),
@@ -185,13 +180,14 @@ lazy_static! {
             tranform_before_mask_deprecated: None,
             transform_before_mask: None
         },
+        layer_type: vellottie::parser::schema::layers::shape::LayerId::Shape,
         shapes: vec![AnyShape::Group(GroupShape {
             properties: ShapeProperties {
                 name: Some("Group".to_string()),
                 match_name: Some(
                     "{f1becc2a-49f0-4f0c-918f-bdffe4c6870f}".to_string()
                 ),
-                shape_type: ShapeType::Group,
+
                 hidden: None,
                 blend_mode: None,
                 index_in_expression: None,
@@ -205,7 +201,6 @@ lazy_static! {
                     match_name: Some(
                         "{2aabac6e-1dd8-41b0-b60b-baf75ccb6318}".to_string()
                     ),
-                    shape_type: ShapeType::Ellipse,
                     hidden: None,
                     blend_mode: None,
                     index_in_expression: None,

@@ -64,10 +64,13 @@ impl AnyLayer {
 
         //Extract
         let properties = LayerProperties::from_obj(breadcrumb, root)?;
-        let layer = match properties.layer_type {
+        let layer_type =
+            root.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
+        let layer = match layer_type {
             LayerType::Precomposition => {
                 AnyLayer::Precomposition(PrecompositionLayer {
                     properties,
+                    layer_type: precomposition::LayerId::Precomposition,
                     precomp_id: root.extract_string(breadcrumb, "refId")?,
                     width: root.extract_number(breadcrumb, "w")?,
                     height: root.extract_number(breadcrumb, "h")?,
@@ -79,6 +82,7 @@ impl AnyLayer {
             }
             LayerType::Shape => AnyLayer::Shape(ShapeLayer {
                 properties,
+                layer_type: shape::LayerId::Shape,
                 shapes: {
                     let mut shapes = vec![];
                     let json_shapes = root.extract_arr(breadcrumb, "shapes")?;
@@ -91,7 +95,10 @@ impl AnyLayer {
                     shapes
                 },
             }),
-            LayerType::Null => AnyLayer::Null(NullLayer { properties }),
+            LayerType::Null => AnyLayer::Null(NullLayer {
+                properties,
+                layer_type: null::LayerId::Null,
+            }),
             layer_type => {
                 todo!("layer type {:?} not implemented yet", layer_type)
             }

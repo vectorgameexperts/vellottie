@@ -1,6 +1,5 @@
 #![allow(deprecated)]
 
-use super::enumerations::LayerType;
 use crate::parser::schema::constants::blend_mode::BlendMode;
 use crate::parser::schema::constants::matte_mode::MatteMode;
 use crate::parser::schema::helpers::int_boolean::BoolInt;
@@ -32,9 +31,6 @@ pub struct LayerProperties {
     #[serde(rename = "hd", default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hidden: Option<bool>,
-    /// Layer type, must be one of the values seen above
-    #[serde(rename = "ty")]
-    pub layer_type: LayerType,
     /// Layer index for parenting
     #[serde(rename = "ind")]
     pub index: Option<Number>,
@@ -141,8 +137,6 @@ impl LayerProperties {
         let match_name = obj.extract_string(breadcrumb, "mn").ok();
         let three_dimensional = obj.extract_bool_int(breadcrumb, "ddd").ok();
         let hidden = obj.extract_bool(breadcrumb, "hd").ok();
-        let layer_type: LayerType =
-            obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let index = obj.extract_number(breadcrumb, "ind").ok();
         let parent_index = obj.extract_number(breadcrumb, "parent").ok();
         let time_stretch = obj.extract_number(breadcrumb, "sr").ok();
@@ -188,7 +182,6 @@ impl LayerProperties {
             match_name,
             three_dimensional,
             hidden,
-            layer_type,
             index,
             parent_index,
             time_stretch,
