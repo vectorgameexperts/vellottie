@@ -47,7 +47,9 @@ impl NumberExt for serde_json::Number {
 pub fn import_composition(
     source: impl AsRef<[u8]>,
 ) -> Result<Composition, Box<dyn std::error::Error>> {
-    let source = Lottie::from_slice(source.as_ref())?;
+    let source = Lottie::from_serde_slice(source.as_ref())
+        .map_err(|_| Lottie::from_slice(source.as_ref()).unwrap_err())?;
+
     let mut target = Composition {
         frames: source.in_point.unwrap_f32()..source.out_point.unwrap_f32(),
         frame_rate: source.frame_rate.unwrap_f32(),
