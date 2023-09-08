@@ -410,7 +410,7 @@ fn conv_geometry(
             };
             Some(crate::runtime::model::Geometry::Rect(rect))
         }
-        AnyShape::Path(value) => conv_shape_geometry(&value.shape),
+        AnyShape::Path(value) => conv_shape_geometry(&value.shape_property),
         // todo: generic shape
         _ => None,
     }

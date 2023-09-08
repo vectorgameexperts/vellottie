@@ -13,4 +13,8 @@ pub struct GroupShape {
     /// Array of shapes
     #[serde(rename = "it")]
     pub shapes: Vec<AnyShape>,
+    /// Index used in expressions
+    #[serde(rename = "cix")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub property_index: Option<Number>,
 }

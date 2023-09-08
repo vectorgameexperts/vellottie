@@ -15,7 +15,7 @@ use super::ShapeType;
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeElement {
     #[serde(flatten)]
-    visual_object: VisualObject,
+    pub visual_object: VisualObject,
 
     /// Whether the shape is hidden
     #[serde(rename = "hd")]
@@ -40,6 +40,11 @@ pub struct ShapeElement {
     #[serde(rename = "ln")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xml_id: Option<String>,
+
+    /// TODO: This is an unknown property, but it showed up sometimes in test files.
+    #[serde(rename = "ind")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub index: Option<Number>,
 }
 
 impl ShapeElement {
@@ -56,6 +61,7 @@ impl ShapeElement {
         let property_index = obj.extract_number(breadcrumb, "ix").ok();
         let css_class = obj.extract_string(breadcrumb, "cl").ok();
         let xml_id = obj.extract_string(breadcrumb, "ln").ok();
+        let index = obj.extract_number(breadcrumb, "ind").ok();
         Ok(ShapeElement {
             visual_object,
             hidden,
@@ -63,6 +69,7 @@ impl ShapeElement {
             property_index,
             css_class,
             xml_id,
+            index,
         })
     }
 }

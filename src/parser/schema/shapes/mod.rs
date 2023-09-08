@@ -30,6 +30,7 @@ pub mod gradient_fill;
 use self::gradient::Gradient;
 use self::gradient_fill::GradientFillShape;
 use self::path::PathShape;
+use self::shape::Shape;
 use self::shape_element::ShapeElement;
 use self::{
     fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
@@ -193,6 +194,7 @@ impl AnyShape {
                     breadcrumb.exit();
                     shapes
                 },
+                property_index: root.extract_number(breadcrumb, "cix").ok(),
             }),
             ShapeType::Transform => AnyShape::Transform(TransformShape {
                 shape_element,
@@ -251,12 +253,9 @@ impl AnyShape {
                     .extract_type(breadcrumb, "m", ValueType::EnumInt)
                     .ok(),
             }),
-            ShapeType::Path => AnyShape::Path(PathShape {
-                shape_element,
-                shape: root.extract_obj(breadcrumb, "ks").and_then(|obj| {
-                    ShapeProperty::from_obj(breadcrumb, &obj)
-                })?,
-            }),
+            ShapeType::Path => {
+                AnyShape::Path(PathShape::from_obj(breadcrumb, root)?)
+            }
             ShapeType::GradientFill => {
                 AnyShape::GradientFill(GradientFillShape {
                     shape_element,

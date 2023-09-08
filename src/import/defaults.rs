@@ -42,6 +42,7 @@ lazy_static! {
                     vec![serde_json::Number::from(0), serde_json::Number::from(0), serde_json::Number::from(0)],
                 ),
             },
+            length: None,
         };
     pub static ref MULTIDIM_ONE: MultiDimensional =
         MultiDimensional {
@@ -54,6 +55,7 @@ lazy_static! {
                     vec![serde_json::Number::from(1), serde_json::Number::from(1), serde_json::Number::from(1)],
                 ),
             },
+            length: None,
         };
 
     pub static ref POSITION_ZERO: schema::animated_properties::position::Position = schema::animated_properties::position::Position {

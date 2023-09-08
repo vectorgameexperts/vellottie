@@ -33,6 +33,7 @@ pub struct LayerProperties {
     pub hidden: Option<bool>,
     /// Layer index for parenting
     #[serde(rename = "ind")]
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<Number>,
     /// Parent index for parenting
     #[serde(rename = "parent")]
