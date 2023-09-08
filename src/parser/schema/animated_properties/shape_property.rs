@@ -18,7 +18,8 @@ pub struct ShapeProperty {
     pub property_index: Option<Number>,
     /// Whether the property is animated
     #[serde(rename = "a")]
-    pub animated: BoolInt,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub animated: Option<BoolInt>,
     /// The expression for the property.
     #[serde(rename = "x")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,9 +44,11 @@ impl ShapeProperty {
     ) -> Result<Self, Error> {
         breadcrumb.enter_unnamed(ValueType::ShapeProperty);
         let property_index = obj.extract_number(breadcrumb, "ix").ok();
-        let animated = obj.extract_bool_int(breadcrumb, "a")?;
+        let animated = obj.extract_bool_int(breadcrumb, "a").ok();
         let expression = obj.extract_string(breadcrumb, "x").ok();
-        let value = if animated == BoolInt::True {
+        let value = if *animated.as_ref().unwrap_or(&BoolInt::False)
+            == BoolInt::True
+        {
             let arr = obj.extract_arr(breadcrumb, "k")?;
             breadcrumb.enter(ValueType::ShapeKeyframe, Some("k"));
             let mut values = vec![];
