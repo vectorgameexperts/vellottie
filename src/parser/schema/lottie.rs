@@ -38,7 +38,6 @@ pub struct Lottie {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub three_dimensional: Option<BoolInt>,
     /// List of assets that can be referenced by layers
-    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assets: Option<Vec<AnyAsset>>,
     /// List of layers
@@ -49,13 +48,13 @@ pub struct Lottie {
 impl Lottie {
     pub fn from_slice(b: &[u8]) -> Result<Lottie, Error> {
         let json_tree: serde_json::Value = serde_json::from_slice(b)?;
-        Self::from_json(&json_tree)
+        Self::from_json(json_tree)
     }
 
     pub fn from_str(s: &str) -> Result<Lottie, Error> {
         let json_tree: serde_json::Value = serde_json::from_str(s)
             .map_err(|e| Error::FileNotJson(Box::new(e)))?;
-        Self::from_json(&json_tree)
+        Self::from_json(json_tree)
     }
 
     pub fn from_serde_slice(v: &[u8]) -> Result<Lottie, serde_json::Error> {
@@ -76,7 +75,7 @@ impl Lottie {
         serde_json::to_value(self).unwrap()
     }
 
-    pub fn from_json(v: &serde_json::Value) -> Result<Lottie, Error> {
+    pub fn from_json(v: serde_json::Value) -> Result<Lottie, Error> {
         let root = v.as_object().ok_or(Error::FileNotObject)?;
         let mut breadcrumb = Breadcrumb::new();
 

@@ -42,7 +42,7 @@ fn test_serde_deserialize() {
 
 #[test]
 fn test_deserialize() {
-    let actual = Lottie::from_json(&JSON);
+    let actual = Lottie::from_json(JSON.to_owned());
 
     match actual {
         Ok(actual) => assert_eq!(*LOTTIE, actual),

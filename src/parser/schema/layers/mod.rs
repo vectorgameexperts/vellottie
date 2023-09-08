@@ -1,5 +1,6 @@
 pub mod common;
 pub mod enumerations;
+pub mod null;
 pub mod precomposition;
 pub mod shape;
 
@@ -11,6 +12,7 @@ use crate::parser::{
     util::{self},
     Error,
 };
+use null::NullLayer;
 use precomposition::PrecompositionLayer;
 use serde::{Deserialize, Serialize};
 use shape::ShapeLayer;
@@ -36,7 +38,7 @@ pub enum AnyLayer {
     Shape(ShapeLayer),
     // Renders Text
     // todo Text
-    Null(LayerProperties),
+    Null(NullLayer),
     // unimplemented - Audio(AudioLayer),
     // unimplemented - VideoPlaceholder(VideoPlaceholderLayer)
     // unimplemented - Video(VideoLayer)
@@ -89,7 +91,7 @@ impl AnyLayer {
                     shapes
                 },
             }),
-            LayerType::Null => AnyLayer::Null(properties),
+            LayerType::Null => AnyLayer::Null(NullLayer { properties }),
             layer_type => {
                 todo!("layer type {:?} not implemented yet", layer_type)
             }

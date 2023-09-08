@@ -19,12 +19,12 @@ pub fn conv_layer(
     let mut layer = Layer::default();
 
     let params = match source {
-        parser::schema::layers::AnyLayer::Null(properties) => {
-            if let Some(true) = properties.hidden {
+        parser::schema::layers::AnyLayer::Null(null_layer) => {
+            if let Some(true) = null_layer.properties.hidden {
                 return None;
             }
 
-            setup_layer_base(properties, &mut layer)
+            setup_layer_base(&null_layer.properties, &mut layer)
         }
         parser::schema::layers::AnyLayer::Precomposition(precomp_layer) => {
             if let Some(true) = precomp_layer.properties.hidden {
