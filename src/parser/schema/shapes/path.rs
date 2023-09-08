@@ -11,5 +11,6 @@ pub struct PathShape {
     #[serde(flatten)]
     pub properties: ShapeProperties,
     /// Bezier path
+    #[serde(flatten)]
     pub shape: ShapeProperty,
 }
