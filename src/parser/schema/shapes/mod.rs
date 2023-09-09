@@ -1,5 +1,6 @@
 pub mod ellipse;
 pub mod fill;
+pub mod gradient_stroke;
 pub mod group;
 pub mod merge;
 pub mod offset_path;
@@ -15,12 +16,11 @@ pub mod stroke;
 pub mod stroke_dash;
 pub mod transform;
 pub mod trim;
-// todo pub mod gradient_stroke;
 // todo pub mod stroke_dash;
 // todo pub mod shape_list;
 // todo pub mod zig_zag;
 // todo pub mod no_style;
-// todo pub mod base_stroke;
+pub mod base_stroke;
 // todo pub mod twist;
 // todo pub mod rounded_corners;
 pub mod gradient;
@@ -29,8 +29,8 @@ pub mod gradient_fill;
 
 use self::gradient::Gradient;
 use self::gradient_fill::GradientFillShape;
+use self::gradient_stroke::GradientStrokeShape;
 use self::path::PathShape;
-use self::shape::Shape;
 use self::shape_element::ShapeElement;
 use self::{
     fill::FillShape, merge::MergeShape, offset_path::OffsetPathShape,
@@ -45,10 +45,8 @@ use group::GroupShape;
 use serde::{Deserialize, Serialize};
 
 use super::animated_properties::color_value::ColorValue;
-use super::animated_properties::gradient_colors::GradientColors;
 use super::animated_properties::multi_dimensional::MultiDimensional;
 use super::animated_properties::position::Position;
-use super::animated_properties::shape_property::ShapeProperty;
 use super::animated_properties::value::FloatValue;
 use super::helpers::transform::Transform;
 
@@ -87,8 +85,9 @@ pub enum AnyShape {
     Path(PathShape),
     #[serde(rename = "gf")]
     GradientFill(GradientFillShape),
+    #[serde(rename = "gs")]
+    GradientStroke(GradientStrokeShape),
     // TODO: model other shapes
-    // todo GradientStroke(gradient_stroke),
     // todo ZigZag(zig_zag),
     // todo no_style(no_style),
     // todo Twist(twist),
@@ -259,34 +258,7 @@ impl AnyShape {
             ShapeType::GradientFill => {
                 AnyShape::GradientFill(GradientFillShape {
                     shape_element,
-                    gradient: Gradient {
-                        start_point: root
-                            .extract_obj(breadcrumb, "s")
-                            .and_then(|obj| {
-                                MultiDimensional::from_obj(breadcrumb, &obj)
-                            })?,
-                        end_point: root.extract_obj(breadcrumb, "e").and_then(
-                            |obj| MultiDimensional::from_obj(breadcrumb, &obj),
-                        )?,
-                        gradient_type: root
-                            .extract_type(breadcrumb, "t", ValueType::EnumInt)
-                            .ok(),
-                        highlight_length: root
-                            .extract_obj(breadcrumb, "h")
-                            .and_then(|obj| {
-                                FloatValue::from_obj(breadcrumb, &obj)
-                            })
-                            .ok(),
-                        highlight_angle: root
-                            .extract_obj(breadcrumb, "a")
-                            .and_then(|obj| {
-                                FloatValue::from_obj(breadcrumb, &obj)
-                            })
-                            .ok(),
-                        colors: root.extract_obj(breadcrumb, "g").and_then(
-                            |obj| GradientColors::from_obj(breadcrumb, &obj),
-                        )?,
-                    },
+                    gradient: Gradient::from_obj(breadcrumb, root)?,
                     opacity: root.extract_obj(breadcrumb, "o").and_then(
                         |obj| FloatValue::from_obj(breadcrumb, &obj),
                     )?,
@@ -301,6 +273,9 @@ impl AnyShape {
                     .extract_type(breadcrumb, "mm", ValueType::EnumInt)
                     .ok(),
             }),
+            ShapeType::GradientStroke => AnyShape::GradientStroke(
+                GradientStrokeShape::from_obj(breadcrumb, root)?,
+            ),
             other_shape => {
                 todo!("Shape {:?} not yet implemented", other_shape)
             }

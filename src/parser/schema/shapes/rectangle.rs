@@ -1,9 +1,5 @@
-use crate::parser::schema::{
-    animated_properties::{
-        multi_dimensional::MultiDimensional, position::Position,
-        value::FloatValue,
-    },
-    helpers::visual_object::VisualObject,
+use crate::parser::schema::animated_properties::{
+    multi_dimensional::MultiDimensional, position::Position, value::FloatValue,
 };
 use serde::{Deserialize, Serialize};
 
