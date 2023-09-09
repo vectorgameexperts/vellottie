@@ -302,38 +302,58 @@ fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
                 opacity: Value::Fixed(100.0),
             })
         }
-        // todo:
-        // Shape::GradientStroke(value) => {
-        //     let stroke = animated::Stroke {
-        //         width: conv_scalar(&value.stroke_width),
-        //         join: match value.line_join {
-        //             LineJoin::Bevel => Join::Bevel,
-        //             LineJoin::Round => Join::Round,
-        //             LineJoin::Miter => Join::Miter,
-        //         },
-        //         miter_limit: value.miter_limit.map(|x| x as f32),
-        //         cap: match value.line_cap {
-        //             LineCap::Butt => Cap::Butt,
-        //             LineCap::Round => Cap::Round,
-        //             LineCap::Square => Cap::Square,
-        //         },
-        //     };
-        //     let is_radial = matches!(value.ty, GradientType::Radial);
-        //     let start_point = conv_point(&value.start_point);
-        //     let end_point = conv_point(&value.end_point);
-        //     let gradient = animated::Gradient {
-        //         is_radial,
-        //         start_point,
-        //         end_point,
-        //         stops: conv_gradient_colors(&value.gradient_colors),
-        //     };
-        //     let brush = animated::Brush::Gradient(gradient).to_model();
-        //     Some(Draw {
-        //         stroke: Some(stroke.to_model()),
-        //         brush,
-        //         opacity: Value::Fixed(100.0),
-        //     })
-        // }
+        AnyShape::GradientStroke(value) => {
+            let stroke = animated::Stroke {
+                width: conv_scalar(&value.base_stroke.width),
+                join: match value
+                    .base_stroke
+                    .line_join
+                    .as_ref()
+                    .unwrap_or(&LineJoin::Round)
+                {
+                    LineJoin::Bevel => Join::Bevel,
+                    LineJoin::Round => Join::Round,
+                    LineJoin::Miter => Join::Miter,
+                },
+                miter_limit: value
+                    .base_stroke
+                    .miter_limit
+                    .as_ref()
+                    .map(|x| x.unwrap_f32()),
+                cap: match value
+                    .base_stroke
+                    .line_cap
+                    .as_ref()
+                    .unwrap_or(&LineCap::Round)
+                {
+                    LineCap::Butt => Cap::Butt,
+                    LineCap::Round => Cap::Round,
+                    LineCap::Square => Cap::Square,
+                },
+            };
+            let is_radial = matches!(
+                value
+                    .gradient
+                    .gradient_type
+                    .as_ref()
+                    .unwrap_or(&GradientType::Linear),
+                GradientType::Radial
+            );
+            let start_point = conv_multi_point(&value.gradient.start_point);
+            let end_point = conv_multi_point(&value.gradient.end_point);
+            let gradient = animated::Gradient {
+                is_radial,
+                start_point,
+                end_point,
+                stops: conv_gradient_colors(&value.gradient.colors),
+            };
+            let brush = animated::Brush::Gradient(gradient).to_model();
+            Some(Draw {
+                stroke: Some(stroke.to_model()),
+                brush,
+                opacity: Value::Fixed(100.0),
+            })
+        }
         _ => None,
     }
 }
