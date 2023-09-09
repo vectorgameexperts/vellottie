@@ -92,12 +92,6 @@ impl Renderer {
     ) {
         let frame = frame.min(animation.frames.end);
         self.batch.clear();
-        sink.push_layer(
-            Mix::Clip,
-            1.0,
-            transform,
-            &Rect::new(0.0, 0.0, animation.width as _, animation.height as _),
-        );
         for layer in animation.layers.iter().rev() {
             if layer.is_mask {
                 continue;
@@ -112,7 +106,6 @@ impl Renderer {
                 sink,
             );
         }
-        sink.pop_layer();
     }
 
     #[allow(clippy::too_many_arguments)]
