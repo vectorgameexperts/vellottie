@@ -4,7 +4,7 @@ use crate::parser::schema::constants::gradient_type::GradientType;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
-    animated, Draw, GroupTransform, SplineToPath, Time, Value,
+    animated, Draw, GroupTransform, Lerp, SplineToPath, Time, Value,
 };
 use crate::runtime::{self, Composition};
 use parser::schema;
@@ -188,6 +188,25 @@ fn conv_shape_transform(
     }
 }
 
+fn normalize_to_range(a: f32, b: f32, x: f32) -> f32 {
+    if a == b {
+        // Avoid division by zero if a and b are the same
+        return 0.0;
+    }
+
+    // Calculate the normalized value
+    let normalized_x = (x - a) / (b - a);
+
+    // Ensure the result is within [0.0, 1.0] range
+    if normalized_x < 0.0 {
+        return 0.0;
+    } else if normalized_x > 1.0 {
+        return 1.0;
+    } else {
+        return normalized_x;
+    }
+}
+
 fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
     use schema::animated_properties::animated_property::AnimatedPropertyK::*;
 
@@ -195,6 +214,7 @@ fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
     match &value.colors.animated_property.value {
         Static(value) => {
             let mut stops = runtime::model::fixed::ColorStops::new();
+            let mut alpha_stops: Vec<(f32, f64)> = Vec::new();
             for chunk in value.chunks_exact(4) {
                 stops.push(
                     (
@@ -207,8 +227,50 @@ fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
                         ),
                     )
                         .into(),
-                )
+                );
+                if stops.len() >= count {
+                    // there is alpha data at the end of the list, which is a sequence of (offset, alpha) pairs
+                    for chunk in value.chunks_exact(2).skip(count * 2) {
+                        let offset = chunk[0].unwrap_f32();
+                        let alpha = chunk[1].unwrap_f64();
+                        alpha_stops.push((offset, alpha));
+                    }
+
+                    for mut stop in stops.iter_mut() {
+                        let mut last: Option<(f32, f64)> = None;
+                        for &(b, alpha_b) in alpha_stops.iter() {
+                            if let Some((a, alpha_a)) = last.take() {
+                                let x = stop.offset;
+                                if x >= a && x <= b {
+                                    let t = normalize_to_range(a, b, x);
+
+                                    let alpha_interp =
+                                        alpha_a.lerp(&alpha_b, t);
+                                    let alpha_interp = if t >= 0.75 && x >= 0.9
+                                    {
+                                        alpha_b
+                                    } else {
+                                        alpha_interp
+                                    }; // todo: this is a hack to get alpha rendering similar to lottiefiles renderer
+
+                                    println!("{a} < x({x}) < {b} => t={t}, lerp({alpha_a},{alpha_b},{t})={alpha_interp}");
+                                    stop.color.a =
+                                        runtime::model::fixed::Color::rgba(
+                                            0.,
+                                            0.,
+                                            0.,
+                                            alpha_interp,
+                                        )
+                                        .a;
+                                }
+                            }
+                            last = Some((b, alpha_b));
+                        }
+                    }
+                    break;
+                }
             }
+
             runtime::model::ColorStops::Fixed(stops)
         }
         AnimatedValue(animated) => {
@@ -295,6 +357,10 @@ fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
                 end_point,
                 stops: conv_gradient_colors(&value.gradient.colors),
             };
+            // println!("value.gradient.colors={:?}", value.gradient.colors);
+            if is_radial {
+                println!("gradient={:?}", gradient);
+            }
             let brush = animated::Brush::Gradient(gradient).to_model();
             Some(Draw {
                 stroke: None,
