@@ -368,11 +368,7 @@ impl ColorStops {
         let ([ix0, ix1], t) = Time::frames_and_weight(&self.frames, frame)?;
         let v0 = self.values.get(ix0)?;
         let v1 = self.values.get(ix1)?;
-        let opacity_start = if v0.len() > self.count * 4 {
-            Some(self.count * 4)
-        } else {
-            None
-        };
+
         let mut stops: fixed::ColorStops = Default::default();
         for i in 0..self.count {
             let j = i * 4;
@@ -380,12 +376,8 @@ impl ColorStops {
             let r = v0.get(j + 1)?.lerp(v1.get(j + 1)?, t) as f64;
             let g = v0.get(j + 2)?.lerp(v1.get(j + 2)?, t) as f64;
             let b = v0.get(j + 3)?.lerp(v1.get(j + 3)?, t) as f64;
-            let a = if let Some(_opacity_start) = opacity_start {
-                // TODO: find and lerp opacities
-                1.0
-            } else {
-                1.0
-            };
+            let a = v0.get(j + 4)?.lerp(v1.get(j + 4)?, t) as f64;
+
             stops.push((offset, fixed::Color::rgba(r, g, b, a)).into())
         }
         Some(stops)

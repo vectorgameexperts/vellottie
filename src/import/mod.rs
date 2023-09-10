@@ -8,6 +8,7 @@ use crate::runtime::model::{
 };
 use crate::runtime::{self, Composition};
 use parser::schema;
+use serde_json::Number;
 use std::collections::HashMap;
 use vello::kurbo::Point;
 use vello::peniko::{self, BlendMode, Mix};
@@ -195,16 +196,66 @@ fn normalize_to_range(a: f32, b: f32, x: f32) -> f32 {
     }
 
     // Calculate the normalized value
-    let normalized_x = (x - a) / (b - a);
+    (x - a) / (b - a)
+}
 
-    // Ensure the result is within [0.0, 1.0] range
-    if normalized_x < 0.0 {
-        return 0.0;
-    } else if normalized_x > 1.0 {
-        return 1.0;
-    } else {
-        return normalized_x;
+fn calc_stops(value: &[Number], count: usize) -> Vec<[f64; 5]> {
+    let mut stops: Vec<[f64; 5]> = Vec::new();
+    let mut alpha_stops: Vec<(f32, f64)> = Vec::new();
+    for chunk in value.chunks_exact(4) {
+        stops.push([
+            chunk[0].unwrap_f64(),
+            chunk[1].unwrap_f64(),
+            chunk[2].unwrap_f64(),
+            chunk[3].unwrap_f64(),
+            1.0,
+        ]);
+        if stops.len() >= count {
+            // there is alpha data at the end of the list, which is a sequence of (offset, alpha) pairs
+            for chunk in value.chunks_exact(2).skip(count * 2) {
+                let offset = chunk[0].unwrap_f32();
+                let alpha = chunk[1].unwrap_f64();
+                alpha_stops.push((offset, alpha));
+            }
+
+            for stop in stops.iter_mut() {
+                let mut last: Option<(f32, f64)> = None;
+                for &(b, alpha_b) in alpha_stops.iter() {
+                    if let Some((a, alpha_a)) = last.take() {
+                        let x = stop[0] as f32;
+                        let t = normalize_to_range(a, b, x);
+
+                        let alpha_interp = alpha_a.lerp(&alpha_b, t);
+                        let alpha_interp = if (x >= a && x <= b)
+                            && (t <= 0.25)
+                            && (x <= 0.1)
+                        {
+                            alpha_a
+                        } else {
+                            alpha_interp
+                        }; // todo: this is a hack to get alpha rendering with a falloff similar to lottiefiles'
+
+                        let alpha_interp = if (x >= a && x <= b)
+                            && (t >= 0.75)
+                            && (x >= 0.9)
+                        {
+                            alpha_b
+                        } else {
+                            alpha_interp
+                        }; // todo: this is a hack to get alpha rendering with a falloff similar to lottiefiles'
+
+                        println!("{a} < x({x}) < {b} => t={t}, lerp({alpha_a},{alpha_b},{t})={alpha_interp}");
+
+                        stop[4] = stop[4].min(alpha_interp);
+                    }
+                    last = Some((b, alpha_b));
+                }
+            }
+            break;
+        }
     }
+
+    stops
 }
 
 fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
@@ -212,81 +263,37 @@ fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
 
     let count = value.count.unwrap_u32() as usize;
     match &value.colors.animated_property.value {
-        Static(value) => {
+        Static(value) => runtime::model::ColorStops::Fixed({
             let mut stops = runtime::model::fixed::ColorStops::new();
-            let mut alpha_stops: Vec<(f32, f64)> = Vec::new();
-            for chunk in value.chunks_exact(4) {
+            let raw = calc_stops(value, count);
+            for values in raw {
                 stops.push(
                     (
-                        chunk[0].unwrap_f32(),
+                        values[0] as f32,
                         runtime::model::fixed::Color::rgba(
-                            chunk[1].unwrap_f64(),
-                            chunk[2].unwrap_f64(),
-                            chunk[3].unwrap_f64(),
-                            1.0,
+                            values[1], values[2], values[3], values[4],
                         ),
                     )
                         .into(),
                 );
-                if stops.len() >= count {
-                    // there is alpha data at the end of the list, which is a sequence of (offset, alpha) pairs
-                    for chunk in value.chunks_exact(2).skip(count * 2) {
-                        let offset = chunk[0].unwrap_f32();
-                        let alpha = chunk[1].unwrap_f64();
-                        alpha_stops.push((offset, alpha));
-                    }
-
-                    for mut stop in stops.iter_mut() {
-                        let mut last: Option<(f32, f64)> = None;
-                        for &(b, alpha_b) in alpha_stops.iter() {
-                            if let Some((a, alpha_a)) = last.take() {
-                                let x = stop.offset;
-                                if x >= a && x <= b {
-                                    let t = normalize_to_range(a, b, x);
-
-                                    let alpha_interp =
-                                        alpha_a.lerp(&alpha_b, t);
-                                    let alpha_interp = if t >= 0.75 && x >= 0.9
-                                    {
-                                        alpha_b
-                                    } else {
-                                        alpha_interp
-                                    }; // todo: this is a hack to get alpha rendering similar to lottiefiles renderer
-
-                                    println!("{a} < x({x}) < {b} => t={t}, lerp({alpha_a},{alpha_b},{t})={alpha_interp}");
-                                    stop.color.a =
-                                        runtime::model::fixed::Color::rgba(
-                                            0.,
-                                            0.,
-                                            0.,
-                                            alpha_interp,
-                                        )
-                                        .a;
-                                }
-                            }
-                            last = Some((b, alpha_b));
-                        }
-                    }
-                    break;
-                }
             }
-
-            runtime::model::ColorStops::Fixed(stops)
-        }
+            stops
+        }),
         AnimatedValue(animated) => {
             let mut frames = vec![];
-            let mut values = vec![];
+            let mut values: Vec<Vec<f32>> = vec![];
             for value in animated {
                 frames.push(Time {
                     frame: value.base.time.unwrap_f32(),
                 });
-                values.push(
-                    value
-                        .value
-                        .iter()
-                        .map(|x| x.unwrap_f32())
-                        .collect::<Vec<_>>(),
-                );
+
+                let stops = calc_stops(&value.value, count)
+                    .into_iter()
+                    .flatten()
+                    .map(|x| x as f32)
+                    .collect::<Vec<_>>();
+
+                values.push(stops);
             }
             runtime::model::ColorStops::Animated(animated::ColorStops {
                 frames,
