@@ -1,11 +1,28 @@
 # Vellottie
 
 ![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)
-[![crates.io](https://img.shields.io/crates/v/bevy_vello.svg)](https://crates.io/crates/bevy_vello)
-[![docs.rs](https://img.shields.io/docsrs/bevy_vello)](https://docs.rs/bevy_vello)
+[![crates.io](https://img.shields.io/crates/v/vellottie.svg)](https://crates.io/crates/vellottie)
+[![docs.rs](https://img.shields.io/docsrs/vellottie)](https://docs.rs/vellottie)
 [![Discord](https://img.shields.io/discord/913957940560531456.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zrjnQzdjCB)
 
-**An experimental [Lottie](https://airbnb.io/lottie) animation parser and renderer built for [Vello](https://vello.dev)**
+An experimental [Lottie](https://airbnb.io/lottie) animation parser and renderer built for [Vello](https://vello.dev)
+
+## Run Demo (Native)
+
+- Native
+
+  ```shell
+  cargo run -p demo
+  ```
+
+## Run Nursery (WASM)
+
+- WASM (requires `cargo install trunk`)
+
+  ```shell
+  cd demo
+  trunk serve
+  ```
 
 ## License
 

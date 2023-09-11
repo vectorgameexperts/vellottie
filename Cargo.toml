@@ -6,21 +6,24 @@ members = ["demo", "nursery"]
 edition = "2021"
 version = "0.0.1"
 license = "MIT/Apache-2.0"
-# homepage = "https://vello.dev" - Domain owned by us, but unused at present
-repository = "https://github.com/linebender/vello"
+repository = "https://github.com/vectorgameexperts/vellottie"
+
+[workspace.dependencies]
+vello = { git = "https://github.com/linebender/vello", rev = "b0303ccf98df15a8b196272720d364a56f7304ba" }
 
 [package]
 name = "vellottie"
 description = "Lottie renderer built on vello."
+authors = [
+  "Sebastian Hamel <sebjfk@gmail.com>",
+  "Spencer C. Imbleau <spencer@imbleau.com>",
+]
 categories = ["rendering", "graphics"]
 keywords = ["2d", "vector-graphics", "animation", "lottie"]
 version.workspace = true
 license.workspace = true
 edition.workspace = true
 repository.workspace = true
-
-[workspace.dependencies]
-vello = { git = "https://github.com/linebender/vello", rev = "b0303ccf98df15a8b196272720d364a56f7304ba" }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
