@@ -12,7 +12,11 @@ pub struct NavigationProps {
 
 #[styled_component]
 pub fn Navigation(props: &NavigationProps) -> Html {
-    let baseurl = web_sys::window().unwrap().origin();
+    let baseurl = web_sys::window()
+        .unwrap()
+        .location()
+        .href()
+        .unwrap_or_default();
     let mut items = vec![];
     for file in FILES.entries().iter().filter_map(DirEntry::as_file) {
         let path = file.path();
