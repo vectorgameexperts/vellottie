@@ -64,7 +64,7 @@ jobs:
       uses: Swatinem/rust-cache@v2.6.2
 
     - name: Build | Test (native)
-      run: cargo test --all
+      run: cargo test
 
     - name: Build | Test (wasm)
       run: wasm-pack test --node
