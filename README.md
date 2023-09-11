@@ -5,7 +5,7 @@
 [![docs.rs](https://img.shields.io/docsrs/vellottie)](https://docs.rs/vellottie)
 [![Discord](https://img.shields.io/discord/913957940560531456.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zrjnQzdjCB)
 
-An experimental [Lottie](https://airbnb.io/lottie) animation parser and renderer built for [Vello](https://vello.dev)
+An integration to parse [Lottie](https://airbnb.io/lottie) files and render them with [Vello](https://vello.dev).
 
 ## Run Demo (Native)
 
