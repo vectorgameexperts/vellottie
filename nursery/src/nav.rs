@@ -28,6 +28,7 @@ pub fn Navigation(props: &NavigationProps) -> Html {
             name,
             html!{
                 <>
+                    <p>{{"If the Vellottie player never loads, "}}<a href="https://chromestatus.com/feature/6213121689518080">{{"WebGPU"}}</a>{{" may not be enabled. Make sure your browser is updated to "}}<a href="https://chromiumdash.appspot.com/schedule">{{"Chrome M113"}}</a>{{" or another browser compatible with WebGPU."}}</p>
                     <player::LottiefilesPlayer file={format!("/assets/{}", path.display())} />
                     <vellottie_player::VellottiePlayer file={format!("/assets/{}", path.display())} />
                 </>
