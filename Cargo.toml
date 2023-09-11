@@ -35,4 +35,5 @@ thiserror = "1.0"
 log = "0.4"
 lazy_static = "1.4"
 
-[dev-dependencies]
+[target.'cfg(target_arch = "wasm32")'.dev-dependencies]
+wasm-bindgen-test = "0.3"
