@@ -4,7 +4,7 @@ use include_dir::{include_dir, Dir, DirEntry};
 use stylist::yew::styled_component;
 use yew::prelude::*;
 
-static FILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/files");
+static FILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/assets");
 
 #[derive(Properties, PartialEq)]
 pub struct NavigationProps {
