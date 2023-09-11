@@ -15,6 +15,7 @@ pub(crate) use spline::SplineToPath;
 
 macro_rules! simple_value {
     ($name:ident) => {
+        #[allow(clippy::large_enum_variant)]
         #[derive(Clone, Debug)]
         pub enum $name {
             Fixed(fixed::$name),
