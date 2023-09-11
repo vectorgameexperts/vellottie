@@ -39,8 +39,6 @@ pub struct PlayerProps {
 
 #[styled_component]
 pub fn VellottiePlayer(props: &PlayerProps) -> Html {
-    let baseurl = web_sys::window().unwrap().origin();
-
     let ctr_css = css! {
         display: inline-grid;
         margin: 10px;
@@ -68,12 +66,8 @@ pub fn VellottiePlayer(props: &PlayerProps) -> Html {
                 init_state().await;
                 // Load file
                 info!("loading {path}...");
-                let body = reqwest::get(format!("{baseurl}{path}"))
-                    .await
-                    .unwrap()
-                    .text()
-                    .await
-                    .unwrap();
+                let body =
+                    reqwest::get(path).await.unwrap().text().await.unwrap();
                 info!("retrieved contents, parsing...");
                 let lottie =
                     vellottie::import::import_composition(body.as_bytes());

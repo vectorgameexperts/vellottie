@@ -12,6 +12,7 @@ pub struct NavigationProps {
 
 #[styled_component]
 pub fn Navigation(props: &NavigationProps) -> Html {
+    let baseurl = web_sys::window().unwrap().origin();
     let mut items = vec![];
     for file in FILES.entries().iter().filter_map(DirEntry::as_file) {
         let path = file.path();
@@ -28,8 +29,8 @@ pub fn Navigation(props: &NavigationProps) -> Html {
             html!{
                 <>
                     <p>{{"If the Vellottie player never loads, "}}<a href="https://chromestatus.com/feature/6213121689518080">{{"WebGPU"}}</a>{{" may not be enabled. Make sure your browser is updated to "}}<a href="https://chromiumdash.appspot.com/schedule">{{"Chrome M113"}}</a>{{" or another browser compatible with WebGPU."}}</p>
-                    <player::LottiefilesPlayer file={format!("/assets/{}", path.display())} />
-                    <vellottie_player::VellottiePlayer file={format!("/assets/{}", path.display())} />
+                    <player::LottiefilesPlayer file={format!("{baseurl}/assets/{}", path.display())} />
+                    <vellottie_player::VellottiePlayer file={format!("{baseurl}/assets/{}", path.display())} />
                 </>
             },
         ));
