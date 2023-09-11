@@ -37,3 +37,8 @@ lazy_static = "1.4"
 
 [target.'cfg(target_arch = "wasm32")'.dev-dependencies]
 wasm-bindgen-test = "0.3"
+
+# These settings are to get the WASM blob smaller for the nursery.
+[profile.release.package."nursery"]
+codegen-units = 1
+opt-level = 'z'
