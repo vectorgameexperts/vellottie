@@ -28,8 +28,8 @@ pub fn Navigation(props: &NavigationProps) -> Html {
             name,
             html!{
                 <>
-                    <player::LottiefilesPlayer file={format!("/files/{}", path.display())} />
-                    <vellottie_player::VellottiePlayer file={format!("/files/{}", path.display())} />
+                    <player::LottiefilesPlayer file={format!("/assets/{}", path.display())} />
+                    <vellottie_player::VellottiePlayer file={format!("/assets/{}", path.display())} />
                 </>
             },
         ));
