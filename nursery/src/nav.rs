@@ -49,8 +49,9 @@ pub fn Navigation(props: &NavigationProps) -> Html {
         background-color: #dddddd;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        width: 200px;
+        height: 100vh;
+        min-width: 200px;
+        width: 20%;
         overflow-y: auto;
     };
 
