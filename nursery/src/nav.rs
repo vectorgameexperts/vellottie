@@ -1,5 +1,4 @@
-use crate::player;
-use crate::vellottie_player;
+use crate::{player, vellottie_player};
 use include_dir::{include_dir, Dir, DirEntry};
 use stylist::yew::styled_component;
 use yew::prelude::*;
