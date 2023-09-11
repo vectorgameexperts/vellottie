@@ -8,7 +8,7 @@ fn test_serde_deserialize() {
     let actual = serde_json::from_str::<Lottie>(JSON);
 
     match actual {
-        Ok(actual) => {
+        Ok(_actual) => {
             // todo assert_eq!(*GOLDEN_MODEL, actual)
         }
         Err(e) => panic!("{e}"),
@@ -20,7 +20,7 @@ fn test_deserialize() {
     let actual = Lottie::from_str(JSON);
 
     match actual {
-        Ok(actual) => {
+        Ok(_actual) => {
             // todo assert_eq!(*GOLDEN_MODEL, actual)
         }
         Err(e) => panic!("{e}"),

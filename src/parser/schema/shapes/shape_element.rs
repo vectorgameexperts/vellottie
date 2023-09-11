@@ -9,8 +9,6 @@ use crate::parser::{
 use serde::{Deserialize, Serialize};
 use serde_json::{Number, Value};
 
-use super::ShapeType;
-
 /// Base class for all elements of ShapeLayer and Group
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 pub struct ShapeElement {
@@ -53,8 +51,6 @@ impl ShapeElement {
         obj: &serde_json::map::Map<String, Value>,
     ) -> Result<Self, Error> {
         let visual_object = VisualObject::from_obj(breadcrumb, obj);
-        let shape_type: ShapeType =
-            obj.extract_type(breadcrumb, "ty", ValueType::EnumInt)?;
         let hidden = obj.extract_bool(breadcrumb, "hd").ok();
         let blend_mode =
             obj.extract_type(breadcrumb, "bm", ValueType::EnumInt).ok();

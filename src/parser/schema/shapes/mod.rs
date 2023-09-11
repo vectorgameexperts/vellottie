@@ -54,6 +54,7 @@ use super::helpers::transform::Transform;
 /// share the properties in `shapes::common::Properties`.
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq)]
 #[serde(tag = "ty")]
+#[allow(clippy::large_enum_variant)]
 pub enum AnyShape {
     /// A group is a shape that can contain other shapes (including other
     /// groups)
