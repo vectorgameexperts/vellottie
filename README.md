@@ -17,12 +17,18 @@ An integration to parse [Lottie](https://airbnb.io/lottie) files and render them
 
 ## Run Nursery (WASM)
 
+[Click here](https://vectorgameexperts.github.io/vellottie/) to visit the nursery on web.
+
 - WASM (requires `cargo install trunk`)
 
   ```shell
   cd demo
   trunk serve
   ```
+
+## Attributions
+
+The animated vector graphics in the nursery and demo are lottie files available from Google Fonts' [Noto Animated Emojis](https://googlefonts.github.io/noto-emoji-animation/documentation).
 
 ## License
 
