@@ -22,7 +22,7 @@ An integration to parse [Lottie](https://airbnb.io/lottie) files and render them
 - WASM (requires `cargo install trunk`)
 
   ```shell
-  cd demo
+  cd nursery
   trunk serve
   ```
 
