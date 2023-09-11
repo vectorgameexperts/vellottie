@@ -1,6 +1,6 @@
 [package]
-name = "with_winit"
-description = "An example using vello to render to a winit window"
+name = "demo"
+description = "An example of vellottie"
 version.workspace = true
 license.workspace = true
 edition.workspace = true

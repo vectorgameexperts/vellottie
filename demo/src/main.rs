@@ -13,7 +13,7 @@ use vellottie::runtime::Composition;
 use winit::{event_loop::EventLoop, window::Window};
 
 #[derive(Parser, Debug)]
-#[command(about, long_about = None, bin_name="cargo run -p with_winit --")]
+#[command(about, long_about = None, bin_name="cargo run -p demo --")]
 struct Args {
     /// Path to the svg file to render. If not set, the GhostScript Tiger will be rendered
     #[cfg(not(target_arch = "wasm32"))]
