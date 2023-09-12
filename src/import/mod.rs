@@ -364,10 +364,6 @@ fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
                 end_point,
                 stops: conv_gradient_colors(&value.gradient.colors),
             };
-            // println!("value.gradient.colors={:?}", value.gradient.colors);
-            if is_radial {
-                println!("gradient={:?}", gradient);
-            }
             let brush = animated::Brush::Gradient(gradient).to_model();
             Some(Draw {
                 stroke: None,
