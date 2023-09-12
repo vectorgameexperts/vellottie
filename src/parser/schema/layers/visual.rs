@@ -67,14 +67,14 @@ pub struct VisualLayer {
     /// Effects for the layer
     #[serde(rename = "ef")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub effects: Option<()>, /* TODO: array of Custom Effect or Drop Shadow
-                              * Effect or Fill Effect or Gaussian Blur
-                              * Effect or Set Matte Effect or Pro Levels
-                              * Effect or Stroke Effect or Tint Effect or
-                              * Tritone Effect or Radial Wipe or Wavy Effect
-                              * or Puppet Effect or Spherize Effect or Mesh
-                              * Warp Effect or Displacement Map Effect or
-                              * Twirl Effect */
+    pub effects: Option<Vec<()>>, /* TODO: array of Custom Effect or Drop Shadow
+                                   * Effect or Fill Effect or Gaussian Blur
+                                   * Effect or Set Matte Effect or Pro Levels
+                                   * Effect or Stroke Effect or Tint Effect or
+                                   * Tritone Effect or Radial Wipe or Wavy Effect
+                                   * or Puppet Effect or Spherize Effect or Mesh
+                                   * Warp Effect or Displacement Map Effect or
+                                   * Twirl Effect */
     /// Layer styles
     #[serde(rename = "sy")]
     #[serde(skip_serializing_if = "Option::is_none")]
