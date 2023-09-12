@@ -193,7 +193,6 @@ impl Spline {
     /// Evalutes the spline at the given frame and emits the elements
     /// to the specified path.
     pub fn evaluate(&self, frame: f32, path: &mut Vec<PathEl>) -> bool {
-        use super::SplineToPath as _;
         let Some(([ix0, ix1], t)) = Time::frames_and_weight(&self.times, frame) else {
             return false;
         };
