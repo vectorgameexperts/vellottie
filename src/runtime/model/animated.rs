@@ -370,7 +370,7 @@ impl ColorStops {
 
         let mut stops: fixed::ColorStops = Default::default();
         for i in 0..self.count {
-            let j = i * 4;
+            let j = i * 5;
             let offset = v0.get(j)?.lerp(v1.get(j)?, t);
             let r = v0.get(j + 1)?.lerp(v1.get(j + 1)?, t) as f64;
             let g = v0.get(j + 2)?.lerp(v1.get(j + 2)?, t) as f64;
