@@ -68,7 +68,7 @@ pub(crate) fn brush_with_alpha(brush: &Brush, alpha: f32) -> Brush {
         match brush {
             Brush::Solid(color) => color.with_alpha_factor(alpha).into(),
             Brush::Gradient(gradient) => Brush::Gradient(peniko::Gradient {
-                kind: gradient.kind.clone(),
+                kind: gradient.kind,
                 extend: gradient.extend,
                 stops: gradient
                     .stops

@@ -2,7 +2,14 @@
 <html lang="en-US">
 
 <head>
+  <!-- Title -->
   <title>Vellottie File Browser</title>
+
+  <!-- Mobile -->
+  <meta name=HandheldFriendly content="True" />
+  <meta name=mobile-web-app-capable content="yes" />
+
+  <!-- The lottiefiles player -->
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
   <script>
     function load(p) {
@@ -11,7 +18,8 @@
     }
   </script>
 
-  <link rel=copy-dir data-trunk href="files/" />
+  <!-- Links -->
+  <link rel=copy-dir data-trunk href="assets/" />
   <link rel=rust data-trunk />
 </head>
 

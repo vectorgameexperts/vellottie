@@ -30,7 +30,6 @@ impl AnyAsset {
         let id = root.extract_string(breadcrumb, "id");
         breadcrumb.enter(ValueType::Asset, id.as_ref().ok());
         // Extract
-        let id = id?;
         let asset = if root.contains_key("layers") {
             // Asset is a precomposition
             AnyAsset::Precomposition(Precomposition::from_obj(

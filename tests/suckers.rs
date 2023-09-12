@@ -8,7 +8,7 @@ fn test_serde_deserialize() {
     let actual = serde_json::from_str::<AnyLayer>(JSON);
 
     match actual {
-        Ok(actual) => {
+        Ok(_actual) => {
             // todo assert_eq!(*GOLDEN_MODEL, actual)
         }
         Err(e) => panic!("{e}"),
@@ -21,7 +21,7 @@ fn test_deserialize() {
     let actual = AnyLayer::from_json(&mut Breadcrumb::new(), &json);
 
     match actual {
-        Ok(actual) => {
+        Ok(_actual) => {
             // todo assert_eq!(*GOLDEN_MODEL, actual)
         }
         Err(e) => panic!("{e}"),

@@ -1,10 +1,9 @@
-use crate::player;
-use crate::vellottie_player;
+use crate::{player, vellottie_player};
 use include_dir::{include_dir, Dir, DirEntry};
 use stylist::yew::styled_component;
 use yew::prelude::*;
 
-static FILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/files");
+static FILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/assets");
 
 #[derive(Properties, PartialEq)]
 pub struct NavigationProps {
@@ -13,6 +12,11 @@ pub struct NavigationProps {
 
 #[styled_component]
 pub fn Navigation(props: &NavigationProps) -> Html {
+    let baseurl = web_sys::window()
+        .unwrap()
+        .location()
+        .href()
+        .unwrap_or_default();
     let mut items = vec![];
     for file in FILES.entries().iter().filter_map(DirEntry::as_file) {
         let path = file.path();
@@ -28,8 +32,9 @@ pub fn Navigation(props: &NavigationProps) -> Html {
             name,
             html!{
                 <>
-                    <player::LottiefilesPlayer file={format!("/files/{}", path.display())} />
-                    <vellottie_player::VellottiePlayer file={format!("/files/{}", path.display())} />
+                    <p>{{"If the Vellottie player never loads, "}}<a href="https://chromestatus.com/feature/6213121689518080">{{"WebGPU"}}</a>{{" may not be enabled. Make sure your browser is updated to "}}<a href="https://chromiumdash.appspot.com/schedule">{{"Chrome M113"}}</a>{{" or another browser compatible with WebGPU."}}</p>
+                    <player::LottiefilesPlayer file={format!("{baseurl}/assets/{}", path.display())} />
+                    <vellottie_player::VellottiePlayer file={format!("{baseurl}/assets/{}", path.display())} />
                 </>
             },
         ));
@@ -48,8 +53,9 @@ pub fn Navigation(props: &NavigationProps) -> Html {
         background-color: #dddddd;
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
-        width: 200px;
+        height: 100vh;
+        min-width: 200px;
+        width: 20%;
         overflow-y: auto;
     };
 

@@ -27,7 +27,7 @@ impl MultiDimensional {
     ) -> Result<Self, Error> {
         breadcrumb.enter_unnamed(ValueType::MultiDimensional);
         let animated_property = AnimatedProperty::from_obj(breadcrumb, obj)?;
-        let length = obj.extract_number(&breadcrumb, "l").ok();
+        let length = obj.extract_number(breadcrumb, "l").ok();
         let multi_dimensional = Self {
             animated_property,
             length,
