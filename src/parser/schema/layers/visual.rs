@@ -64,24 +64,26 @@ pub struct VisualLayer {
     #[serde(rename = "masksProperties")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub masks_properties: Option<Vec<Mask>>,
-    /// Effects for the layer
-    #[serde(rename = "ef")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub effects: Option<Vec<()>>, /* TODO: array of Custom Effect or Drop Shadow
-                                   * Effect or Fill Effect or Gaussian Blur
-                                   * Effect or Set Matte Effect or Pro Levels
-                                   * Effect or Stroke Effect or Tint Effect or
-                                   * Tritone Effect or Radial Wipe or Wavy Effect
-                                   * or Puppet Effect or Spherize Effect or Mesh
-                                   * Warp Effect or Displacement Map Effect or
-                                   * Twirl Effect */
-    /// Layer styles
-    #[serde(rename = "sy")]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub styles: Option<()>, /* TODO: array of Layer Stroke or Drop Shadow or
-                             * Inner Shadow or Outer Glow or Inner Glow or
-                             * Bevel Emboss or Satin or Color Overlay or
-                             * Gradient Overlay */
+    // TODO: these effects don't map well to vello and most are rarely used,
+    // but we should finish modeling these for completeness.
+    // /// Effects for the layer
+    // #[serde(rename = "ef")]
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // pub effects: Option<Vec<()>>, /* TODO: array of Custom Effect or Drop Shadow
+    //                                * Effect or Fill Effect or Gaussian Blur
+    //                                * Effect or Set Matte Effect or Pro Levels
+    //                                * Effect or Stroke Effect or Tint Effect or
+    //                                * Tritone Effect or Radial Wipe or Wavy Effect
+    //                                * or Puppet Effect or Spherize Effect or Mesh
+    //                                * Warp Effect or Displacement Map Effect or
+    //                                * Twirl Effect */
+    // /// Layer styles
+    // #[serde(rename = "sy")]
+    // #[serde(skip_serializing_if = "Option::is_none")]
+    // pub styles: Option<Vec<()>>, /* TODO: array of Layer Stroke or Drop Shadow or
+    //                               * Inner Shadow or Outer Glow or Inner Glow or
+    //                               * Bevel Emboss or Satin or Color Overlay or
+    //                               * Gradient Overlay */
     /// Layer transform
     #[serde(rename = "ks")]
     pub transform: Transform,
@@ -161,7 +163,7 @@ impl VisualLayer {
         let rotate_to_match_anim_pos_path =
             obj.extract_bool_int(breadcrumb, "ao").ok();
         let matte_layer_index = obj.extract_number(breadcrumb, "tp").ok();
-        let has_mask = obj.extract_bool(breadcrumb, "hasmask").ok();
+        let has_mask = obj.extract_bool(breadcrumb, "hasMask").ok();
         let motion_blur = obj.extract_bool(breadcrumb, "mb").ok();
         let css_class = obj.extract_string(breadcrumb, "cl").ok();
         let id = obj.extract_string(breadcrumb, "ln").ok();
@@ -192,8 +194,6 @@ impl VisualLayer {
             matte_mode,
             matte_target,
             masks_properties,
-            effects: None, // TODO
-            styles: None,  // TODO
             transform,
             rotate_to_match_anim_pos_path,
             matte_layer_index,

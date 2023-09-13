@@ -244,8 +244,6 @@ fn calc_stops(value: &[Number], count: usize) -> Vec<[f64; 5]> {
                             alpha_interp
                         }; // todo: this is a hack to get alpha rendering with a falloff similar to lottiefiles'
 
-                        println!("{a} < x({x}) < {b} => t={t}, lerp({alpha_a},{alpha_b},{t})={alpha_interp}");
-
                         stop[4] = stop[4].min(alpha_interp);
                     }
                     last = Some((b, alpha_b));
