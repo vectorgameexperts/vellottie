@@ -61,14 +61,16 @@ impl<'a, T: Clone> ValueRef<'a, T> {
 pub struct Time {
     /// Frame number.
     pub frame: f32,
+    /// Whether it's a hold frame.
+    pub hold: bool,
 }
 
 impl Time {
-    /// Returns the frame indices and interpolation weight for the given frame.
+    /// Returns the frame indices and interpolation weight for the given frame, and whether to hold the frame
     pub(crate) fn frames_and_weight(
         times: &[Time],
         frame: f32,
-    ) -> Option<([usize; 2], f32)> {
+    ) -> Option<([usize; 2], f32, bool)> {
         if times.is_empty() {
             return None;
         }
@@ -89,8 +91,9 @@ impl Time {
         let ix1 = (ix0 + 1).min(times.len() - 1);
         let t0 = times[ix0].frame;
         let t1 = times[ix1].frame;
+        let hold = times[ix0].hold;
         let t = (frame - t0) / (t1 - t0);
-        Some(([ix0, ix1], t.clamp(0.0, 1.0)))
+        Some(([ix0, ix1], t.clamp(0.0, 1.0), hold))
     }
 }
 
@@ -107,7 +110,10 @@ impl<T: Lerp> Animated<T> {
     }
 
     fn evaluate_inner(&self, frame: f32) -> Option<T> {
-        let ([ix0, ix1], t) = Time::frames_and_weight(&self.times, frame)?;
+        let ([ix0, ix1], t, hold) =
+            Time::frames_and_weight(&self.times, frame)?;
+        let t = if hold { 0f32 } else { t };
+
         Some(self.values.get(ix0)?.lerp(self.values.get(ix1)?, t))
     }
 }

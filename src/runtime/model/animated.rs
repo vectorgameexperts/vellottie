@@ -193,7 +193,8 @@ impl Spline {
     /// Evalutes the spline at the given frame and emits the elements
     /// to the specified path.
     pub fn evaluate(&self, frame: f32, path: &mut Vec<PathEl>) -> bool {
-        let Some(([ix0, ix1], t)) = Time::frames_and_weight(&self.times, frame) else {
+        let Some(([ix0, ix1], t, _hold)) = Time::frames_and_weight(&self.times, frame) else {
+            // TODO: evaluate whether hold frame is needed here
             return false;
         };
         let (Some(from), Some(to)) = (self.values.get(ix0), self.values.get(ix1)) else {
@@ -364,7 +365,9 @@ impl ColorStops {
     }
 
     fn evaluate_inner(&self, frame: f32) -> Option<fixed::ColorStops> {
-        let ([ix0, ix1], t) = Time::frames_and_weight(&self.frames, frame)?;
+        let ([ix0, ix1], t, hold) =
+            Time::frames_and_weight(&self.frames, frame)?;
+
         let v0 = self.values.get(ix0)?;
         let v1 = self.values.get(ix1)?;
 
@@ -372,6 +375,8 @@ impl ColorStops {
         for i in 0..self.count {
             let j = i * 5;
             let offset = v0.get(j)?.lerp(v1.get(j)?, t);
+            let t = if hold { 0f32 } else { t };
+
             let r = v0.get(j + 1)?.lerp(v1.get(j + 1)?, t) as f64;
             let g = v0.get(j + 2)?.lerp(v1.get(j + 2)?, t) as f64;
             let b = v0.get(j + 3)?.lerp(v1.get(j + 3)?, t) as f64;

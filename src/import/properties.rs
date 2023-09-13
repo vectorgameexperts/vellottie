@@ -1,6 +1,7 @@
 use crate::import::NumberExt;
 use crate::parser;
 use crate::parser::schema::animated_properties::multi_dimensional::MultiDimensional;
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::runtime::model::{self, Lerp, Time, Value};
 use parser::schema;
 use vello::kurbo::{Point, Size, Vec2};
@@ -18,7 +19,16 @@ pub fn conv_scalar(
             for keyframe in keyframes {
                 let start_time = keyframe.base.time.unwrap_f32();
                 let data = keyframe.value[0].unwrap_f32();
-                frames.push(crate::runtime::model::Time { frame: start_time });
+                let hold = keyframe
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
+                frames.push(crate::runtime::model::Time {
+                    frame: start_time,
+                    hold,
+                });
                 values.push(data);
                 // todo: end_value deprecated but should we still push it if it exists?
             }
@@ -53,8 +63,15 @@ pub fn conv_multi<T: Lerp>(
                     .iter()
                     .map(|number| number.as_f64().unwrap())
                     .collect();
+                let hold = keyframe
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
                 frames.push(Time {
                     frame: keyframe.base.time.unwrap_f32(),
+                    hold,
                 });
                 values.push(f(&data));
                 // todo: end_value deprecated but should we still append it if it exists?
@@ -90,8 +107,15 @@ pub fn conv_multi_color<T: Lerp>(
                     .iter()
                     .map(|number| number.as_f64().unwrap())
                     .collect();
+                let hold = keyframe
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
                 frames.push(Time {
                     frame: keyframe.base.time.unwrap_f32(),
+                    hold,
                 });
                 values.push(f(&data));
                 // todo: end_value deprecated but should we still append it if it exists?
@@ -128,8 +152,16 @@ pub fn conv_pos<T: Lerp>(
                     .iter()
                     .map(|number| number.as_f64().unwrap())
                     .collect();
+                let hold = keyframe
+                    .keyframe
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
                 frames.push(Time {
                     frame: keyframe.keyframe.base.time.unwrap_f32(),
+                    hold,
                 });
                 values.push(f(&data));
                 // todo: end_value deprecated but should we still append it if it exists?

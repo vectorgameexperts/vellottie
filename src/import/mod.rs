@@ -1,6 +1,7 @@
 use crate::import::properties::{conv_color, conv_multi_point, conv_size};
 use crate::parser::schema::animated_properties::gradient_colors::GradientColors;
 use crate::parser::schema::constants::gradient_type::GradientType;
+use crate::parser::schema::helpers::int_boolean::BoolInt;
 use crate::parser::{self, Lottie};
 use crate::runtime::model::animated::Position;
 use crate::runtime::model::{
@@ -281,8 +282,15 @@ fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
             let mut frames = vec![];
             let mut values: Vec<Vec<f32>> = vec![];
             for value in animated {
+                let hold = value
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
                 frames.push(Time {
                     frame: value.base.time.unwrap_f32(),
+                    hold,
                 });
 
                 let stops = calc_stops(&value.value, count)
@@ -521,8 +529,15 @@ fn conv_shape_geometry(
             let mut frames = vec![];
             let mut values = vec![];
             for value in animated {
+                let hold = value
+                    .base
+                    .hold
+                    .as_ref()
+                    .map(|b| b.eq(&BoolInt::True))
+                    .unwrap_or(false);
                 frames.push(Time {
                     frame: value.base.time.unwrap_f32(),
+                    hold,
                 });
                 let (points, is_frame_closed) =
                     conv_spline(value.start.get(0)?);
