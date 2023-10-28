@@ -4,12 +4,12 @@ members = ["demo", "nursery"]
 
 [workspace.package]
 edition = "2021"
-version = "0.0.1"
+version = "0.0.2"
 license = "MIT/Apache-2.0"
 repository = "https://github.com/vectorgameexperts/vellottie"
 
 [workspace.dependencies]
-vello = { git = "https://github.com/linebender/vello", rev = "b0303ccf98df15a8b196272720d364a56f7304ba" }
+vello = { git = "https://github.com/linebender/vello", rev = "b5e3ae586846c8b9c7ad9b4830d8035a807eb15f" }
 
 [package]
 name = "vellottie"

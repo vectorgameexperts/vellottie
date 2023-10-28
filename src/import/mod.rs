@@ -11,7 +11,7 @@ use crate::runtime::{self, Composition};
 use parser::schema;
 use serde_json::Number;
 use std::collections::HashMap;
-use vello::kurbo::Point;
+use vello::kurbo::{Cap, Join, Point};
 use vello::peniko::{self, BlendMode, Mix};
 
 use self::defaults::{
@@ -311,7 +311,6 @@ fn conv_gradient_colors(value: &GradientColors) -> runtime::model::ColorStops {
 }
 
 fn conv_draw(value: &schema::shapes::AnyShape) -> Option<runtime::model::Draw> {
-    use peniko::{Cap, Join};
     use schema::constants::line_cap::LineCap;
     use schema::constants::line_join::LineJoin;
     use schema::shapes::AnyShape;

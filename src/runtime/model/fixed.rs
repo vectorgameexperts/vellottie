@@ -20,7 +20,7 @@ pub type ColorStops = peniko::ColorStops;
 pub type Brush = peniko::Brush;
 
 /// Fixed stroke style.
-pub type Stroke = peniko::Stroke;
+pub type Stroke = kurbo::Stroke;
 
 /// Fixed repeater effect.
 #[derive(Clone, Debug)]

@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use std::default;
 use std::{fs, time::Instant};
 use vello::RendererOptions;
 use vello::{
@@ -34,13 +35,16 @@ async fn run(
     let size = window.inner_size();
     let mut surface = render_cx
         .create_surface(&window, size.width, size.height)
-        .await;
+        .await
+        .expect("Unable to create render surface for window");
     let device_handle = &render_cx.devices[surface.dev_id];
     let mut vellottie_renderer = vellottie::runtime::Renderer::new();
     let mut renderer = Renderer::new(
         &device_handle.device,
         &RendererOptions {
             surface_format: Some(surface.format),
+            timestamp_period: 0.0,
+            use_cpu: false,
         },
     )
     .unwrap();

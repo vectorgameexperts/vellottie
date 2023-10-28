@@ -278,11 +278,11 @@ pub struct Stroke {
     /// Width of the stroke.
     pub width: Value<f32>,
     /// Join style.
-    pub join: peniko::Join,
+    pub join: kurbo::Join,
     /// Limit for miter joins.
     pub miter_limit: Option<f32>,
     /// Cap style.
-    pub cap: peniko::Cap,
+    pub cap: kurbo::Cap,
 }
 
 impl Stroke {
@@ -292,13 +292,13 @@ impl Stroke {
     }
 
     /// Evaluates the stroke at the specified frame.
-    pub fn evaluate(&self, frame: f32) -> peniko::Stroke {
+    pub fn evaluate(&self, frame: f32) -> kurbo::Stroke {
         let width = self.width.evaluate(frame);
-        let mut stroke = peniko::Stroke::new(width)
+        let mut stroke = kurbo::Stroke::new(width.into())
             .with_caps(self.cap)
             .with_join(self.join);
         if let Some(miter_limit) = self.miter_limit {
-            stroke.miter_limit = miter_limit;
+            stroke.miter_limit = miter_limit.into();
         }
         stroke
     }
