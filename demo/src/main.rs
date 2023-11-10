@@ -2,7 +2,6 @@ use anyhow::Result;
 use clap::Parser;
 use std::default;
 use std::{fs, time::Instant};
-use vello::RendererOptions;
 use vello::{
     block_on_wgpu,
     kurbo::{Affine, Vec2},
@@ -10,6 +9,7 @@ use vello::{
     util::RenderContext,
     RenderParams, Renderer, Scene, SceneBuilder,
 };
+use vello::{AaSupport, RendererOptions};
 use vellottie::runtime::Composition;
 use winit::{event_loop::EventLoop, window::Window};
 
@@ -41,10 +41,15 @@ async fn run(
     let mut vellottie_renderer = vellottie::runtime::Renderer::new();
     let mut renderer = Renderer::new(
         &device_handle.device,
-        &RendererOptions {
+        RendererOptions {
             surface_format: Some(surface.format),
             timestamp_period: 0.0,
             use_cpu: false,
+            antialiasing_support: AaSupport {
+                area: false,
+                msaa8: false,
+                msaa16: true,
+            },
         },
     )
     .unwrap();
@@ -140,6 +145,7 @@ async fn run(
                         base_color: Color::BLACK,
                         width,
                         height,
+                        antialiasing_method: vello::AaConfig::Msaa16,
                     },
                 ),
             )

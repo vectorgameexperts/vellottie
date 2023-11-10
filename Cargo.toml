@@ -9,7 +9,7 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/vectorgameexperts/vellottie"
 
 [workspace.dependencies]
-vello = { git = "https://github.com/linebender/vello", rev = "b5e3ae586846c8b9c7ad9b4830d8035a807eb15f" }
+vello = { git = "https://github.com/linebender/vello", rev = "28914d66f675efecf03c53261a0fb1b8ecce4fe9" }
 
 [package]
 name = "vellottie"
