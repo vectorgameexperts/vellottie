@@ -7,7 +7,7 @@ edition = "2021"
 vellottie = { path = "../" }
 include_dir = "0.7"
 stylist = { version = "0.12.0", features = ["yew_integration"] }
-yew = { version = "0.20.0", features = ["csr"] }
+yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.17.0"
 gloo-dialogs = "0.2.0"
 gloo-timers = "0.3"
