@@ -25,3 +25,9 @@ dist/
 # Some people use pre-commit
 .pre-commit-config.yaml
 .pre-commit-config.yml
+
+# Some people have Apple
+.DS_Store
+
+# Generated on wasm-pack failure
+**/unsupported.js
