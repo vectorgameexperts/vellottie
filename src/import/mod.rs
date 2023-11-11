@@ -12,7 +12,7 @@ use parser::schema;
 use serde_json::Number;
 use std::collections::HashMap;
 use vello::kurbo::{Cap, Join, Point};
-use vello::peniko::{self, BlendMode, Mix};
+use vello::peniko::{BlendMode, Mix};
 
 use self::defaults::{
     FLOAT_VALUE_ONE_HUNDRED, FLOAT_VALUE_ZERO, MULTIDIM_ONE, POSITION_ZERO,

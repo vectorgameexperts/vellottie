@@ -8,7 +8,7 @@ use vello::{
     SceneBuilder,
 };
 use vellottie::runtime::{
-    vello::{self, util::RenderSurface, RendererOptions},
+    vello::{self, util::RenderSurface, AaConfig, AaSupport, RendererOptions},
     Composition,
 };
 use winit::{
@@ -31,6 +31,7 @@ struct RenderState {
     vellottie_renderer: vellottie::runtime::Renderer,
     vello_renderer: vellottie::runtime::vello::Renderer,
 }
+unsafe impl Send for RenderState {}
 
 #[derive(Properties, PartialEq)]
 pub struct PlayerProps {
@@ -122,13 +123,19 @@ async fn init_state() {
     _ = web_sys::HtmlElement::from(canvas).focus();
 
     let size = window.inner_size();
-    let surface = ctx.create_surface(&window, size.width, size.height).await;
+    let surface = ctx
+        .create_surface(&window, size.width, size.height)
+        .await
+        .unwrap();
     let device_handle = &ctx.devices[surface.dev_id];
     let vellottie_renderer = vellottie::runtime::Renderer::new();
     let vello_renderer = vellottie::runtime::vello::Renderer::new(
         &device_handle.device,
-        &RendererOptions {
+        RendererOptions {
             surface_format: Some(surface.format),
+            timestamp_period: 0.0,
+            use_cpu: false,
+            antialiasing_support: AaSupport::area_only(),
         },
     )
     .unwrap();
@@ -178,6 +185,7 @@ fn render(composition: &Composition, time: f32) {
                 base_color: Color::WHITE,
                 width,
                 height,
+                antialiasing_method: AaConfig::Area,
             },
         )
         .expect("failed to render to surface");

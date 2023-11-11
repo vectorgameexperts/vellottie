@@ -1,6 +1,5 @@
 use anyhow::Result;
 use clap::Parser;
-use std::default;
 use std::{fs, time::Instant};
 use vello::{
     block_on_wgpu,
